@@ -166,3 +166,57 @@ That keeps transparency without producing a 500-page log.
 **Result**
 
 - Created the three requested AI-development log files and left all journal slots unselected. No gameplay code changed.
+
+### 2026-10-07 17:51 - M0 Playable Kernel
+
+**Prompt**
+
+```text
+Read `AGENTS.md` and all referenced `.agents/` docs first.
+
+Then inspect the repo and start M0 - Playable Kernel following the documented architecture and quality bar.
+
+Before work, append this prompt verbatim to `docs/PROMPT_LOG.md`. After work, add only a concise TLDR + verification + real commit to `docs/DEVELOPMENT_LOG.md`.
+
+Do not touch `PROMPT_JOURNAL.md` unless I explicitly ask.
+
+Keep scope strict. Do not implement M1+ features yet.
+```
+
+### 2026-10-07 18:02 - Clarify M0 boundary
+
+**Prompt**
+
+```text
+Use this M0 boundary instead:
+
+- one tiny isometric level
+- placeholder primitives only
+- Forward command only
+- Run
+- Step
+- fish collection
+- Retry
+- Reset Program
+- deterministic pure game engine + basic tests
+- desktop/mobile smoke check
+- bun run build passes
+
+Defer:
+- Left/Right
+- collision complexity beyond basic invalid-tile stop
+- loops
+- expedition
+- onboarding
+- persistence
+- audio
+- themes
+- real Quaternius/Kenney assets
+
+M0 is only proving the architecture and end-to-end playable kernel.
+Do not expand scope.
+```
+
+**Result**
+
+- Implemented the clarified Forward-only M0 kernel; 14 tests, desktop/mobile smoke checks, and production build pass. No M1+ systems added.

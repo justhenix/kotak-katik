@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: #263d45;
+  background: #d8eee6;
+  --ink: #263d45;
+  --cream: #fff3d6;
+  --forward: #f7d774;
+  --warning: #943044;
+}
+
+body { margin: 0; min-width: 280px; }
+button { font: inherit; color: inherit; cursor: pointer; min-height: 48px; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid var(--ink); outline-offset: 5px; }
+button:disabled { cursor: default; }
+button:disabled:not(.command-block) { opacity: 0.55; }
+button:active:not(:disabled) { transform: translateY(2px); }
+svg { flex-shrink: 0; }
+h1, h2, p { margin: 0; }
+h1, h2, .wordmark { font-family: 'Fredoka', sans-serif; font-weight: 500; }
+h1 { font-size: clamp(1.4rem, 2.4vw, 1.9rem); line-height: 1.2; }
+h2 { font-size: 1.25rem; margin-bottom: 14px; }
+
+.game-shell { max-width: 1180px; margin: 0 auto; padding: 24px 32px 32px; }
+.game-header { margin-bottom: 22px; }
+.wordmark { font-size: 1.6rem; }
+.world-area { position: relative; }
+.objective-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.fish-progress { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 700; white-space: nowrap; }
+.fish-progress svg { width: 34px; height: 26px; color: #876516; }
+.board-scene { width: 100%; height: clamp(300px, 43vh, 470px); position: relative; }
+.scene-loading, .scene-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; text-align: center; }
+.scene-fallback button { border: 2px solid var(--ink); padding: 12px 20px; background: var(--cream); border-radius: 8px; }
+.feedback { display: flex; align-items: center; gap: 12px; min-height: 58px; max-width: 600px; margin: 0 auto 22px; font-size: 1rem; }
+.feedback-symbol { display: grid; place-items: center; min-width: 34px; height: 34px; border: 2px solid currentColor; border-radius: 6px; font-weight: 700; }
+.feedback.failed { color: var(--warning); }
+.feedback.completed { color: #315a3c; }
+.feedback.completed .feedback-symbol { background: #315a3c; color: white; }
+
+.workbench { background: var(--cream); border-radius: 14px; border-bottom: 5px solid #c8b996; padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px 32px; }
+.program-area { grid-column: 1 / -1; min-width: 0; }
+.empty-program { display: flex; align-items: center; gap: 16px; min-height: 92px; }
+.empty-slot { display: grid; place-items: center; width: 76px; height: 76px; border: 2px dashed #83765a; border-radius: 8px; font-size: 1.6rem; }
+.program-list { display: flex; flex-wrap: wrap; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.program-list li { min-width: 0; }
+.command-block { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 90px; min-height: 110px; border: 2px solid #665e48; border-bottom-width: 5px; border-radius: 8px; padding: calc(0.85rem + 14px) 10px 7px; gap: 5px; font-size: 0.9rem; font-weight: 700; }
+.forward { background: var(--forward); }
+.command-icon { width: 34px; height: 34px; }
+.command-number { position: absolute; top: 4px; left: 9px; font-size: 0.85rem; }
+.remove-mark { position: absolute; right: 8px; top: 0; font-size: 20px; }
+.active-command { outline: 3px solid var(--ink); outline-offset: 3px; }
+.active-command .command-number { text-decoration: underline; text-decoration-thickness: 2px; }
+.failed-command { outline-color: var(--warning); border-color: var(--warning); }
+.tray-hint { margin-top: 12px; font-size: 0.9rem; }
+.palette-command { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 12px 14px; border: 2px solid #665e48; border-bottom-width: 5px; border-radius: 8px; font-weight: 700; }
+.palette-command .command-icon { width: 26px; height: 26px; }
+.palette-command > span:last-child { font-size: 1.25rem; }
+.controls-area { align-self: end; min-width: 0; }
+.execution-controls { display: flex; flex-wrap: wrap; gap: 12px; }
+.run-button, .step-button { display: flex; justify-content: center; align-items: center; gap: 10px; border-radius: 8px; padding: 14px 20px; min-height: 62px; font-weight: 700; border: 2px solid var(--ink); border-bottom-width: 5px; }
+.run-button { background: var(--ink); color: var(--cream); }
+.step-button { background: transparent; }
+.execution-controls svg { width: 22px; height: 22px; }
+.secondary-controls { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; }
+.secondary-controls button { text-decoration: underline; text-underline-offset: 4px; padding: 8px 4px; border: 0; background: transparent; font-size: 0.95rem; }
+
+@media (hover: hover) and (pointer: fine) {
+  button:hover:not(:disabled) { filter: brightness(0.96); }
+}
+@media (max-width: 1000px) {
+  .workbench { grid-template-columns: minmax(0, 1fr); }
+  .controls-area { width: 100%; }
+  .secondary-controls { justify-content: start; gap: 32px; }
+}
+@media (max-width: 600px) {
+  .game-shell { padding: 16px 16px max(24px, env(safe-area-inset-bottom)); }
+  .game-header { margin-bottom: 18px; }
+  .wordmark { font-size: 1.35rem; }
+  .objective-row { gap: 10px; }
+  .fish-progress { font-size: 1rem; gap: 5px; }
+  .fish-progress svg { width: 26px; }
+  .board-scene { height: 290px; }
+  .feedback { margin-bottom: 16px; font-size: 0.95rem; }
+  .workbench { padding: 20px 16px; gap: 22px; }
+  .command-block { width: 80px; min-height: 105px; }
+  .program-list { gap: 12px; }
+  .palette-command { flex: 1; justify-content: center; gap: 8px; padding: 10px; }
+  .palette-command > span:last-child { display: none; }
+  .run-button, .step-button { flex: 1 1 8rem; padding: 12px 8px; gap: 8px; font-size: 0.95rem; }
+  .secondary-controls { justify-content: space-between; gap: 12px; }
+}
+@media (max-width: 360px) {
+  .game-shell { padding-left: 12px; padding-right: 12px; }
+  .workbench { padding-left: 12px; padding-right: 12px; }
+  .palette-command { gap: 5px; padding: 8px 6px; font-size: 0.9rem; }
+  .palette-command .command-icon { width: 22px; }
+  .execution-controls { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button:active:not(:disabled) { transform: none; }
+}
