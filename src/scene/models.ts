@@ -6,6 +6,7 @@ import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
 export const modelPaths = {
   cat: '/assets/models/cat.glb', fish: '/assets/models/fish.glb',
+  fishTrout: '/assets/models/fish-trout.glb',
   tree: '/assets/models/tree.glb', rock: '/assets/models/rock.glb',
   crate: '/assets/models/crate.glb', bush: '/assets/models/bush.glb',
 } as const;

@@ -439,6 +439,61 @@
         "messages": [],
         "truncated": false
       }
+    },
+    {
+      "name": "fish-trout",
+      "file": "fish-trout.glb",
+      "source": "poly/2W2sKWYvk8k.glb",
+      "sourceBytes": 21724,
+      "sourceSha256": "7f0f98a67b31c5ad46b2669c78e3c6288571c7d5776debd67c9cd898e1abd260",
+      "bytes": 21732,
+      "sha256": "4931c3638468a59aca70e915f26f50ddb07c6018512a32b8fa36b122b1535418",
+      "bounds": {
+        "min": [
+          -0.3499999999999999,
+          0,
+          -0.06974789334596532
+        ],
+        "max": [
+          0.3499999999999999,
+          0.2604621791496925,
+          0.06974789334596533
+        ]
+      },
+      "scale": 0.011488812793836059,
+      "yaw": 1.5707963267948966,
+      "meshes": 1,
+      "triangles": 268,
+      "materials": [
+        {
+          "name": "lambert2SG",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [
+        {
+          "name": "Tex_Trout",
+          "dimensions": [
+            32,
+            32
+          ],
+          "bytes": 115,
+          "mimeType": "image/png"
+        }
+      ],
+      "skins": [],
+      "animations": [],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "numHints": 0,
+        "messages": [],
+        "truncated": false
+      }
     }
   ],
   "browserValidation": {
@@ -525,7 +580,62 @@
       "Cat original scene/root name collision fixed by giving the scene a unique name.",
       "Fish rest bounds use skinned vertices in Three.js; glTF Transform bounds are conservative unskinned bounds.",
       "Fish retains two inherited Khronos skinned-node warnings; actual pose playback verified."
-    ]
+    ],
+    "scope": "Original M0.5 curation from a11484d, before 1.5x display scaling. The fish entry refers to the original clownfish, again the current default; it is not evidence for the alternate trout."
   },
-  "reproducibility": "Second preparation run produced identical SHA-256 hashes for all six GLBs."
+  "reproducibility": "Full seven-asset preparation on 2026-10-10 reproduces every shipping GLB byte-for-byte in an isolated directory. The original six hashes still match a11484d.",
+  "fishReplacementValidation": {
+    "reviewed": "2026-10-10",
+    "file": "fish.glb",
+    "sha256": "fe776d7f22fc782005cd2fe8da17d2168898d8dec3e64d2c8c429a321613d6a0",
+    "source": "https://poly.pizza/m/2W2sKWYvk8k",
+    "creator": "Poly by Google",
+    "license": "CC BY 3.0",
+    "geometryNormalsUvsAndIndices": "Exact source arrays retained.",
+    "texturePixels": "PNG image-defining chunks retained byte-for-byte.",
+    "reproducibility": "Targeted second preparation in an isolated temporary directory matched the shipping hash.",
+    "originalOtherAssetHashes": "All five match a11484d.",
+    "runtime": "Three.js GLTFLoader and existing R3F scene loaded the final trout with its embedded texture on desktop and touch-emulated mobile.",
+    "visual": "Whole fish inspected at gameplay scale, with head, eyes, dorsal/side fins and forked tail; natural source colors retained.",
+    "animations": "No source rig/clips. Existing presentation pickup, reduced motion and cat idle/walk/eat/dance unchanged.",
+    "checks": {
+      "unitTests": 25,
+      "playwrightTests": 10,
+      "productionBuild": "pass"
+    },
+    "limitations": [
+      "Physical-device and learner testing not performed.",
+      "Existing large-renderer-bundle advisory remains."
+    ],
+    "scope": "Historical intermediate trout-only iteration at fish.glb; superseded by fishVariantValidation. Its recorded hash applies to that earlier filename/wrapper version."
+  },
+  "fishVariantValidation": {
+    "reviewed": "2026-10-10",
+    "default": "fish.glb",
+    "alternate": "fish-trout.glb",
+    "displayScale": 1.5,
+    "assetHashes": [
+      {
+        "file": "fish.glb",
+        "sha256": "a8bd08d482ab5cd1e5d275b4cf7f8202a3b8c3280e1600cd3565ac2d2020bd0a"
+      },
+      {
+        "file": "fish-trout.glb",
+        "sha256": "4931c3638468a59aca70e915f26f50ddb07c6018512a32b8fa36b122b1535418"
+      }
+    ],
+    "checks": {
+      "unitTests": 25,
+      "defaultGamePlaywrightTests": 10,
+      "productionBuild": "pass",
+      "bothVariantFixture": "Desktop and 390x844 touch-emulated mobile: loading, 1.5x size, pickup/reset and reduced-motion pickup/reset pass."
+    },
+    "visual": "Both whole-fish silhouettes inspected, with default-game desktop/mobile renders and both-variant renders; tile clearance retained.",
+    "scope": "Presentation selection and display scale only. Simulation/timings unchanged; trout is loaded only when selected by the optional component prop.",
+    "limitations": [
+      "Default clownfish retains its two source skin-transform warnings.",
+      "Physical-device and learner testing not performed.",
+      "Existing renderer bundle-size advisory remains."
+    ]
+  }
 }

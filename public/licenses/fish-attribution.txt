@@ -1,0 +1,16 @@
+Trout by Poly by Google
+Prepared model: public/assets/models/fish-trout.glb (alternate collectible)
+Source: https://poly.pizza/m/2W2sKWYvk8k
+Original delivered GLB: https://static.poly.pizza/1dfba885-5874-4e3f-8926-0ded89b0894f.glb
+License: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+https://creativecommons.org/licenses/by/3.0/
+https://creativecommons.org/licenses/by/3.0/legalcode
+
+Modified for Kotak-Katik: normalized scale, grounding and facing through wrapper
+nodes; lossless resource deduplication and removal of ancillary PNG metadata;
+embedded this attribution in the GLB copyright metadata. Original geometry and
+texture pixels retained. The model has no skeletal rig or source animation clips.
+Existing game presentation supplies collection motion.
+
+This asset remains CC BY 3.0 independently of the game's code license.
+No endorsement by the original creator is implied.

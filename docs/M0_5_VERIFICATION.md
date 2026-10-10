@@ -1,5 +1,7 @@
 # M0.5: 3D asset integration
 
+Historical checkpoint record: dimensions and render observations below describe commit `a11484d`. The original clownfish binary is again the default; a trout is now retained as an alternate, and both render at 1.5× presentation scale. Current variant checks are in `docs/ASSETS.md` and `docs/ASSET_VALIDATION.json`; attribution covers both models. Collection and cat animation behavior remains unchanged.
+
 Reviewed 2026-10-10. Cat and fish use the curated, self-contained GLBs through Fiber `useLoader` and Three.js GLTFLoader. Skeleton-aware clones separate mutable instance transforms/bones while sharing immutable cached geometry and materials. No package or asset binary changed. The existing processing pipeline and curation validation record are preserved.
 
 ## Changed files

@@ -92,3 +92,50 @@ Record meaningful work after verification and map it to real Git history. Use `P
 
 **Commit**
 - Pending commit at verification time: `feat: integrate curated 3d game assets`, with parent `ba9f490`. This entry is included in that checkpoint; resolve its full hash with `git log -1 --format=%H -- docs/M0_5_VERIFICATION.md`. The actual commit and push result are reported after execution, never invented in advance.
+
+### 2026-10-10 - Replace clownfish with a whole trout
+
+**Prompt:** PROMPT_LOG entry / 2026-10-10 Whole-fish collectible replacement
+
+**Done**
+- Searched salmon candidates; rejected fillets, carcass/food assets, and a temporary red snapper with an unclear small-size silhouette. User subsequently allowed other ordinary whole fish.
+- Replaced only the shipping `fish.glb` with Poly by Google's low-poly Trout, verified CC BY 3.0. Retained natural colors, geometry, and texture pixels. Added source/license/modification credit to documentation, GLB metadata, and a shipped text notice.
+- Reused the preparation pipeline with a targeted asset argument, preserving other models and historical validation evidence. Normalized trout size/facing/grounding; applied lossless metadata/resource optimization.
+
+**Verified**
+- Final trout: 21,712 bytes, 268 triangles, one embedded texture, no rig/source clips. Khronos validation reports zero errors or warnings. Exact geometry/UV/normal/index arrays and PNG pixel-defining chunks preserved; isolated second preparation reproduces its SHA-256.
+- 25 unit tests, production build, and all 10 desktop/mobile E2E tests pass with the final asset. Inspected desktop/mobile gameplay-size renders. Collection, cat reactions, Retry, Reset, collision, cancellation, reduced motion, and loading remain covered by existing tests.
+- All five other curated asset hashes match `a11484d`. No gameplay component, engine/store, test, dependency, or lockfile changed. PROMPT_JOURNAL.md untouched. Candidates, screenshots, and inspection scripts are not shipping files.
+- Existing renderer bundle advisory remains. Physical-device and learner verification not claimed.
+
+**Commit**
+- Pending commit. User explicitly requested no commit or push.
+
+### 2026-10-10 - Keep both fish and enlarge collectibles
+
+**Prompt:** PROMPT_LOG entry / 2026-10-10 Fish variants and larger size
+
+**Done**
+- Restored the original clownfish at `fish.glb` as default, byte-for-byte from `a11484d`. Retained trout at `fish-trout.glb`, with its processing recipe and CC BY 3.0 notice.
+- Added an optional Fish variant prop and shared 1.5× display scale outside the existing pickup transform. Both fish are 50% larger; no selector UI or gameplay feature added.
+- Updated current asset contracts, attribution, and separately scoped validation evidence while retaining accurate prior work entries.
+
+**Verified**
+- 25 unit tests, production build, and 10 desktop/mobile default-game E2E tests pass. Mounted both actual Fish variants in an ignored local fixture: loading, enlarged size, pickup/reset, and reduced-motion pickup/reset pass on desktop and mobile; renders inspected.
+- Full isolated seven-model preparation reproduces byte-for-byte. Original six shipping hashes unchanged; trout geometry and texture pixels preserved. Zero trout validator errors/warnings; existing clownfish skin warnings remain documented.
+- Engine/store, gameplay timing, tests, dependencies, lockfile, and PROMPT_JOURNAL.md unchanged. Temporary fixtures/screenshots are ignored. Existing renderer bundle advisory remains.
+
+**Commit**
+- Pending commit. No commit or push requested or performed.
+
+### 2026-10-10 - Atomic fish-variant checkpoint
+
+**Prompt:** PROMPT_LOG entry / 2026-10-10 Commit fish variants and sizing
+
+**Done and verified at staging time**
+- Reviewed the final presentation, alternate GLB, reproducible processing, license notice, and relevant documentation as one coherent change. All seven shipping hashes match their validation records; the original six assets match `a11484d`.
+- Retained the completed verification from the preceding turn: 25 unit tests, 10 desktop/mobile E2E tests, production build, and direct checks of both variants. No application changes since those checks.
+- Confirmed main matches fetched origin/main before committing. Excluded temporary files, screenshots, and local inspection tools. PROMPT_JOURNAL.md and engine/store, tests, dependencies, and lockfile unchanged.
+
+**Commit**
+- Pending commit at staging time: `feat: enlarge fish and retain trout variant`, with parent `a11484d`. This entry is included in that single checkpoint; resolve its actual hash with `git log -1 --format=%H -- public/assets/models/fish-trout.glb`. User authorizes an ordinary non-force push to origin/main; actual Git results are reported only after confirmation from Git.

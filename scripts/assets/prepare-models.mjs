@@ -5,9 +5,9 @@ import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Keep conversion tools outside the game's dependency graph.
-const [sourceDirectory, toolDirectory] = process.argv.slice(2);
+const [sourceDirectory, toolDirectory, selectedAsset] = process.argv.slice(2);
 if (!sourceDirectory || !toolDirectory) {
-  throw new Error('Usage: bun scripts/assets/prepare-models.mjs <sources> <toolchain>');
+  throw new Error('Usage: bun scripts/assets/prepare-models.mjs <sources> <toolchain> [asset]');
 }
 const requireTool = createRequire(path.join(path.resolve(toolDirectory), 'package.json'));
 const loadTool = (name) => import(pathToFileURL(requireTool.resolve(name)).href);
@@ -43,6 +43,10 @@ const picks = [
     hash: '9607de8de8a0ac2d857f271272e70e6d8d3fd19852d979c2cfbe9eafe1e4fcc5',
   },
   {
+    name: 'fish-trout', input: 'poly/2W2sKWYvk8k.glb', width: 0.7, yaw: Math.PI / 2,
+    hash: '7f0f98a67b31c5ad46b2669c78e3c6288571c7d5776debd67c9cd898e1abd260',
+  },
+  {
     name: 'tree', input: 'poly/ahBEW2RRgq.glb', width: 1.3, yaw: 0,
     hash: '73da653baf82d3c04c979f37b037415f190813d8d16610bd49fc6a20f649077f',
   },
@@ -60,7 +64,12 @@ const picks = [
   },
 ];
 const reports = [];
-for (const pick of picks) {
+if (selectedAsset && !picks.some((pick) => pick.name === selectedAsset)) {
+  throw new Error(`Unknown asset: ${selectedAsset}`);
+}
+const validationPath = path.join(project, 'docs/ASSET_VALIDATION.json');
+const previousReport = selectedAsset ? JSON.parse(await readFile(validationPath, 'utf8')) : undefined;
+for (const pick of picks.filter((pick) => !selectedAsset || pick.name === selectedAsset)) {
   const inputPath = path.join(sourceDirectory, pick.input);
   const input = await readFile(inputPath);
   if (sha256(input) !== pick.hash) throw new Error(`Source hash mismatch: ${pick.input}`);
@@ -78,6 +87,9 @@ for (const pick of picks) {
   }));
   for (const material of root.listMaterials()) {
     material.setMetallicFactor(0).setRoughnessFactor(1);
+  }
+  if (pick.name === 'fish-trout') {
+    root.getAsset().copyright = 'Trout by Poly by Google, CC BY 3.0. https://poly.pizza/m/2W2sKWYvk8k ; https://creativecommons.org/licenses/by/3.0/ . Modified: normalized wrappers, lossless resource deduplication and PNG metadata removal.';
   }
   for (const texture of root.listTextures()) {
     if (texture.getMimeType() === 'image/png') texture.setImage(stripPngMetadata(texture.getImage()));
@@ -142,7 +154,12 @@ for (const pick of picks) {
   reports.push(report);
   console.log(`${pick.name}: ${output.length} bytes; ${triangles} triangles; ${validation.issues.numErrors} errors; ${validation.issues.numWarnings} warnings`);
 }
-await writeFile(path.join(project, 'docs/ASSET_VALIDATION.json'), JSON.stringify({
+const assets = previousReport ? previousReport.assets.map((asset) => reports.find((report) => report.name === asset.name) ?? asset) : reports;
+for (const report of reports) {
+  if (!assets.some((asset) => asset.name === report.name)) assets.push(report);
+}
+await writeFile(validationPath, JSON.stringify({
+  ...previousReport,
   reviewed: '2026-10-10', toolchain: { gltfTransform: '4.5.1', gltfValidator: validator.version() },
-  assets: reports,
+  assets,
 }, null, 2) + '\n');

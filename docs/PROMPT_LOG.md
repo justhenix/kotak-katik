@@ -373,3 +373,67 @@ Report commit hash, verification results, and any remaining issues. If critical 
 **Result at verification time**
 
 - Reviewed M0.5 scope and CC0 provenance; six assets reproduce byte-for-byte in an isolated scratch directory. Unit tests (25), production build, and the final full E2E run (10 desktop/mobile tests) pass. Fixed a transient-phase E2E polling miss without changing gameplay. Inspector and generated files excluded; PROMPT_JOURNAL.md untouched. Requested checkpoint commit/push are authorized next; actual Git results are reported after execution.
+
+### 2026-10-10 - Whole-fish collectible replacement
+
+**Prompt**
+
+```text
+Replace Kotak-Katik's clownfish collectible with a **cute, living low-poly salmon**.
+
+Read `AGENTS.md`, `.agents/design.md`, and relevant asset documentation first.
+
+1. Search for a stylized **whole salmon in a natural swimming pose**, preferably CC0 and GLB/glTF.
+2. Avoid models labeled Dead Fish, Dead Salmon, fish fillets, realistic carcasses, or gore.
+3. Prefer soft salmon-orange/pink, recognizable fins and tail, and a chunky toy-like silhouette.
+4. Download, validate, and optimize the selected model. Preserve the existing `fish.glb` path and asset pipeline.
+5. Replace only the collectible visuals. Preserve gameplay, fish collection, animations, and reset behavior.
+6. Verify readability at small sizes, desktop/mobile rendering, tests, and production build.
+7. Update `docs/ATTRIBUTIONS.md` with verified source and license.
+
+If no suitable licensed model is found, report candidates instead of forcing a poor asset.
+
+No unrelated changes. Do not commit or push.
+```
+
+**Follow-up steering, in order**
+
+```text
+a fish, i need FISH not meat
+```
+
+```text
+if salmon not found, others may ok but not toxic/not normal fish
+```
+
+```text
+wtf is that fish
+```
+
+**Result**
+
+- Used the authorized other-fish fallback: a whole low-poly Trout by Poly by Google (CC BY 3.0), with a conventional body, eyes, fins, and forked tail. Fillet candidates never replaced the collectible; the temporary squat snapper was removed after the user's objection. Final fish is 21.2 KiB, has zero validator errors/warnings, and reproduces byte-for-byte. Original geometry and texture pixels retained; source credit ships with the GLB and text notice. Final 25 unit tests, production build, and 10 desktop/mobile E2E tests pass. Other assets and game code unchanged. No commit or push; PROMPT_JOURNAL.md untouched.
+
+### 2026-10-10 - Fish variants and larger size
+
+**Prompt**
+
+```text
+maybe keep clownfish, heck make it default, i think the trout is.. kinda too small, okay keep both, but make it more big (currently too small)
+```
+
+**Result**
+
+- Clownfish restored as default at `fish.glb`; trout retained at `fish-trout.glb` through an optional presentation variant. Both display at 1.5× scale, independently of the existing pickup transform. Default-game E2E tests (10), unit tests (25), and production build pass. Both actual variants checked on desktop/mobile for loading, size, pickup/reset, and reduced motion; renders inspected. Reproducible preparation covers all seven assets. No gameplay rule or dependency changes, commit, or push. PROMPT_JOURNAL.md unchanged.
+
+### 2026-10-10 - Commit fish variants and sizing
+
+**Prompt**
+
+```text
+atomic commit and push
+```
+
+**Result at staging time**
+
+- Reviewed the final coherent diff for larger fish, default clownfish, retained trout, processing, attribution, and verification logs. Prior verification passed: 25 unit tests, 10 desktop/mobile E2E tests, production build, and both-variant visual/pickup/reset checks. No application changes since those checks. Temporary files and inspection fixtures excluded; PROMPT_JOURNAL.md unchanged. User authorizes one ordinary commit and push to origin/main; actual Git results are reported after execution.
