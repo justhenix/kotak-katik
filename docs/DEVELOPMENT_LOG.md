@@ -139,3 +139,31 @@ Record meaningful work after verification and map it to real Git history. Use `P
 
 **Commit**
 - Pending commit at staging time: `feat: enlarge fish and retain trout variant`, with parent `a11484d`. This entry is included in that single checkpoint; resolve its actual hash with `git log -1 --format=%H -- public/assets/models/fish-trout.glb`. User authorizes an ordinary non-force push to origin/main; actual Git results are reported only after confirmation from Git.
+
+### 2026-10-10 - M1 core gameplay mechanics
+
+**Original prompt:** [PROMPT_LOG / M1 core gameplay mechanics](./PROMPT_LOG.md#2026-10-10---m1-core-gameplay-mechanics) retains the complete original request, including scope, verification, and conditional commit/push authorization.
+
+**Done**
+- Extended the existing typed commands and pure engine with relative quarter-turns and structured Repeat counts 2, 3, 4. A live cursor executes one primitive per Step/400 ms Run action without flattening or separate executors; active paths and one-based loop iterations remain inspectable on collision.
+- Added optional top-level/body slot limits and shared validation. Repeat counts/bodies edit through semantic tap/keyboard controls; previous/next buttons organize top-level blocks and body primitives. Empty bodies block execution; nested loops and unavailable commands are rejected. All editing remains locked during continuous Run.
+- Preserved program retention, Retry from the start, deep Reset to initialProgram, valid-end completion, post-Step edit reset, invalid-tile stopping, timer cancellation, and GLB loading/recovery. Added Stop for inspection and Step continuation. Status-only interruption preserves animation; rapid repeated turns retain their direction; reduced motion uses exact poses and persistent highlights.
+- Kept original M0 level data/default route unchanged. Added small turning and square-loop engineering fixtures through explicit query URLs. Preserved every GLB, both fish variants, processing/licenses, cat reactions, scene architecture, and existing regression tests. No new dependencies or curriculum/progression features.
+- Updated README and [M1 architecture](./M1_ARCHITECTURE.md). PROMPT_JOURNAL.md untouched. Screenshots, traces, and temporary inspection files remain ignored.
+
+**Executed verification**
+- `bun run test`: **53 passed**, five files. Covers all facings, left/right combinations, 2/3/4 counts, ordering, loop/top-level boundaries, permissions/limits, exact action pacing, Run/Step parity after each primitive including collision, collection/completion, editing after Step/error, locked edits, Retry, Reset, interruption, cleanup, and interrupted/reduced-motion presentation. Original 25 tests retained.
+- `bun run build`: **passed**; JS gzip approximately 331.90 kB. Existing >500 kB raw bundle advisory remains, without new dependencies.
+- `bun run test:e2e`: **24 passed** in the final complete run, desktop 1440×1000 and touch-emulated mobile 390×844. Original ten M0/M0.5 regression cases retained, plus fourteen M1 cases. Actual touch taps, native count selectors, keyboard activation, exact per-Step highlights/iterations, every facing, loop exit/re-entry, ordering/removal, slot limits, collisions, completion, Stop/cancellation, Retry/Reset, GLB errors/loading, demand rest, and reduced motion verified.
+- Inspected real production renders for desktop/mobile turns and all four facings, loop highlighting/editing, collision and completion, reduced motion, and 200% text zoom. Initial tests measured a hidden R3F fallback button; corrected visible-control selection. Visual review found zoomed Kanan text exceeding its block; made width follow font size and added an internal-overflow assertion. Final rebuild and full E2E rerun passed.
+- Enabled text contrast: ink on cyan **6.80:1**, orange **6.13:1**, yellow **8.13:1**, cream **10.37:1**. Visible controls meet at least 44×44 CSS pixels; page and command text overflow assertions pass at text zoom. No unexpected console/page errors in tested successful flows.
+- No claim of physical-device testing or child/teacher comprehension testing. Fixtures are not the final curriculum; M2 still needs authored gradual-release lessons, appropriate entry/progression, and learner validation. Existing renderer advisory and previously documented fish skin warnings remain.
+
+**Anti-Slop DURING delivery gate**
+- **Hard gate PASS:** actual desktop/mobile click/tap/keyboard flows, visible controls, empty/loading/error states, contrast and 200% zoom verified; no fabricated content or dead controls introduced.
+- **Purpose gate PASS:** Repeat border identifies its command scope; direction colors/arrows, native count selector, and reorder controls communicate mechanics. Reasons recorded in M1_ARCHITECTURE.md.
+- **Liveliness PASS:** existing Pastel Toybox 2/2/2 direction, cat/board focal point, chunky commands and calm purposeful motion retained in inspected renders.
+- **Craft/quality PASS:** unit/build/browser checks passed; no unrelated redesign/dependencies, nested loops, additional game modes, asset changes, or documentation curation.
+
+**Checkpoint at staging time**
+- Planned single scoped commit: `feat: add turning and repeat commands`, parent `140da85`. Resolve its actual hash with `git log -1 --format=%H -- docs/M1_ARCHITECTURE.md`. An ordinary non-force push is authorized only while fetched origin/main remains at that parent; actual Git results are reported after execution.

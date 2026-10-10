@@ -437,3 +437,65 @@ atomic commit and push
 **Result at staging time**
 
 - Reviewed the final coherent diff for larger fish, default clownfish, retained trout, processing, attribution, and verification logs. Prior verification passed: 25 unit tests, 10 desktop/mobile E2E tests, production build, and both-variant visual/pickup/reset checks. No application changes since those checks. Temporary files and inspection fixtures excluded; PROMPT_JOURNAL.md unchanged. User authorizes one ordinary commit and push to origin/main; actual Git results are reported after execution.
+
+### 2026-10-10 - M1 core gameplay mechanics
+
+**Original prompt**
+
+```markdown
+# Kotak-Katik -> M1: Core Gameplay Mechanics
+
+You are the lead gameplay engineer. Complete M1 autonomously, end-to-end. Prioritize correctness and verification over speed. I will be away, so make reasonable decisions without waiting for approval, if using antislop skill, use DURING mode.
+
+**First:** Read `AGENTS.md`, all relevant `.agents/*.md`, and inspect the existing M0.5 code. Preserve the current architecture, assets, animations, and working Forward-only kernel.
+
+## Implement
+
+1. **Turning:** Add `turn-left` and `turn-right`. Rotate the cat exactly 90° relative to its facing direction, without changing its tile. Maintain cyan-left/orange-right visual cues.
+2. **Repetition:** Add structured Repeat blocks with fixed counts **2×, 3×, 4×** and editable command bodies. No nested loops. Support optional top-level and loop-body slot limits.
+3. **Interpreter:** Run and Step must share one deterministic primitive-action executor. **One Step = exactly one Forward/Left/Right action**, including inside loops. Expose the active command path and loop iteration for visual highlighting.
+4. **Program editor:** Provide usable, accessible controls for adding, removing, organizing, and editing commands and loop bodies. Tap-based interaction must work on mobile without requiring drag-and-drop. Show only commands permitted by the current level.
+5. **Execution behavior:** Preserve \~400 ms pacing, Retry versus Reset semantics, correct completion rules, collision inspection, program retention, timer cancellation, and reduced-motion behavior. Disable editing during continuous execution.
+
+## Scope
+
+- Keep the existing M0 kernel fixture working unchanged.
+- Add small deterministic turning/loop test fixtures to exercise the mechanics and UI. These are engineering fixtures, not the final curriculum.
+- Preserve the existing GLB assets, both fish variants, cat animations, and Pastel Toybox styling.
+- Do not implement Home Menu, Expedition, full level curriculum, onboarding, backend, or visual redesign.
+- Avoid unnecessary dependencies, speculative abstractions, and unrelated refactoring.
+
+## Verification -> mandatory
+
+Test all four orientations, turn combinations, loop counts, command ordering, Step/Run equivalence, loop boundaries, slot limits, collisions, completion, editing after Step, interruption, Retry, Reset, and cleanup.
+
+Run:
+
+- `bun run test`
+- `bun run build`
+- `bun run test:e2e`
+
+Extend Vitest and Playwright coverage. Inspect actual desktop and mobile rendering, including command highlights, turning animation, loop editing, touch interaction, and reduced motion. Fix failures and rerun affected checks. Do not claim tests passed unless executed.
+
+## Documentation and delivery
+
+- Append the original prompt and verified results to `docs/PROMPT_LOG.md` and `docs/DEVELOPMENT_LOG.md`.
+- Update relevant architecture documentation.
+- Leave `docs/PROMPT_JOURNAL.md` untouched; curation requires my explicit instruction.
+- Preserve M0/M0.5 regression coverage.
+
+**Definition of Done:** A child can construct a short program with Forward, Left, Right, and Repeat; run it; step through each primitive; identify the active instruction; and retry or edit after an error. The same program produces identical logical results in Run and Step.
+
+Work until M1 is complete and verified. If blocked, document the exact blocker instead of bypassing requirements or reporting false success.
+
+When all checks pass, make one scoped commit and perform a normal non-force push to `main`, provided the remote has not diverged. Otherwise stop and report.
+
+Finish with a concise summary of changes, test results, commit SHA, and remaining M2 work.
+```
+
+**Result**
+
+- Implemented relative Left/Right, fixed-count structured Repeat without nesting, live primitive cursor/path/iteration, tap/keyboard body editing and reordering, optional slot limits, and cancellable Run. Original M0 fixture remains at `/`; mechanics fixtures are `/?fixture=turning` and `/?fixture=loops`.
+- Executed final checks: `bun run test` passes 53 tests; `bun run build` passes; `bun run test:e2e` passes all 24 desktop/mobile tests. Original M0/M0.5 tests retained. Inspected gameplay renders for every facing, animated turns, loop highlights, collision, completion, touch editing, reduced motion, and 200% text zoom. Fixed the initial hidden-fallback measurement and the real zoomed command-label overflow, then rebuilt and reran the complete browser suite.
+- Existing GLB binaries, fish variants, asset pipeline/licenses, dependencies, lockfile, and PROMPT_JOURNAL.md unchanged. Architecture and development log updated. Learner/physical-device verification remains unclaimed; the existing renderer bundle-size advisory remains.
+- User authorizes one scoped commit and ordinary non-force push if fetched main is unchanged. Git outcomes are reported only after execution.

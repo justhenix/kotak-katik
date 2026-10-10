@@ -7,7 +7,7 @@ import { gameStore, useGameStore } from '../stores/game-store';
 
 function Feedback() {
   const simulation = useGameStore((s) => s.simulation);
-  const { status, activeCommandIndex } = simulation;
+  const { status, activeCommandIndex, activeCommandPath, loopIteration } = simulation;
   const number = activeCommandIndex === null ? null : activeCommandIndex + 1;
   const message = status === 'completed' ? 'Semua ikan terkumpul!'
     : status === 'failed' ? 'Tidak ada kotak di depan. Ubah urutanmu.'
@@ -15,7 +15,10 @@ function Feedback() {
     : status === 'running' ? 'Lihat kucing bergerak.'
     : status === 'paused' ? 'Lihat hasilnya. Lanjut satu langkah?'
     : 'Bawa kucing ke semua ikan.';
-  return <div className={`feedback ${status}`} role="status" aria-live="polite" aria-atomic="true" data-status={status}>
+  return <div className={`feedback ${status}`} role="status" aria-live="polite" aria-atomic="true" data-status={status}
+    data-command-path={activeCommandPath?.join('.') ?? ''} data-loop-iteration={loopIteration ?? ''}
+    data-x={simulation.avatar.position.x} data-z={simulation.avatar.position.z} data-orientation={simulation.avatar.orientation}
+    data-actions={simulation.nextCommandIndex}>
     <span className="feedback-symbol" aria-hidden="true">{status === 'completed' ? '✓' : status === 'failed' ? '!' : number ?? '•'}</span>
     <p>{message}</p>
   </div>;

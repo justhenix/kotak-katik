@@ -32,9 +32,11 @@ export class CatPlayback {
 
   sync(simulation: GameState, reduced: boolean) {
     if (simulation === this.simulation && reduced === this.reduced) return;
+    const statusOnly = simulation.avatar === this.simulation?.avatar && simulation.events === this.simulation?.events && reduced === this.reduced;
     const sameAction = simulation === this.simulation;
     this.simulation = simulation;
     this.reduced = reduced;
+    if (statusOnly) return;
     this.pending = [];
     const yaw = orientationRotation[simulation.avatar.orientation];
     const { x, z } = simulation.avatar.position;
@@ -49,7 +51,11 @@ export class CatPlayback {
       return;
     }
     this.from = { x: this.placement.position.x, z: this.placement.position.z, yaw: this.placement.rotation.y };
-    const difference = Math.atan2(Math.sin(yaw - this.from.yaw), Math.cos(yaw - this.from.yaw));
+    let difference = Math.atan2(Math.sin(yaw - this.from.yaw), Math.cos(yaw - this.from.yaw));
+    const turn = simulation.events.find((event) => event.type === 'turned');
+    // Rapid Steps can interrupt a quarter-turn; keep the command's rotation direction.
+    if (turn?.direction === 'left' && difference < -0.0001) difference += 2 * Math.PI;
+    if (turn?.direction === 'right' && difference > 0.0001) difference -= 2 * Math.PI;
     this.to = { x, z, yaw: this.from.yaw + difference };
     if (simulation.events.some((event) => event.type === 'collected')) this.pending.push('eat');
     if (simulation.completion) this.pending.push('dance');

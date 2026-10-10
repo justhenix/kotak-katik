@@ -3,6 +3,9 @@ import { AnimationClip, Group, NumberKeyframeTrack, Vector3 } from 'three';
 import { CatPlayback } from './playback';
 import { createInitialState, executeNextAction } from '../../game/interpreter/interpreter';
 import { kernelLevel } from '../../game/levels/kernel';
+import { turningLevel } from '../../game/levels/mechanics';
+import { ORIENTATIONS } from '../../game/engine/simulation';
+import { orientationRotation } from '../config';
 import type { Orientation } from '../../game/types';
 
 function setup() {
@@ -25,6 +28,60 @@ function setup() {
 }
 
 describe('cat presentation', () => {
+  it.each(ORIENTATIONS)('animates either exact quarter-turn from %s without translation', (orientation) => {
+    for (const type of ['turn-left', 'turn-right'] as const) {
+      const { playback, placement } = setup();
+      const level = { ...turningLevel, avatar: { ...turningLevel.avatar, orientation } };
+      const start = createInitialState(level);
+      playback.sync(start, false);
+      const yaw = placement.rotation.y;
+      const next = executeNextAction(level, [{ type }], start);
+      playback.sync(next, false);
+      expect(playback.phase).toBe('turn');
+      playback.tick(0.12);
+      expect(Math.abs(placement.rotation.y - yaw)).toBeGreaterThan(0);
+      expect(Math.abs(placement.rotation.y - yaw)).toBeLessThan(Math.PI / 2);
+      playback.tick(0.12);
+      expect(placement.rotation.y - yaw).toBeCloseTo(type === 'turn-left' ? Math.PI / 2 : -Math.PI / 2);
+      expect(placement.position.x).toBe(level.avatar.position.x);
+      expect(placement.position.z).toBe(level.avatar.position.z);
+      expect(Math.cos(placement.rotation.y)).toBeCloseTo(Math.cos(orientationRotation[next.avatar.orientation]));
+      playback.sync(start, true);
+      playback.sync(next, true);
+      expect(playback.phase).toBe('static');
+      expect(playback.tick(1)).toBe(false);
+      expect(placement.rotation.y).toBe(orientationRotation[next.avatar.orientation]);
+    }
+  });
+
+  it('stopping Run preserves the current animation without replaying the pickup', () => {
+    const { playback, completed } = setup();
+    const running = { ...completed, status: 'running' as const, completion: false };
+    playback.sync(running, false);
+    playback.tick(0.24);
+    expect(playback.phase).toBe('eat');
+    playback.tick(0.2);
+    playback.sync({ ...running, status: 'paused' }, false);
+    playback.tick(0.3);
+    expect(playback.phase).toBe('idle');
+  });
+
+  it.each(['turn-left', 'turn-right'] as const)('rapid repeated %s Steps retain their rotation direction', (type) => {
+    const { playback, placement } = setup();
+    const start = createInitialState(turningLevel);
+    const program = [{ type }, { type }] as const;
+    playback.sync(start, false);
+    const yaw = placement.rotation.y;
+    const first = executeNextAction(turningLevel, program, start);
+    playback.sync(first, false);
+    const second = executeNextAction(turningLevel, program, first);
+    playback.sync(second, false);
+    playback.tick(0.24);
+    expect(placement.rotation.y - yaw).toBeCloseTo(type === 'turn-left' ? Math.PI : -Math.PI);
+    expect(placement.position.x).toBe(0);
+    expect(placement.position.z).toBe(0);
+  });
+
   it.each([
     ['north', 0, -1], ['east', 1, 0], ['south', 0, 1], ['west', -1, 0],
   ] as const)('faces %s from the model’s −Z forward axis', (orientation: Orientation, x, z) => {
