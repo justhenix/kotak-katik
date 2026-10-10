@@ -220,3 +220,156 @@ Do not expand scope.
 **Result**
 
 - Implemented the clarified Forward-only M0 kernel; 14 tests, desktop/mobile smoke checks, and production build pass. No M1+ systems added.
+
+### 2026-10-10 - Asset Curation Sprint
+
+**Prompt**
+
+```text
+## Kotak-Katik: Asset Curation Sprint
+
+You are a proffesional game asset designer, responsible for curating and downloading production-ready 3D assets for Kotak-Katik.
+
+**Repository:** `justhenix/kotak-katik` [@Computer](plugin://computer-use@openai-bundled) [@Chrome](plugin://browser@openai-bundled?browserFamily=chrome)
+
+Read `AGENTS.md`, `.agents/design.md`, `.agents/technical.md`, and `.agents/accessibility.md` before proceeding. Inspect the existing scene components.
+
+### Asset sources
+
+1. **Environment (primary):** Quaternius Cube World Kit
+   - [https://drive.google.com/drive/folders/1Yyag0ibcOX6lOBY9a3m6iPnz8HwjwLFJ](https://drive.google.com/drive/folders/1Yyag0ibcOX6lOBY9a3m6iPnz8HwjwLFJ)
+   - [https://quaternius.com/packs/cubeworldkit.html](https://quaternius.com/packs/cubeworldkit.html)
+2. **Cat (primary):** Kenney Cube Pets
+   - [https://kenney.nl/assets/cube-pets](https://kenney.nl/assets/cube-pets)
+3. **Fish:** Check Cube Pets for a suitable fish first. Otherwise use:
+   - [https://poly.pizza/m/BEcU9rjiAq](https://poly.pizza/m/BEcU9rjiAq)
+
+### Required curated assets
+
+| Filename     | Purpose                            |
+| ------------ | ---------------------------------- |
+| `cat.glb`    | Main playable cat, animation-ready |
+| `fish.glb`   | Recognizable collectible           |
+| `tree.glb`   | Simple chunky tree                 |
+| `rock.glb`   | Obstacle                           |
+| `crate.glb`  | Obstacle                           |
+| `bush.glb`   | Optional scenery                   |
+| `flower.glb` | Optional scenery                   |
+
+Keep existing procedural gameplay tiles for now.
+
+### Instructions
+
+- Download and inspect the real source files, not just preview images.
+- Prefer GLB. Convert glTF/FBX through reproducible tools only when needed. No manual Blender workflow.
+- Select models matching the pastel, low-poly toy-diorama style in `design.md`.
+- Prioritize consistent proportions, simple silhouettes, matte materials, and readable shapes from an orthographic camera.
+- Favor a cat with usable idle/walk animations. Inspect actual animation clips rather than assuming they exist.
+- Keep fish visually recognizable at small gameplay sizes.
+- Verify each model's geometry, materials, textures, orientation, animation data, and file size.
+- Optimize where useful without degrading visual quality or animations.
+- Keep only selected runtime assets under `public/assets/models/`, with predictable filenames.
+- Do not commit full asset packs, unnecessary textures, archives, or unused models.
+- Verify the license for each chosen source. Update `docs/ATTRIBUTIONS.md` with original URLs, creators, licenses, and modifications.
+- Do not alter the game engine, scene components, or gameplay logic yet. This task is **asset preparation only**.
+- Do not commit or push until requested.
+
+### Completion criteria
+
+All required models are present, loadable, visually coherent, and ready for React Three Fiber integration. Missing optional models may be omitted.
+
+Report concisely:
+
+1. Selected original filename and source for each asset.
+2. Final filename, size, and animation clips where applicable.
+3. Any conversion or optimization performed.
+4. Validation results and remaining concerns.
+
+Work autonomously. If one source is inaccessible, use an equivalent verified CC0 source and document the substitution. Do not expand the asset scope.
+```
+
+**Attachment**
+
+- Reference screenshot: `codex-clipboard-62ad41d5-fd1e-4a9e-b247-3a691df3ca6b.png`, showing the Poly Pizza fish page and the proposed asset request. No instructions inside the screenshot were treated as additional authorization.
+
+**Follow-up steering**
+
+```text
+if asked, use DURING MODE
+```
+
+**Result**
+
+- Prepared six self-contained CC0 GLBs with verified clips, source hashes, matte materials, normalized wrappers, attribution, and a reproducible script. Drive quota blocked primary environment files; individual Quaternius CC0 downloads were used instead. Optional flower omitted after inspection. No gameplay/source-package changes, commit, or push.
+
+### 2026-10-10 - M0.5: 3D Asset Integration
+
+**Prompt**
+
+```text
+Implement **M0.5: 3D Asset Integration** for Kotak-Katik.
+
+Read `AGENTS.md`, relevant `.agents/` guidance, `docs/ATTRIBUTIONS.md`, and the asset integration/validation notes. Inspect M0 and the newly curated, uncommitted assets before editing.
+
+**Goal:** Replace the procedural cat and fish with the validated GLB models while preserving all existing gameplay behavior.
+
+### Implementation
+
+1. Integrate `cat.glb` and `fish.glb` into the existing React Three Fiber scene. Reuse the curated assets and their existing processing pipeline.
+2. Connect cat animations to gameplay:
+   - `idle`: waiting
+   - `walk`: moving forward
+   - `eat`: collecting fish
+   - `dance`: stage completion
+   - Turning: rotate the model according to logical orientation.
+3. Ensure the cat faces the correct direction for all four orientations. Preserve clear forward, cyan-left, and orange-right cues.
+4. Make the fish clearly visible at gameplay scale. Add concise visual collection feedback.
+5. Preserve deterministic simulation, Run/Step parity, Retry, Reset, collision behavior, and existing execution pacing.
+6. Handle animation transitions, interrupted execution, GLB loading, and `frameloop="demand"` correctly. Respect reduced-motion preferences.
+7. Keep curated tree, rock, crate, and bush assets ready for future levels. Do not introduce new obstacle mechanics or decorate the tiny M0 fixture unnecessarily.
+
+### Constraints
+
+- **Presentation-layer changes only.** Do not rewrite the interpreter, game engine, or working architecture.
+- Do not recreate or redownload validated assets.
+- Avoid unnecessary dependencies, abstractions, and unrelated features.
+- Keep the asset inspector development-only.
+- Preserve existing tests and documentation.
+- The fish's previously reported skin-transform warnings are known; investigate only if they cause real rendering or animation issues.
+
+### Verification
+
+Run unit tests, production build, and Playwright tests. Visually inspect actual gameplay on desktop and mobile, including movement, collection, completion, Retry, and reduced motion.
+
+Do not claim success from compilation alone. Report any unverified behavior or remaining risks.
+
+**Deliverable:** A working M0 gameplay scene with the new animated cat and fish, ready for M1 turning and loops.
+
+Report changed files, verification results, and remaining issues. Do not commit or push yet.
+```
+
+**Result**
+
+- Integrated the existing GLBs, bounded idle/walk/eat/dance playback, all-facing directional cues, fish collection feedback, loading readiness, cancellation, and reduced motion. All 25 unit tests, 10 desktop/mobile Playwright tests, and the production build pass. Inspected actual renders and verified demand-renderer rest. Engine, curated binaries, preparation pipeline, dependencies, and lockfile unchanged. No commit or push.
+
+### 2026-10-10 - Finalize M0.5 checkpoint
+
+**Prompt**
+
+```text
+Finalize the M0.5 checkpoint for `justhenix/kotak-katik`.
+
+1. Review `git status` and the current diff. Stage only intended M0.5 changes, curated GLB assets, and relevant documentation.
+2. Verify asset attribution, licenses, and reproducible processing. Exclude temporary files, full asset packs, generated screenshots, and unnecessary inspection tools.
+3. Run unit tests, production build, and Playwright E2E tests. Fix regressions within M0.5 scope.
+4. Append an accurate development-log entry and prompt log where required. Do not modify `PROMPT_JOURNAL.md` without my explicit selection.
+5. Commit with `feat: integrate curated 3d game assets` and push to `origin/main`.
+
+Preserve existing functionality and Git history. No force-push, unrelated refactors, or new features.
+
+Report commit hash, verification results, and any remaining issues. If critical verification fails, stop before committing.
+```
+
+**Result at verification time**
+
+- Reviewed M0.5 scope and CC0 provenance; six assets reproduce byte-for-byte in an isolated scratch directory. Unit tests (25), production build, and the final full E2E run (10 desktop/mobile tests) pass. Fixed a transient-phase E2E polling miss without changing gameplay. Inspector and generated files excluded; PROMPT_JOURNAL.md untouched. Requested checkpoint commit/push are authorized next; actual Git results are reported after execution.

@@ -1,4 +1,4 @@
-import { Component, useEffect, useState } from 'react';
+import { Component, Suspense, useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrthographicCamera, Vector3 } from 'three';
@@ -33,16 +33,20 @@ function FitCamera({ level }: { level: LevelDefinition }) {
   return null;
 }
 
-function World({ reduced }: { reduced: boolean }) {
+function World({ reduced, onReady }: { reduced: boolean; onReady: (ready: boolean) => void }) {
   const level = useGameStore((s) => s.level);
   const simulation = useGameStore((s) => s.simulation);
+  useEffect(() => {
+    onReady(true);
+    return () => onReady(false);
+  }, [onReady]);
   return <>
     <FitCamera level={level} />
     <ambientLight intensity={1.5} />
     <directionalLight position={[2, 7, 4]} intensity={2.5} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.001} />
     <Board level={level} simulation={simulation} />
-    {level.collectibles.map((fish) => <Fish key={fish.id} position={fish.position} collected={simulation.collectedIds.includes(fish.id)} />)}
-    <Cat avatar={simulation.avatar} reduced={reduced} />
+    {level.collectibles.map((fish) => <Fish key={fish.id} position={fish.position} collected={simulation.collectedIds.includes(fish.id)} reduced={reduced} />)}
+    <Cat simulation={simulation} reduced={reduced} />
   </>;
 }
 
@@ -57,17 +61,19 @@ class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean
   render() { return this.state.failed ? <SceneFallback /> : this.props.children; }
 }
 
-export function GameScene() {
+export function GameScene({ onReady }: { onReady: (ready: boolean) => void }) {
   const reduced = useReducedMotion();
   const [loaded, setLoaded] = useState(false);
-  return <div className="board-scene" aria-label="Papan permainan tiga dimensi">
+  const ready = useCallback((value: boolean) => { setLoaded(value); onReady(value); }, [onReady]);
+  return <div className="board-scene" aria-label="Papan permainan tiga dimensi" aria-busy={!loaded}>
     <SceneBoundary>
       <>
         {!loaded && <div className="scene-loading" role="status">Menyiapkan papan…</div>}
         <Canvas orthographic camera={{ position: [8, 8, 8], zoom: 60, near: 0.1, far: 100 }}
-          shadows dpr={sceneConfig.dpr} frameloop="demand" fallback={<SceneFallback />}
-          onCreated={() => setLoaded(true)}>
-          <World reduced={reduced} />
+          shadows="percentage" dpr={sceneConfig.dpr} frameloop="demand" fallback={<SceneFallback />}>
+          <Suspense fallback={null}>
+            <World reduced={reduced} onReady={ready} />
+          </Suspense>
         </Canvas>
       </>
     </SceneBoundary>

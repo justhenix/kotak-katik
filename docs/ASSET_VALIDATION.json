@@ -1,0 +1,531 @@
+{
+  "reviewed": "2026-10-10",
+  "toolchain": {
+    "gltfTransform": "4.5.1",
+    "gltfValidator": "2.0.0-dev.3.10"
+  },
+  "assets": [
+    {
+      "name": "cat",
+      "file": "cat.glb",
+      "source": "cube-pets/Models/GLB format/animal-cat.glb",
+      "sourceBytes": 165164,
+      "sourceSha256": "1e73aaf7d497dd7d2946badf92d189d2333f163e66dced91feb446bc9bdee850",
+      "bytes": 107484,
+      "sha256": "ccd990f3129aa326435663c2020735d0a1123b5f786fa32615000dd6ad511de0",
+      "bounds": {
+        "min": [
+          -0.3114581643445593,
+          0,
+          -0.45
+        ],
+        "max": [
+          0.3114581643445593,
+          0.8521467466772968,
+          0.45
+        ]
+      },
+      "scale": 0.49833306295129487,
+      "yaw": 3.141592653589793,
+      "meshes": 7,
+      "triangles": 684,
+      "materials": [
+        {
+          "name": "colormap",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [
+        {
+          "name": "colormap",
+          "dimensions": [
+            512,
+            512
+          ],
+          "bytes": 10915,
+          "mimeType": "image/png"
+        }
+      ],
+      "skins": [],
+      "animations": [
+        {
+          "name": "static",
+          "channels": 24,
+          "duration": 0.10000000149011612
+        },
+        {
+          "name": "idle",
+          "channels": 24,
+          "duration": 1
+        },
+        {
+          "name": "walk",
+          "channels": 24,
+          "duration": 0.5
+        },
+        {
+          "name": "run",
+          "channels": 24,
+          "duration": 0.25
+        },
+        {
+          "name": "eat",
+          "channels": 24,
+          "duration": 0.5
+        },
+        {
+          "name": "dance",
+          "channels": 24,
+          "duration": 0.5
+        },
+        {
+          "name": "gesture-positive",
+          "channels": 24,
+          "duration": 0.25
+        },
+        {
+          "name": "gesture-negative",
+          "channels": 24,
+          "duration": 0.25
+        }
+      ],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 7,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/3/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/4/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/6/primitives/0/attributes/TANGENT"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "name": "fish",
+      "file": "fish.glb",
+      "source": "poly/BEcU9rjiAq.glb",
+      "sourceBytes": 81508,
+      "sourceSha256": "9607de8de8a0ac2d857f271272e70e6d8d3fd19852d979c2cfbe9eafe1e4fcc5",
+      "bytes": 79136,
+      "sha256": "a8bd08d482ab5cd1e5d275b4cf7f8202a3b8c3280e1600cd3565ac2d2020bd0a",
+      "bounds": {
+        "min": [
+          -0.2899999999999999,
+          0,
+          -0.03536054268131058
+        ],
+        "max": [
+          0.2899999999999999,
+          0.29919009985700395,
+          0.03536054268131059
+        ]
+      },
+      "scale": 0.07363092086956777,
+      "yaw": 1.5707963267948966,
+      "meshes": 1,
+      "triangles": 686,
+      "materials": [
+        {
+          "name": "Outline",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        },
+        {
+          "name": "Body",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        },
+        {
+          "name": "Stripes",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [],
+      "skins": [
+        {
+          "name": "",
+          "joints": 6
+        }
+      ],
+      "animations": [
+        {
+          "name": "Armature|Swim",
+          "channels": 3,
+          "duration": 1.2916666269302368
+        }
+      ],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 2,
+        "numInfos": 2,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/7"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/9"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/10"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/10"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "name": "tree",
+      "file": "tree.glb",
+      "source": "poly/ahBEW2RRgq.glb",
+      "sourceBytes": 38404,
+      "sourceSha256": "73da653baf82d3c04c979f37b037415f190813d8d16610bd49fc6a20f649077f",
+      "bytes": 35032,
+      "sha256": "cc7aa66b28f61997447c2b1cce4fc8508a448928f14e7bec44e562d7d77b6963",
+      "bounds": {
+        "min": [
+          -0.65,
+          0,
+          -0.525640118098627
+        ],
+        "max": [
+          0.65,
+          1.6176424062213846,
+          0.5256401180986269
+        ]
+      },
+      "scale": 0.24314699064517764,
+      "yaw": 0,
+      "meshes": 1,
+      "triangles": 778,
+      "materials": [
+        {
+          "name": "Atlas",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [
+        {
+          "name": "Atlas.png",
+          "dimensions": [
+            32,
+            32
+          ],
+          "bytes": 597,
+          "mimeType": "image/png"
+        }
+      ],
+      "skins": [],
+      "animations": [],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "numHints": 0,
+        "messages": [],
+        "truncated": false
+      }
+    },
+    {
+      "name": "rock",
+      "file": "rock.glb",
+      "source": "poly/4MUaQTcDdc.glb",
+      "sourceBytes": 9116,
+      "sourceSha256": "306a8e11898caad21aa4da9eb60538ba05e041d9dd3c1a3d5da85b2a6165d8d8",
+      "bytes": 8796,
+      "sha256": "792b2561d31f2dd6c545c5ece60dba8d6c426c3ba9b9cec35f0dd04ac46444ad",
+      "bounds": {
+        "min": [
+          -0.35,
+          0,
+          -0.33148170658181886
+        ],
+        "max": [
+          0.3499999999999999,
+          0.857216748713149,
+          0.33148170658181886
+        ]
+      },
+      "scale": 4.519057682794757,
+      "yaw": 0,
+      "meshes": 1,
+      "triangles": 162,
+      "materials": [
+        {
+          "name": "Stone",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [],
+      "skins": [],
+      "animations": [],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 1,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "name": "crate",
+      "file": "crate.glb",
+      "source": "poly/YAghI6GBls.glb",
+      "sourceBytes": 12960,
+      "sourceSha256": "e0c4c5946b53ba314ec6e22bdb5d3329e4a2f0950b3c477a88e0d456d85baea8",
+      "bytes": 12392,
+      "sha256": "143d8f9aa020b5a04c756b8d6c87f579bee9963fc9ddd549bc85a2f34e0e8305",
+      "bounds": {
+        "min": [
+          -0.37499996903011035,
+          0,
+          -0.375
+        ],
+        "max": [
+          0.37499996903011035,
+          0.75,
+          0.375
+        ]
+      },
+      "scale": 0.37113807264878446,
+      "yaw": 0,
+      "meshes": 1,
+      "triangles": 264,
+      "materials": [
+        {
+          "name": "Wood",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        },
+        {
+          "name": "Wood_Light",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [],
+      "skins": [],
+      "animations": [],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "numHints": 0,
+        "messages": [],
+        "truncated": false
+      }
+    },
+    {
+      "name": "bush",
+      "file": "bush.glb",
+      "source": "poly/92EytlU1El.glb",
+      "sourceBytes": 21348,
+      "sourceSha256": "a10307dcb7030d364093fae966f01a3776e3482bf7bb0ab0231b16a3e1b65e27",
+      "bytes": 21100,
+      "sha256": "1edbcb37f3156c04ecca70027d8c32bd4a8bf0569c3412711a2d19e98cff44fb",
+      "bounds": {
+        "min": [
+          -0.25546306083720016,
+          0,
+          -0.325
+        ],
+        "max": [
+          0.25546306083720016,
+          0.4775877598870175,
+          0.32499999999999996
+        ]
+      },
+      "scale": 0.3846094090974439,
+      "yaw": 0,
+      "meshes": 1,
+      "triangles": 364,
+      "materials": [
+        {
+          "name": "Green",
+          "metallic": 0,
+          "roughness": 1,
+          "alphaMode": "OPAQUE"
+        }
+      ],
+      "textures": [],
+      "skins": [],
+      "animations": [],
+      "validatorVersion": "2.0.0-dev.3.10",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "numHints": 0,
+        "messages": [],
+        "truncated": false
+      }
+    }
+  ],
+  "browserValidation": {
+    "renderer": "Three.js 0.186.1 GLTFLoader + AnimationMixer, Chrome",
+    "camera": "orthographic, position +X/+Y/+Z",
+    "animationComparison": [
+      {
+        "name": "cat",
+        "maximumLocalPoseError": 0,
+        "samples": 328,
+        "clips": [
+          {
+            "name": "static",
+            "motionDelta": 5.551115123125783e-17
+          },
+          {
+            "name": "idle",
+            "motionDelta": 0.012992566625920453
+          },
+          {
+            "name": "walk",
+            "motionDelta": 0.06472663720964111
+          },
+          {
+            "name": "run",
+            "motionDelta": 0.09584579448108252
+          },
+          {
+            "name": "eat",
+            "motionDelta": 0.031918511269225625
+          },
+          {
+            "name": "dance",
+            "motionDelta": 0.02883216471854841
+          },
+          {
+            "name": "gesture-positive",
+            "motionDelta": 0.020387898220119355
+          },
+          {
+            "name": "gesture-negative",
+            "motionDelta": 0.011998856054997136
+          }
+        ],
+        "renderedRestBounds": {
+          "min": [
+            -0.3114581643445593,
+            0,
+            -0.45
+          ],
+          "max": [
+            0.3114581643445593,
+            0.8521467466772968,
+            0.45
+          ]
+        }
+      },
+      {
+        "name": "fish",
+        "maximumLocalPoseError": 1.7881393399310497e-7,
+        "samples": 41,
+        "clips": [
+          {
+            "name": "Armature|Swim",
+            "motionDelta": 0.055277420393578365
+          }
+        ],
+        "renderedRestBounds": {
+          "min": [
+            -0.2723669254310736,
+            0.00012529744450856528,
+            -0.0896457101391038
+          ],
+          "max": [
+            0.2881214968258603,
+            0.30116692744369034,
+            0.03880328074683809
+          ]
+        }
+      }
+    ],
+    "notes": [
+      "All six final GLBs loaded without external resources.",
+      "Cat original scene/root name collision fixed by giving the scene a unique name.",
+      "Fish rest bounds use skinned vertices in Three.js; glTF Transform bounds are conservative unskinned bounds.",
+      "Fish retains two inherited Khronos skinned-node warnings; actual pose playback verified."
+    ]
+  },
+  "reproducibility": "Second preparation run produced identical SHA-256 hashes for all six GLBs."
+}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GameScene } from '../scene/GameScene';
 import { ProgramTray } from '../components/program/ProgramTray';
 import { CommandPalette } from '../components/commands/CommandPalette';
@@ -22,6 +22,7 @@ function Feedback() {
 }
 
 export function App() {
+  const [sceneReady, setSceneReady] = useState(false);
   const title = useGameStore((s) => s.level.title);
   const collected = useGameStore((s) => s.simulation.collectedIds.length);
   const total = useGameStore((s) => s.level.collectibles.length);
@@ -36,13 +37,13 @@ export function App() {
           {collected} / {total}
         </span>
       </div>
-      <GameScene />
+      <GameScene onReady={setSceneReady} />
       <Feedback />
     </section>
     <div className="workbench">
       <ProgramTray />
       <CommandPalette />
-      <RunControls />
+      <RunControls ready={sceneReady} />
     </div>
   </main>;
 }

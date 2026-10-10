@@ -1,59 +1,60 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Group, Shape } from 'three';
-import type { AvatarState } from '../../game/types';
-import { orientationRotation, sceneConfig } from '../config';
+import type { GameState } from '../../game/types';
+import { sceneConfig } from '../config';
+import { useModel } from '../models';
+import { CatPlayback } from './playback';
 
 const arrow = new Shape();
-arrow.moveTo(0, 0.24); arrow.lineTo(-0.16, 0); arrow.lineTo(-0.06, 0);
-arrow.lineTo(-0.06, -0.12); arrow.lineTo(0.06, -0.12); arrow.lineTo(0.06, 0);
-arrow.lineTo(0.16, 0); arrow.closePath();
+arrow.moveTo(0, 0.15); arrow.lineTo(-0.12, 0); arrow.lineTo(-0.045, 0);
+arrow.lineTo(-0.045, -0.09); arrow.lineTo(0.045, -0.09); arrow.lineTo(0.045, 0);
+arrow.lineTo(0.12, 0); arrow.closePath();
 
-function Cuboid({ position, size, color }: {
-  position: [number, number, number]; size: [number, number, number]; color: string;
-}) {
-  return <mesh position={position} castShadow><boxGeometry args={size} /><meshStandardMaterial color={color} roughness={0.85} /></mesh>;
-}
-
-export function Cat({ avatar, reduced }: { avatar: AvatarState; reduced: boolean }) {
-  const group = useRef<Group>(null);
-  const initialAvatar = useRef(avatar).current;
-  const transition = useRef({ start: 0, x: avatar.position.x, z: avatar.position.z,
-    yaw: orientationRotation[avatar.orientation], targetYaw: orientationRotation[avatar.orientation] });
-  const invalidate = useThree((s) => s.invalidate);
-  const colors = sceneConfig.colors;
-  useEffect(() => {
-    const mesh = group.current;
-    if (!mesh) return;
-    const yaw = mesh.rotation.y;
-    const target = orientationRotation[avatar.orientation];
-    const difference = Math.atan2(Math.sin(target - yaw), Math.cos(target - yaw));
-    transition.current = { start: performance.now(), x: mesh.position.x, z: mesh.position.z, yaw, targetYaw: yaw + difference };
-    invalidate();
-  }, [avatar, reduced, invalidate]);
-  useFrame(() => {
-    if (!group.current) return;
-    const t = reduced ? 1 : Math.min(1, (performance.now() - transition.current.start) / sceneConfig.transitionMs);
-    const ease = 1 - (1 - t) ** 3;
-    group.current.position.x = transition.current.x + (avatar.position.x - transition.current.x) * ease;
-    group.current.position.z = transition.current.z + (avatar.position.z - transition.current.z) * ease;
-    group.current.rotation.y = transition.current.yaw + (transition.current.targetYaw - transition.current.yaw) * ease;
-    if (t < 1) invalidate();
-  });
-  return <group ref={group} position={[initialAvatar.position.x, 0, initialAvatar.position.z]} rotation={[0, orientationRotation[initialAvatar.orientation], 0]}>
-    <Cuboid position={[0, 0.39, 0.08]} size={[0.42, 0.38, 0.5]} color={colors.cream} />
-    <Cuboid position={[0, 0.71, -0.13]} size={[0.55, 0.4, 0.4]} color={colors.cream} />
-    {([-1, 1] as const).map((side) => <group key={side}>
-      <mesh position={[side * 0.19, 1.0, -0.1]} castShadow><coneGeometry args={[0.14, 0.25, 4]} /><meshStandardMaterial color={colors.cream} /></mesh>
-      <Cuboid position={[side * 0.15, 0.73, -0.338]} size={[0.055, 0.075, 0.02]} color={colors.ink} />
-      <Cuboid position={[side * 0.15, 0.17, -0.02]} size={[0.14, 0.13, 0.34]} color={colors.cream} />
-    </group>)}
-    <Cuboid position={[0, 0.62, -0.354]} size={[0.08, 0.055, 0.045]} color={colors.ink} />
-    <group position={[0, 0.45, 0.4]} rotation={[-0.35, 0, 0]}>
-      <Cuboid position={[0, 0.15, 0]} size={[0.1, 0.5, 0.1]} color={colors.cream} />
-    </group>
-    <mesh position={[0, 0.17, -0.57]} rotation={[-Math.PI / 2, 0, 0]}>
+function DirectionCues() {
+  const { colors } = sceneConfig;
+  return <group>
+    <mesh position={[0, 0.94, -0.36]} rotation={[-Math.PI / 2, 0, 0]}>
       <shapeGeometry args={[arrow]} /><meshBasicMaterial color={colors.ink} />
     </mesh>
+    {([-1, 1] as const).map((side) => <group key={side} position={[side * 0.26, 0.94, -0.36]}>
+      <mesh rotation={[-Math.PI / 2, 0, side * -Math.PI / 2]} scale={0.8}>
+        <shapeGeometry args={[arrow]} /><meshBasicMaterial color={colors.ink} />
+      </mesh>
+      <mesh position={[0, 0.003, 0]} rotation={[-Math.PI / 2, 0, side * -Math.PI / 2]} scale={0.62}>
+        <shapeGeometry args={[arrow]} /><meshBasicMaterial color={side === -1 ? colors.left : colors.right} />
+      </mesh>
+    </group>)}
   </group>;
+}
+
+export function Cat({ simulation, reduced }: { simulation: GameState; reduced: boolean }) {
+  const { scene, animations } = useModel('cat');
+  const placement = useMemo(() => new Group(), []);
+  const playback = useMemo(() => new CatPlayback(placement, scene, animations), [placement, scene, animations]);
+  const firstFrame = useRef(true);
+  const invalidate = useThree((state) => state.invalidate);
+  const canvas = useThree((state) => state.gl.domElement);
+  useEffect(() => {
+    playback.sync(simulation, reduced);
+    firstFrame.current = true;
+    invalidate();
+  }, [simulation, reduced, playback, invalidate]);
+  useEffect(() => () => playback.dispose(), [playback]);
+  useFrame((_, delta) => {
+    const first = firstFrame.current;
+    const active = playback.tick(first ? 0 : delta);
+    firstFrame.current = false;
+    if (first || canvas.dataset.catAnimation !== playback.phase || !active) {
+      canvas.dataset.catAnimation = playback.phase;
+      canvas.dataset.catX = String(placement.position.x);
+      canvas.dataset.catZ = String(placement.position.z);
+      canvas.dataset.catYaw = String(placement.rotation.y);
+    }
+    if (active) invalidate();
+  });
+  return <primitive object={placement} dispose={null}>
+    <primitive object={scene} dispose={null} />
+    <DirectionCues />
+  </primitive>;
 }
