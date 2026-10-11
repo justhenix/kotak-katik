@@ -1,5 +1,7 @@
 import { validateLevel } from '../engine/simulation';
 import { kernelLevel } from './kernel';
+import { curriculumLevels, findCurriculumLevel } from './curriculum';
+import { validateCurriculum } from './validate-curriculum';
 import type { LevelDefinition } from '../types';
 
 // Explicit engineering fixtures; curriculum and progression are deferred.
@@ -22,8 +24,12 @@ export const loopLevel: LevelDefinition = {
 
 validateLevel(turningLevel);
 validateLevel(loopLevel);
+validateCurriculum(curriculumLevels);
 
 export function selectFixture(search: string): LevelDefinition {
-  const fixture = new URLSearchParams(search).get('fixture');
+  const params = new URLSearchParams(search);
+  const preview = findCurriculumLevel(params.get('level') ?? '');
+  if (preview) return preview;
+  const fixture = params.get('fixture');
   return fixture === 'turning' ? turningLevel : fixture === 'loops' ? loopLevel : kernelLevel;
 }

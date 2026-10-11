@@ -12,15 +12,34 @@ export type CommandPath = readonly [number] | readonly [number, number];
 export type ExecutionCursor = Readonly<{ commandIndex: number; bodyIndex: number; iteration: number }>;
 export type AvatarState = Readonly<{ position: Position; orientation: Orientation }>;
 
+export type LearningConcept = 'movement' | 'sequencing' | 'turning' | 'combined-paths' | 'loop' | 'debugging' | 'mixed-application';
+export type LearningPhase = 'practice' | 'demonstration' | 'guided' | 'independent';
+export type HintCue =
+  | Readonly<{ type: 'board-region'; positions: readonly Position[] }>
+  | Readonly<{ type: 'command'; path: CommandPath }>
+  | Readonly<{ type: 'program-slot'; index: number; loopIndex?: number; choices: readonly CommandType[] }>
+  | Readonly<{ type: 'relative-turn'; position: Position; orientation: Orientation; direction: 'left' | 'right' }>
+  | Readonly<{ type: 'repeat-count'; commandIndex: number; choices: readonly RepeatCount[] }>;
+export type VisualHint = Readonly<{
+  id: string;
+  text: string;
+  reveal: Readonly<{ when: 'on-entry' | 'after-attempt' | 'on-request' }>
+    | Readonly<{ when: 'after-action'; path: CommandPath }>;
+  cue: HintCue;
+}>;
+export type LearningMetadata = Readonly<{
+  concept: LearningConcept;
+  phase: LearningPhase;
+  introducesNewConcept: boolean;
+  learningGoal: string;
+  instruction?: string;
+  visualHints?: readonly VisualHint[];
+}>;
+
 export type LevelDefinition = Readonly<{
   id: string;
   title: string;
-  learning: {
-    concept: 'movement' | 'turning' | 'loop';
-    phase: 'practice';
-    introducesNewConcept: false;
-    learningGoal: string;
-  };
+  learning: LearningMetadata;
   tiles: readonly Readonly<{ position: Position; kind: 'floor' }>[];
   avatar: AvatarState;
   collectibles: readonly Readonly<{ id: string; position: Position }>[];
