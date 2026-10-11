@@ -92,15 +92,13 @@ export function ToyboxDressing() {
   return (
     <group>
       {/* Distant background floating mini islands */}
-      <MiniIsland position={[-3.5, -0.4, -2.6]} trees />
-      <MiniIsland position={[3.8, -0.4, -2.8]} trees />
-      <MiniIsland position={[-4.2, -0.35, 0.5]} rocks />
+      <MiniIsland position={[2.6, -0.45, -1.8]} trees />
+      <MiniIsland position={[-2.0, -0.55, 0.5]} rocks />
 
       {/* Distant soft background clouds */}
-      <PuffyCloud position={[-4.5, 3.2, -3.8]} scale={1.1} />
-      <PuffyCloud position={[3.8, 3.5, -4.2]} scale={1.2} />
-      <PuffyCloud position={[-1.2, 3.8, -5.5]} scale={1.0} />
-      <PuffyCloud position={[-5.2, 2.6, -1.0]} scale={0.95} />
+      <PuffyCloud position={[-3.2, 3.2, -4.2]} scale={1.05} />
+      <PuffyCloud position={[3.2, 3.4, -4.5]} scale={1.15} />
+      <PuffyCloud position={[-0.2, 3.8, -5.2]} scale={1.0} />
     </group>
   );
 }

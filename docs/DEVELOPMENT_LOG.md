@@ -203,3 +203,19 @@ Record meaningful work after verification and map it to real Git history. Use `P
 **Limitations**
 - Physical devices and SDLB-B learner/teacher comprehension have not been tested. Touch is browser-emulated. Fixtures remain engineering fixtures; M2 pedagogy and progression remain out of scope.
 - WebGL is required; the existing renderer bundle-size advisory remains (approximately 335.05 kB gzip). Existing asset validation caveats remain documented. No BISINDO material was invented.
+
+### 2026-10-11 - M1.1 gameplay GUI review and final refinement
+
+**Implemented & Corrected**
+- Replaced the artificial 750ms turn phase hold in `src/scene/Cat/Cat.tsx` with genuine 240ms transition physics and an explicit `canvas.dataset.catTurns` action counter. Updated `e2e/mechanics.spec.ts` so observation starts before step clicks, eliminating race conditions without stalling the simulation or forcing continuous frame invalidations.
+- Repositioned procedural floating islands in `src/scene/Environment/ToyboxDressing.tsx` (`[2.6, -0.45, -1.8]` and `[-2.0, -0.55, 0.5]`), eliminating viewport edge clipping and unwanted projection behind the top HTML title header.
+- Scaled program tray elements for narrow mobile viewports (`@media (max-width: 720px)`) in `src/styles/index.css`: sized command blocks to 66×70px, repeat head to 56×68px, and insertion slots to 46×68px (all well above 44px min touch targets). This allows Repeat blocks with inner commands and the outer `+` insertion slot to fit cleanly on 390px screens without clipping.
+- Ensured all label typography satisfies the roughly 16px legibility standard (`.slot-count` at 1rem/16px, `.command-number` at 0.95rem/15.2px bold, `.loop-progress` at 0.95rem/15.2px). Increased Play button icon to 46px for clear visual dominance.
+- `docs/PROMPT_JOURNAL.md` remains untouched.
+
+**Executed verification**
+- `bun run test`: **56 passed**, 6 test files.
+- `bun run build`: **passed cleanly** (`tsc --noEmit && vite build`, 0 errors).
+- `bun run test:e2e`: **30 passed** across desktop (1440×1000) and mobile (390×844) viewports.
+- Fresh rendered screenshots in `.verification/` inspected and confirmed free of clipped controls or awkward dressing placement.
+

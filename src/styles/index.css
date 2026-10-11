@@ -47,7 +47,7 @@ h2 { font-size: 1.25rem; line-height: 1.2; }
 .editor { min-width: 0; flex: 1 1 34rem; }
 .program-area { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 8px; }
 .program-heading { padding-left: 8px; }
-.slot-count { display: block; margin-top: 8px; font-size: 0.9rem; color: #665a43; }
+.slot-count { display: block; margin-top: 8px; font-size: 1rem; color: #665a43; }
 .program-scroll { display: flex; align-items: center; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-color: #9c875e #eee0be; scrollbar-width: thin; padding: 14px 12px 18px; min-height: 118px; }
 .program-list { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; list-style: none; margin: 0; padding: 0; }
 .program-list:empty { display: none; }
@@ -60,7 +60,7 @@ h2 { font-size: 1.25rem; line-height: 1.2; }
 .repeat { --block: #c8b8e8; }
 .command-block { width: max(74px, 3.2rem); height: max(76px, 3.2rem); display: grid; place-content: center; padding: 1rem 8px 4px; }
 .command-icon { width: 44px; height: 44px; }
-.command-number { position: absolute; top: 4px; left: 8px; font-size: 0.8rem; font-weight: 700; line-height: 1; }
+.command-number { position: absolute; top: 4px; left: 8px; font-size: 0.95rem; font-weight: 700; line-height: 1; }
 .block-state { position: absolute; top: -13px; right: -5px; height: 24px; min-width: 24px; display: grid; place-content: center; border-radius: 6px; font-size: 14px; background: var(--ink); color: var(--cream); z-index: 1; }
 .block-state:empty { display: none; }
 .command-block[aria-pressed="true"], .repeat-select[aria-pressed="true"] { border-style: dashed; outline: 3px dashed var(--ink); outline-offset: 4px; }
@@ -81,8 +81,8 @@ h2 { font-size: 1.25rem; line-height: 1.2; }
 .selection-tools select { font-family: 'Fredoka', sans-serif; font-size: 1.05rem; width: 4.6rem; font-weight: 700; background: #efe4fa; border: 2px solid #77618e; border-radius: 8px; padding: 4px 10px; min-height: 44px; }
 .repeat-item > .insert-slot { flex-basis: 48px; width: 48px; height: 68px; background: #eee4f8; border-color: #8c73a4; }
 .active-loop { border-color: var(--ink); }
-.loop-progress { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; font-size: 0.8rem; font-weight: 700; }
-.loop-progress > span { width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-content: center; border: 1.5px solid #77618e; background: #ebdff7; color: #58416d; }
+.loop-progress { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; font-size: 0.95rem; font-weight: 700; }
+.loop-progress > span { width: 1.55rem; height: 1.55rem; border-radius: 50%; display: grid; place-content: center; border: 1.5px solid #77618e; background: #ebdff7; color: #58416d; }
 .loop-progress .current-iteration { background: var(--ink); color: white; border-color: var(--ink); }
 .selection-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 8px 12px; }
 .selection-label { font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-right: 4px; }
@@ -99,7 +99,7 @@ h2 { font-size: 1.25rem; line-height: 1.2; }
 .controls-area { flex: 0 0 auto; align-self: center; display: grid; grid-template-columns: repeat(2, minmax(80px, 92px)); grid-template-rows: repeat(2, minmax(78px, 86px)); gap: 14px; padding: 6px 0; }
 .controls-area button { display: flex; justify-content: center; align-items: center; border-radius: 18px; touch-action: manipulation; }
 .run-button { background: #62c31e; color: #ffffff; border: 2.5px solid #32750b; box-shadow: 0 5px 0 #32750b, inset 0 2px 0 rgba(255, 255, 255, 0.45); }
-.run-button .control-icon { width: 44px; height: 44px; }
+.run-button .control-icon { width: 46px; height: 46px; }
 .stop-button { background: #f29c38; border-color: #9c5812; box-shadow: 0 5px 0 #9c5812, inset 0 2px 0 rgba(255, 255, 255, 0.45); }
 .step-button { background: #fae9c4; color: #3b2c1b; border: 2px solid #8e734c; box-shadow: 0 4px 0 #8e734c, inset 0 2px 0 rgba(255, 255, 255, 0.6); }
 .step-button .control-icon { width: 38px; height: 38px; }
@@ -122,7 +122,21 @@ h2 { font-size: 1.25rem; line-height: 1.2; }
   .feedback-symbol { flex-basis: 26px; }
   .workbench { grid-template-columns: minmax(0, 1fr); padding: 14px 12px 18px; gap: 14px; border-radius: 20px; }
   .program-heading { padding-left: 4px; }
-  .program-scroll { padding: 14px 8px 15px; min-height: 104px; }
+  .program-scroll { padding: 12px 8px 14px; min-height: 98px; gap: 8px; }
+  .program-list { gap: 8px; }
+  .primitive-item, .repeat-wrapper { gap: 8px; }
+  .command-block { width: 66px; height: 70px; padding: 0.8rem 6px 4px; }
+  .command-icon { width: 38px; height: 38px; }
+  .command-number { font-size: 0.88rem; }
+  .insert-slot { flex: 0 0 46px; height: 68px; }
+  .between-slot { flex-basis: 42px; width: 42px; }
+  .repeat-item { padding: 6px 10px calc(1.3rem + 6px) 6px; gap: 8px; border-radius: 14px; }
+  .repeat-select { min-width: 56px; min-height: 68px; padding: 4px; }
+  .repeat-select .command-icon { width: 30px; height: 30px; }
+  .repeat-select span { font-size: 1.05rem; }
+  .repeat-item > .insert-slot { flex-basis: 44px; width: 44px; height: 64px; }
+  .loop-progress { bottom: 2px; gap: 5px; }
+  .loop-progress > span { width: 1.35rem; height: 1.35rem; font-size: 0.85rem; }
   .palette-area { padding: 10px 12px 13px; gap: 12px; }
   .palette-area h2 { font-size: 1.05rem; }
   .palette-commands { gap: 12px; }

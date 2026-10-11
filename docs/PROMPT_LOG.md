@@ -621,8 +621,12 @@ The follow-up included `codex-clipboard-039e5d51-8dcd-481d-8ed3-60a06d139c00.png
 **Result**
 
 - Delivered M1.1 gameplay GUI refinement: tactile 2×2 action dock (large Play green, Paw Step sand, Retry blue, Clear red), large chunky directional puzzle blocks (Maju yellow, Kiri cyan, Kanan peach, Ulangi lavender), restrained procedural background islands and puffy clouds, responsive tap-based program editor, and inline scoped Repeat loops.
+- Replaced 750ms phase hold in `Cat.tsx` with genuine 240ms transition physics and an explicit `catTurns` action counter on the canvas dataset, eliminating artificial observation holds and continuous frame invalidation.
+- Repositioned procedural dressing in `ToyboxDressing.tsx` to eliminate viewport edge clipping and UI header interference.
+- Sized program tray and repeat elements on narrow mobile viewports (`@media (max-width: 720px)`) to keep touch targets >= 44px while eliminating outer insertion slot clipping.
+- Ensured label and indicator typography is roughly 16px or larger (`.slot-count`, `.command-number`, `.loop-progress`).
 - All 56 Vitest unit and store tests pass across 6 test files.
-- All 30 Playwright end-to-end tests pass across desktop (1440×1000) and mobile (390×844) viewports. Turn animation phase hold (750ms) ensures deterministic observation under full suite load.
+- All 30 Playwright end-to-end tests pass across desktop (1440×1000) and mobile (390×844) viewports.
 - Production build passes cleanly (`tsc --noEmit && vite build`).
 - Inspected actual browser captures in `.verification/` across beginner, turning, loops, 200% text zoom, and reduced-motion modes.
 - `docs/PROMPT_JOURNAL.md` remains untouched.

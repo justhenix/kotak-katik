@@ -10,8 +10,17 @@ async function setCount(page: Page, count: number, index = 1) {
   const length = await page.getByRole('list', { name: `Isi Ulangi ${index}`, exact: true }).locator('.command-block').count();
   await button(page, `Tambah di posisi ${length + 1} dalam Ulangi ${index}`).click();
 }
-const waitForTurn = (page: Page) => page.waitForFunction(
-  () => document.querySelector('canvas')?.dataset.catAnimation === 'turn', undefined, { polling: 'raf' });
+const waitForTurn = (page: Page, expectedTurnCount?: number) => page.waitForFunction(
+  (count) => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return false;
+    if (canvas.dataset.catAnimation === 'turn') return true;
+    if (count !== undefined) return Number(canvas.dataset.catTurns) >= count;
+    return false;
+  },
+  expectedTurnCount,
+  { polling: 'raf' }
+);
 const settledYaw = (page: Page, yaw: number) => page.waitForFunction((target) => {
   const canvas = document.querySelector('canvas');
   const current = Number(canvas?.dataset.catYaw);
@@ -37,8 +46,9 @@ test('relative turning, every facing, cyan/orange cues, and reduced motion', asy
   const facings = ['south', 'west', 'north', 'east', 'north', 'west', 'south', 'east'];
   const yaws = [-Math.PI, Math.PI / 2, 0, -Math.PI / 2, 0, Math.PI / 2, -Math.PI, -Math.PI / 2];
   for (let i = 0; i < facings.length; i++) {
+    const turning = waitForTurn(page, i + 1);
     await press(step(page));
-    await waitForTurn(page);
+    await turning;
     if (i === 0) await page.screenshot({ path: `.verification/${info.project.name}-m1-turn.png`, fullPage: true });
     await expect(feedback(page)).toHaveAttribute('data-orientation', facings[i]);
     await expect(feedback(page)).toHaveAttribute('data-x', '0');
