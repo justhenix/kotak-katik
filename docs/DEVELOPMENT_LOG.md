@@ -219,3 +219,19 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - `bun run test:e2e`: **30 passed** across desktop (1440×1000) and mobile (390×844) viewports.
 - Fresh rendered screenshots in `.verification/` inspected and confirmed free of clipped controls or awkward dressing placement.
 
+### 2026-10-11 - Gameplay GUI Refinement: Interlocking Puzzle Blocks & Lucide Icon Hierarchy
+
+**Implemented & Corrected**
+- Integrated `lucide-react` across all UI controls and command symbols, replacing ad-hoc/AI SVG paths with crisp, recognizable icons with bold strokes (`strokeWidth: 2.8–3.5`).
+- Re-architected command sequence items into seamlessly interlocking jigsaw puzzle pieces (`gap: 0` between connected blocks, male tab `::after`, female socket `::before`, no shadow seam smear, clean rounded start edge without leftmost notch cutout).
+- Widened the Step button (`118px` wide, `#faecd0`) as a distinct secondary action beside the dominant green Play button (`92px` wide, `#4cb016`), with compact secondary controls (`Retry` and `Clear`, `62x48px`) centered cleanly beneath them in a 2-column grid.
+- De-cluttered child-facing UI: removed unnecessary visible text labels ("Tambah perintah" and "Urutanmu" converted to `sr-only` headers for accessibility without visual clutter).
+- Cleaned up the top-right fish counter: removed stray circle ticks, retaining a clean fish icon and ratio badge.
+- Increased center-right dock breathing room (`.editor` max-width constrained, larger workbench gap) so the 3D isometric board remains the clear visual focal point.
+
+**Executed verification**
+- `bun run test`: **56 passed**, 6 test files.
+- `bun run build`: **passed cleanly** (`tsc --noEmit && vite build`, 0 errors).
+- `bun x playwright test e2e/refinement.spec.ts`: **6 passed** across desktop and mobile viewports.
+- `docs/PROMPT_JOURNAL.md` remains untouched.
+

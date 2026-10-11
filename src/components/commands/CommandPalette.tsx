@@ -9,7 +9,7 @@ export function CommandPalette({ loopIndex, replacing, full, onChoose }: {
   const running = useGameStore((s) => s.simulation.status === 'running');
   const title = replacing ? 'Ganti perintah' : loopIndex === undefined ? 'Tambah perintah' : `Isi Ulangi ${loopIndex + 1}`;
   return <section aria-labelledby="palette-title" className="palette-area">
-    <h2 id="palette-title">{title}</h2>
+    <h2 id="palette-title" className="sr-only">{title}</h2>
     <div className="palette-commands">
       {allowed.filter((type) => (loopIndex === undefined && !replacing) || type !== 'repeat').map((type) => <button key={type}
         className={`palette-command puzzle-block ${type}`} disabled={running || (!replacing && full)}

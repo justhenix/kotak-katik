@@ -102,7 +102,8 @@ export function ProgramTray() {
     if (event.key === 'Escape' && !running) { insertAt(program.length); focusPath(String(program.length), true); }
   }}>
     <section aria-labelledby="program-title" className="program-area">
-      <div className="program-heading"><h2 id="program-title">Urutanmu</h2>
+      <div className="program-heading">
+        <h2 id="program-title" className="sr-only">Urutanmu</h2>
         {level.maxProgramSlots !== undefined && <span className="slot-count" aria-label={`${program.length} dari ${level.maxProgramSlots} tempat terisi`}>{program.length} / {level.maxProgramSlots}</span>}
       </div>
       <div className="program-scroll" ref={strip}>

@@ -49,7 +49,6 @@ export function App() {
     <header className="game-header"><h1 className="wordmark">Kotak-Katik</h1>
       <div className={`fish-progress ${collected === total ? 'all-collected' : ''}`} role="img" aria-label={`${collected} dari ${total} ikan terkumpul`}>
         <FishIcon /><span>{collected} / {total}</span>
-        <span className="fish-ticks" aria-hidden="true">{Array.from({ length: total }, (_, index) => <span key={index} className={index < collected ? 'caught' : ''}>{index < collected ? '✓' : ''}</span>)}</span>
       </div>
     </header>
     <section className="world-area" aria-label={title}>

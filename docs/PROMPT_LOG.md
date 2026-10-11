@@ -631,3 +631,52 @@ The follow-up included `codex-clipboard-039e5d51-8dcd-481d-8ed3-60a06d139c00.png
 - Inspected actual browser captures in `.verification/` across beginner, turning, loops, 200% text zoom, and reduced-motion modes.
 - `docs/PROMPT_JOURNAL.md` remains untouched.
 
+### 2026-10-11 - Gameplay GUI Refinement: Interlocking Puzzle Blocks & Lucide Icon Hierarchy
+
+**Original prompt (verbatim)**
+
+```text
+Refine the current Kotak-Katik gameplay GUI using the existing implementation as the base.
+
+Use the current layout direction, but improve spacing, hierarchy, and consistency.
+
+Goals:
+1. Keep the board as the main focal point.
+2. Make the bottom dock feel roomier and less cramped.
+3. Enlarge the empty center-right dock area so the layout breathes more.
+4. Make the Step control wider and clearer as a secondary action beside the large primary Play button.
+5. Use Lucide icons instead of AI-generated SVG shapes for UI controls and symbols.
+6. Remove unnecessary visible section text such as “Tambah perintah”.
+7. Minimize or remove “Urutanmu” if the grouping is already visually obvious.
+8. Clean up the fish counter in the top-right. Remove any meaningless extra circle or stray indicator.
+9. Make the command blocks feel like connected puzzle pieces, not separate rounded cards:
+   - consistent tabs and notches
+   - clearer connected silhouette
+   - consistent depth and shadow
+10. Keep the visual style pastel toybox, tactile, and child-friendly, but avoid copying Google’s doodle literally.
+
+Interaction and UI rules:
+- Play = one dominant green button
+- Step = clearly visible secondary button, wider than now
+- Retry and Clear = smaller secondary controls
+- Command blocks should be icon-first
+- Use short text only when truly necessary
+- Teacher support should come from tooltip, accessible labels, and clean grouping, not visible instructional text
+- Do not make buttons cramped
+- Preserve the existing game engine and mechanics
+
+Preferred outcome:
+A cleaner, roomier, more cohesive gameplay GUI that feels like a toy puzzle game, not a form-based learning app.
+```
+
+**Result**
+
+- Integrated `lucide-react` across all UI controls and command symbols.
+- Re-architected command sequence into seamless interlocking jigsaw puzzle pieces (`gap: 0`, male tabs `::after`, female sockets `::before`, clean start edge).
+- Widened Step control (`118px`) beside dominant green Play button (`92px`), with 2-column aligned secondary controls (`Retry`, `Clear`).
+- Removed visual clutter: "Tambah perintah" and "Urutanmu" converted to `sr-only` headers.
+- Cleaned up top-right fish counter: removed stray circle ticks.
+- Constrained editor width to create generous center-right dock breathing room.
+- Verified: all 56 Vitest unit tests pass, production build passes cleanly, all 6 Playwright refinement e2e tests pass.
+- `docs/PROMPT_JOURNAL.md` remains untouched.
+
