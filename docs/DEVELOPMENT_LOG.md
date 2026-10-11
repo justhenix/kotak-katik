@@ -167,3 +167,39 @@ Record meaningful work after verification and map it to real Git history. Use `P
 
 **Checkpoint at staging time**
 - Planned single scoped commit: `feat: add turning and repeat commands`, parent `140da85`. Resolve its actual hash with `git log -1 --format=%H -- docs/M1_ARCHITECTURE.md`. An ordinary non-force push is authorized only while fetched origin/main remains at that parent; actual Git results are reported after execution.
+
+### 2026-10-11 - M1.1 gameplay GUI refinement
+
+**Original prompt:** [PROMPT_LOG / M1.1 gameplay GUI refinement](./PROMPT_LOG.md#2026-10-11---m11-gameplay-gui-refinement) preserves the original request and the follow-up clarifying that Google's game is inspiration only.
+
+**Implemented**
+- Reframed the orthographic scene around projected occupied-tile bounds and the cat's travel envelope. Enlarged the world area; gave grass and soil shared beveled geometry, matte surfaces, visible thickness, and soft shadows. The camera stays stable during execution. The existing seven GLBs, animated cat, default clownfish, alternate trout, and preparation/licensing pipeline remain unchanged.
+- Replaced the tall editor with one horizontal puzzle-block strip and one contextual palette. Tap selects a command; contextual controls replace, insert before/after, reorder, and delete. Repeat is inline with an editable 2×/3×/4× count after selecting its header. Its inner `+` scopes the shared palette to primitives. No mandatory drag-and-drop or nested loops.
+- Added validated insertion and primitive replacement to the existing store edit boundary. Retained append compatibility, top/body limits, edit resets, no-op behavior, and Run locking. Simulation, interpreter, level fixtures, Run/Step execution, Retry/Reset, and interruption rules are untouched.
+- Added a dominant green Play/Stop control, distinct one-action Step, quieter Retry/Clear, data-derived fish progress and collection ticks, explicit pause feedback, persistent command/error markers, and numbered Repeat iterations. The collision X stays at the blocked edge where it remains visible. No sound, scores, stars, or extra mechanics.
+- Reflowed controls for mobile and enlarged text. Native buttons/selects expose keyboard names; focus is visually distinct from selection and execution. Deleting, reordering, and choosing insertion restore keyboard focus. Active/insertion targets scroll only the horizontal program strip.
+- Updated README, M1 architecture, and M1_1_INTERFACE.md. PROMPT_JOURNAL.md is untouched. No dependencies, lockfile, third-party assets, or `.agents` guidance changed.
+
+**Changed files**
+- Presentation: `src/app/App.tsx`, `src/styles/index.css`, `src/components/commands/CommandPalette.tsx`, `src/components/program/ProgramTray.tsx`, `src/components/controls/RunControls.tsx`, new `src/components/controls/ControlIcon.tsx`.
+- Scene: `src/scene/GameScene.tsx`, `src/scene/Board/Board.tsx`, `src/scene/config.ts`.
+- Editing: `src/stores/game-store.ts`, new `src/stores/editor.test.ts`.
+- Browser verification: `e2e/assets.spec.ts`, `e2e/kernel.spec.ts`, `e2e/mechanics.spec.ts`, new `e2e/refinement.spec.ts`.
+- Documentation: `README.md`, `docs/M1_ARCHITECTURE.md`, new `docs/M1_1_INTERFACE.md`, `docs/PROMPT_LOG.md`, `docs/DEVELOPMENT_LOG.md`.
+
+**Visual inspection and corrections**
+- Inspected actual browser renders for beginner, turning, and Repeat, including selection, active commands, iterations, collection, collision, success, and 200% text zoom. Initial renders revealed a canvas retaining its intrinsic height as the dock grew and zoomed labels crowding fixed-width controls; fixed canvas sizing and content-driven reflow.
+- A viewport sweep checked 1440×900, 1024×768, 390×844, 320×740, and 844×390. No page horizontal overflow or runtime errors. The standard Repeat editor fits within 1440×900, 1024×768, and 390×844; narrower/short landscape screens scroll vertically. Long programs scroll within their single strip.
+- Rendered a temporary 7×5 diagnostic board through the actual scene at 1440 and 390 widths; all board edges, cat, and fish fit without clipping. This diagnostic was render-only and is not a shipping level or new curriculum.
+- Earlier browser runs exposed missing focus handoff after before/after insertion, a focus style overridden by selected-state CSS, and observers missing short walk/Retry-reset states. Added the focus handoff and explicit focus precedence; armed observers before actions. The 240 ms presentation and 400 ms interpreter pacing were not changed. Layout assertions inspect label/icon bounds rather than counting the intentionally protruding puzzle tab as text overflow.
+- Calculated contrast: Play text 5.75:1; lavender command text 6.25:1; supporting cream text 5.94:1; sky text 8.21:1; palette text 7.87:1; blue focus against lavender 5.71:1. Control/loop borders checked against the non-text 3:1 criterion (Play border 3.36:1; Repeat boundary 3.47:1; command edge against tray 3.85:1). Existing cyan/peach/yellow text pairs are retained.
+
+**Executed verification**
+- `bun run test`: **56 passed**, six test files (covers mechanics, store editor, playback, interpreter, and kernel).
+- `bun run build`: **passed**; production client build clean with zero TypeScript errors.
+- `bun run test:e2e`: **30 passed** across desktop (1440×1000) and mobile (390×844) viewports. Turn animation phase hold (750ms) ensures deterministic observation under full suite load.
+- Visually inspected rendered captures in `.verification/` for desktop and mobile viewports across beginner, turning, loops, 200% text zoom, and reduced-motion modes.
+
+**Limitations**
+- Physical devices and SDLB-B learner/teacher comprehension have not been tested. Touch is browser-emulated. Fixtures remain engineering fixtures; M2 pedagogy and progression remain out of scope.
+- WebGL is required; the existing renderer bundle-size advisory remains (approximately 335.05 kB gzip). Existing asset validation caveats remain documented. No BISINDO material was invented.

@@ -16,7 +16,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run, Retry, Reset, invalid-tile st
   await page.screenshot({ path: `.verification/${testInfo.project.name}-initial.png`, fullPage: true });
 
   // R3F's canvas can be a tab stop; follow the real focus order to the first control.
-  for (let i = 0; i < 3 && !(await add(page).evaluate((button) => button === document.activeElement)); i++) {
+  for (let i = 0; i < 5 && !(await add(page).evaluate((button) => button === document.activeElement)); i++) {
     await page.keyboard.press('Tab');
   }
   await expect(add(page)).toBeFocused();
@@ -24,7 +24,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run, Retry, Reset, invalid-tile st
   await add(page).click();
   await page.getByRole('button', { name: 'Satu langkah', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'paused');
-  await expect(active(page)).toHaveAttribute('aria-label', 'Hapus perintah 1: Maju');
+  await expect(active(page)).toHaveAttribute('aria-label', 'Pilih perintah 1: Maju');
   await expect(page.getByLabel('0 dari 1 ikan terkumpul')).toBeVisible();
   await page.getByRole('button', { name: 'Satu langkah', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
@@ -38,18 +38,19 @@ test('M0 desktop/mobile smoke: Forward, Step, Run, Retry, Reset, invalid-tile st
   await expect(page.getByRole('button', { name: 'Satu langkah', exact: true })).toBeDisabled();
   await expect(page.locator('.program-list li')).toHaveCount(2);
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
+  await page.getByRole('button', { name: 'Pilih perintah 2: Maju', exact: true }).click();
   await page.getByRole('button', { name: 'Hapus perintah 2: Maju', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
   await expect(page.getByLabel('0 dari 1 ikan terkumpul')).toBeVisible();
   await page.getByRole('button', { name: 'Jalankan', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'finished');
-  await expect(page.getByText('Masih ada ikan. Tambah perintah.')).toBeVisible();
+  await expect(page.getByText('Masih ada ikan.', { exact: true })).toBeVisible();
   await add(page).click();
   await add(page).click();
   await page.getByRole('button', { name: 'Jalankan', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'failed');
-  await expect(page.getByText('Tidak ada kotak di depan. Ubah urutanmu.')).toBeVisible();
-  await expect(active(page)).toHaveAttribute('aria-label', 'Hapus perintah 3: Maju');
+  await expect(page.getByText('Jalan habis. Ubah urutanmu.')).toBeVisible();
+  await expect(active(page)).toHaveAttribute('aria-label', 'Pilih perintah 3: Maju');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-invalid-tile.png`, fullPage: true });
   await page.getByRole('button', { name: 'Hapus semua', exact: true }).click();
   await expect(page.getByText('Ketuk perintah di bawah.')).toBeVisible();
@@ -70,9 +71,16 @@ test('M0 desktop/mobile smoke: Forward, Step, Run, Retry, Reset, invalid-tile st
   }
   await page.addStyleTag({ content: 'html { font-size: 200%; }' });
   await page.evaluate(() => document.fonts.ready);
-  for (const button of await page.getByRole('button').all()) {
+  for (const button of await page.locator('.palette-area button, .controls-area button').all()) {
     const box = await button.boundingBox();
-    expect(box!.x + box!.width).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
+    expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    expect(await button.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      return [...element.querySelectorAll('span')].every((label) => {
+        const text = label.getBoundingClientRect();
+        return text.left >= bounds.left && text.right <= bounds.right;
+      });
+    })).toBe(true);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => innerWidth));
   await page.screenshot({ path: `.verification/${testInfo.project.name}-text-zoom.png`, fullPage: true });

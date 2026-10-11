@@ -499,3 +499,131 @@ Finish with a concise summary of changes, test results, commit SHA, and remainin
 - Executed final checks: `bun run test` passes 53 tests; `bun run build` passes; `bun run test:e2e` passes all 24 desktop/mobile tests. Original M0/M0.5 tests retained. Inspected gameplay renders for every facing, animated turns, loop highlights, collision, completion, touch editing, reduced motion, and 200% text zoom. Fixed the initial hidden-fallback measurement and the real zoomed command-label overflow, then rebuilt and reran the complete browser suite.
 - Existing GLB binaries, fish variants, asset pipeline/licenses, dependencies, lockfile, and PROMPT_JOURNAL.md unchanged. Architecture and development log updated. Learner/physical-device verification remains unclaimed; the existing renderer bundle-size advisory remains.
 - User authorizes one scoped commit and ordinary non-force push if fetched main is unchanged. Git outcomes are reported only after execution.
+
+### 2026-10-11 - M1.1 gameplay GUI refinement
+
+**Original prompt (verbatim)**
+
+```text
+# Kotak-Katik -> M1.1: Gameplay GUI Refinement
+
+You are the lead UX engineer and game interface designer. Implement M1.1 end-to-end in `justhenix/kotak-katik`. If using antislop, use DURING mode.
+
+**Goal:** Transform the working M1 prototype into a polished, visual-first educational game for deaf-first SDLB-B students in grades 1–3.
+
+Read `AGENTS.md`, relevant `.agents/*.md`, and the existing M1 implementation first. If using the anti-slop skill, use DURING mode.
+
+## Visual references
+
+- **Image A:** Approved beginner screen. The primary visual reference.
+- **Image B:** Advanced Repeat/turning screen. Same design system, different mechanics.
+- **Google Coding Doodle (2017):** Inspiration for interaction simplicity, not artwork to reproduce.
+
+Follow the existing **Pastel Toybox** direction: soft aqua sky, matte grassy islands, chunky purple-gray cat, cream command dock, Fredoka/Inter, colorful tactile blocks.
+
+Treat the screenshots as visual references, not authoritative gameplay data. Actual board layouts, commands, fish counts, and execution states must come from the existing engine.
+
+## Implement
+
+### 1. Scene and composition
+
+- Make the 3D board the dominant focal point, substantially larger than M1.
+- Improve orthographic camera framing for small and large boards without clipping.
+- Refine grass tiles with subtle bevels, visible thickness, soft contact shadows, and matte materials.
+- Add restrained background scenery only where useful. Keep puzzle tiles unobstructed.
+- Preserve existing GLB models, animations, and fish variants.
+
+### 2. Simplify the command editor
+
+- Recreate Image A's compact, tactile puzzle-block interface.
+- Large directional icons; short Indonesian labels only where helpful.
+- Colors: Maju yellow, Kiri cyan, Kanan peach, Ulangi lavender.
+- One horizontal program area and one shared contextual command palette.
+- Use compact inline Repeat containers, following Image B.
+- Repeat must support editable 2×/3×/4× counts and primitive command bodies.
+- Make insertion targets obvious. Use tap-to-add, explicit selection, and contextual edit/reorder/delete controls.
+- Remove duplicated palettes, permanently visible reorder arrows, and unnecessary instructional text.
+- Preserve program limits and every M1 editing capability. No mandatory drag-and-drop.
+
+### 3. Simplify gameplay controls
+
+- One dominant green Play button.
+- Clearly distinguish Step (one primitive action) from Play.
+- Retry and Clear are smaller, quieter secondary controls.
+- Replace text-heavy instructions with clear icons and contextual visual cues.
+- Show fish collection progress visually, without introducing scores or stars.
+- All controls must have accessible names, keyboard support, and understandable disabled/focus states.
+
+### 4. Deaf-first feedback
+
+- Synchronize active block highlighting with cat movement and turning.
+- Show the active inner command and iteration during Repeat execution.
+- Provide visible collision, collection, success, and pause feedback.
+- Keep feedback understandable with audio muted and reduced motion enabled.
+- Avoid constant pulsing, neon effects, excessive particles, or distracting animations.
+
+**Visual-first, not strictly textless.** Use short supporting labels when necessary for comprehension.
+
+## Hard constraints
+
+Preserve the complete M1 engine, deterministic interpreter, Run/Step parity, Retry/Reset behavior, interruption, command limits, GLB loading, and existing engineering fixtures.
+
+Do not implement M2 lessons, Home Menu, Expedition, persistence, backend, new mechanics, or unrelated features.
+
+Build the real responsive React/Three.js interface. Do not replace gameplay with static images or hardcoded mockup states.
+
+Prioritize child comprehension over literal screenshot imitation. Make reasonable UX decisions independently.
+
+## Verification
+
+Run:
+
+- `bun run test`
+- `bun run build`
+- `bun run test:e2e`
+
+Update tests for genuine interface changes while preserving gameplay regression coverage.
+
+**Inspect actual browser renders**, not merely successful builds:
+
+- Desktop and mobile, including touch
+- Beginner, turning, and Repeat fixtures
+- Program insertion, reordering, editing, and deletion
+- Play, Step, Retry, Clear, Stop
+- Active commands, loop iterations, collisions, collection, success
+- Reduced motion, muted audio, keyboard navigation, and 200% text zoom
+
+Fix layout issues, clipped controls, illegible commands, misleading feedback, and interaction failures. Rerun affected tests.
+
+## Delivery
+
+Append the original prompt and verified implementation results to `docs/PROMPT_LOG.md` and `docs/DEVELOPMENT_LOG.md`. Update relevant technical documentation. Leave `docs/PROMPT_JOURNAL.md` untouched.
+
+Once all checks pass, create one scoped commit and non-force push to `main` if the remote has not diverged.
+
+Report changed files, visual improvements, actual test results, commit SHA, and remaining limitations.
+
+**Definition of Done:** Kotak-Katik looks and behaves like a cohesive children's toy game. A learner can recognize available commands, construct and edit a sequence or Repeat, run it, and visually understand what the cat did, without relying on long instructions.
+
+Finish the complete refinement autonomously. Do not stop after planning or producing a static mockup.
+```
+
+**Reference attachments:** `codex-clipboard-b426c9cf-8088-4eb1-b9d3-b51e19e3b1f5.png` (approved beginner), `codex-clipboard-7bd4abac-0c02-4c66-979e-fd8c8f48291e.png` (Repeat/turning). Images guide visual design only; engine data remains authoritative.
+
+**Follow-up prompt (verbatim)**
+
+```text
+This is the google's version as reference or inspiration, not to plagiarism
+```
+
+The follow-up included `codex-clipboard-039e5d51-8dcd-481d-8ed3-60a06d139c00.png`, a screenshot of Google's bunny-coding game in a YouTube video. Used only to interpret interaction simplicity. No artwork, characters, code, or video UI copied.
+
+**Result**
+
+- Delivered M1.1 gameplay GUI refinement: tactile 2×2 action dock (large Play green, Paw Step sand, Retry blue, Clear red), large chunky directional puzzle blocks (Maju yellow, Kiri cyan, Kanan peach, Ulangi lavender), restrained procedural background islands and puffy clouds, responsive tap-based program editor, and inline scoped Repeat loops.
+- All 56 Vitest unit and store tests pass across 6 test files.
+- All 30 Playwright end-to-end tests pass across desktop (1440×1000) and mobile (390×844) viewports. Turn animation phase hold (750ms) ensures deterministic observation under full suite load.
+- Production build passes cleanly (`tsc --noEmit && vite build`).
+- Inspected actual browser captures in `.verification/` across beginner, turning, loops, 200% text zoom, and reduced-motion modes.
+- `docs/PROMPT_JOURNAL.md` remains untouched.
+

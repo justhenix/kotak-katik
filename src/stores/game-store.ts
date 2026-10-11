@@ -12,7 +12,8 @@ type GameStore = {
   level: LevelDefinition;
   program: Program;
   simulation: GameState;
-  addCommand: (type: CommandType, loopIndex?: number) => void;
+  addCommand: (type: CommandType, loopIndex?: number, atIndex?: number) => void;
+  replaceCommand: (index: number, type: PrimitiveCommand['type'], loopIndex?: number) => void;
   removeCommand: (index: number, loopIndex?: number) => void;
   moveCommand: (index: number, offset: -1 | 1, loopIndex?: number) => void;
   setRepeatCount: (index: number, count: RepeatCount) => void;
@@ -63,10 +64,22 @@ export function createGameStore(level: LevelDefinition) {
     return {
       level, program: structuredClone(level.initialProgram),
       simulation: resetSimulation(),
-      addCommand: (type, loopIndex) => {
+      addCommand: (type, loopIndex, atIndex) => {
         if (get().simulation.status === 'running' || !level.allowedCommands.includes(type)) return;
         if (loopIndex !== undefined && type === 'repeat') return;
-        editScope(loopIndex, (commands) => [...commands, type === 'repeat' ? { type, count: 2, commands: [] } : { type }]);
+        editScope(loopIndex, (commands) => {
+          const target = atIndex ?? commands.length;
+          if (!Number.isInteger(target) || target < 0 || target > commands.length) return commands;
+          const command: Command = type === 'repeat' ? { type, count: 2, commands: [] } : { type };
+          return [...commands.slice(0, target), command, ...commands.slice(target)];
+        });
+      },
+      replaceCommand: (index, type, loopIndex) => {
+        if (!level.allowedCommands.includes(type)) return;
+        editScope(loopIndex, (commands) => {
+          if (!commands[index] || commands[index].type === 'repeat' || commands[index].type === type) return commands;
+          return commands.map((command, commandIndex) => commandIndex === index ? { type } : command);
+        });
       },
       removeCommand: (index, loopIndex) => {
         editScope(loopIndex, (commands) => commands[index] ? commands.filter((_, commandIndex) => index !== commandIndex) : commands);

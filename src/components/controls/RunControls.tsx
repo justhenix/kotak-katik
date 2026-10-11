@@ -1,5 +1,6 @@
 import { useGameStore } from '../../stores/game-store';
 import { programError } from '../../game/program';
+import { ControlIcon } from './ControlIcon';
 
 export function RunControls({ ready }: { ready: boolean }) {
   const status = useGameStore((s) => s.simulation.status);
@@ -12,23 +13,21 @@ export function RunControls({ ready }: { ready: boolean }) {
   const invalid = useGameStore((s) => programError(s.level, s.program) !== null);
   const running = status === 'running';
   const terminal = ['failed', 'finished', 'completed'].includes(status);
-  return <div className="controls-area">
-    <div className="execution-controls">
-      <button className="run-button" disabled={!ready || empty || invalid || running} onClick={run}>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m6 3 16 9-16 9Z" fill="currentColor" />
-        </svg>
-        {running ? 'Berjalan…' : terminal ? 'Jalankan lagi' : 'Jalankan'}
-      </button>
-      <button className="step-button" disabled={!ready || empty || invalid || running} onClick={step}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 4 12 8-12 8Zm14 0h4v16h-4Z" fill="currentColor" /></svg>
-        Satu langkah
-      </button>
-    </div>
-    <div className="secondary-controls">
-      {running && <button onClick={stop}>Berhenti</button>}
-      <button disabled={!ready || empty || invalid || running} onClick={retry}>Coba lagi</button>
-      <button disabled={empty || running} onClick={reset}>Hapus semua</button>
-    </div>
+  const disabled = !ready || empty || invalid || running;
+  return <div className="controls-area" role="group" aria-label="Jalankan urutan">
+    <button className={`run-button ${running ? 'stop-button' : ''}`} disabled={!running && disabled}
+      aria-label={running ? 'Berhenti' : terminal ? 'Jalankan lagi' : 'Jalankan'}
+      title={running ? 'Berhenti' : terminal ? 'Jalankan lagi' : 'Jalankan'} onClick={running ? stop : run}>
+      <ControlIcon type={running ? 'stop' : 'play'} />
+    </button>
+    <button className="step-button" disabled={disabled} aria-label="Satu langkah" title="Satu langkah" onClick={step}>
+      <ControlIcon type="step" />
+    </button>
+    <button className="retry-button" disabled={disabled} aria-label="Coba lagi" title="Coba lagi" onClick={retry}>
+      <ControlIcon type="retry" />
+    </button>
+    <button className="clear-button" disabled={empty || running} aria-label="Hapus semua" title="Hapus semua" onClick={reset}>
+      <ControlIcon type="delete" />
+    </button>
   </div>;
 }

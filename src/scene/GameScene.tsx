@@ -8,6 +8,7 @@ import { Board } from './Board/Board';
 import { Cat } from './Cat/Cat';
 import { Fish } from './Collectibles/Fish';
 import { sceneConfig } from './config';
+import { ToyboxDressing } from './Environment/ToyboxDressing';
 import type { LevelDefinition } from '../game/types';
 
 function FitCamera({ level }: { level: LevelDefinition }) {
@@ -16,17 +17,21 @@ function FitCamera({ level }: { level: LevelDefinition }) {
     if (!(camera instanceof OrthographicCamera)) return;
     const xs = level.tiles.map((tile) => tile.position.x);
     const zs = level.tiles.map((tile) => tile.position.z);
-    const minX = Math.min(...xs) - 0.7, maxX = Math.max(...xs) + 0.7;
-    const minZ = Math.min(...zs) - 0.7, maxZ = Math.max(...zs) + 0.7;
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minZ = Math.min(...zs), maxZ = Math.max(...zs);
     const center = new Vector3((minX + maxX) / 2, 0.25, (minZ + maxZ) / 2);
     camera.position.copy(center).add(new Vector3(8, 8, 8));
     camera.lookAt(center);
     camera.updateMatrixWorld();
-    const projected = [minX, maxX].flatMap((x) => [minZ, maxZ].flatMap((z) =>
-      [-0.4, 1.5].map((y) => new Vector3(x, y, z).applyMatrix4(camera.matrixWorldInverse))));
-    const width = Math.max(...projected.map((v) => v.x)) - Math.min(...projected.map((v) => v.x));
-    const height = Math.max(...projected.map((v) => v.y)) - Math.min(...projected.map((v) => v.y));
-    camera.zoom = Math.min(size.width / (width + 0.3), size.height / (height + 0.3));
+    // Fit occupied tiles, including the cat's full travel envelope, not the empty
+    // corners of a rectangular level. Keep the same framing throughout execution.
+    const projected = level.tiles.flatMap(({ position }) => [-0.56, 0.56].flatMap((dx) => [-0.56, 0.56].flatMap((dz) =>
+      [-0.4, 1.2].map((y) => new Vector3(position.x + dx, y, position.z + dz).applyMatrix4(camera.matrixWorldInverse)))));
+    const left = Math.min(...projected.map((v) => v.x)), right = Math.max(...projected.map((v) => v.x));
+    const bottom = Math.min(...projected.map((v) => v.y)), top = Math.max(...projected.map((v) => v.y));
+    const offset = new Vector3((left + right) / 2, (bottom + top) / 2, 0).applyQuaternion(camera.quaternion);
+    camera.position.add(offset);
+    camera.zoom = Math.min(size.width * 0.88 / (right - left), size.height * 0.94 / (top - bottom));
     camera.updateProjectionMatrix();
     invalidate();
   }, [camera, level, size.width, size.height, invalidate]);
@@ -42,9 +47,13 @@ function World({ reduced, onReady }: { reduced: boolean; onReady: (ready: boolea
   }, [onReady]);
   return <>
     <FitCamera level={level} />
-    <ambientLight intensity={1.5} />
-    <directionalLight position={[2, 7, 4]} intensity={2.5} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-6} shadow-camera-right={6} shadow-camera-top={6} shadow-camera-bottom={-6} shadow-bias={-0.001} />
+    <ambientLight intensity={1.7} />
+    <directionalLight position={[-3, 8, 5]} intensity={2.1} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-8} shadow-camera-right={8} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-bias={-0.0005} shadow-normalBias={0.02} shadow-radius={4} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+      <planeGeometry args={[200, 200]} /><shadowMaterial transparent opacity={0.13} />
+    </mesh>
     <Board level={level} simulation={simulation} />
+    <ToyboxDressing />
     {level.collectibles.map((fish) => <Fish key={fish.id} position={fish.position} collected={simulation.collectedIds.includes(fish.id)} reduced={reduced} />)}
     <Cat simulation={simulation} reduced={reduced} />
   </>;

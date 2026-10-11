@@ -30,7 +30,7 @@ The existing single 400 ms timeout chain calls the shared interpreter for Run an
 
 All editor mutations are guarded during Run: add/remove, reorder, repeat count, and Reset. Invalid/out-of-range edits are no-ops. Limits are enforced by store actions as well as disabled controls. Stop cancels the pending timeout and preserves the last result for inspection; Step can continue from that cursor. Stopping before the first action restores idle. Run/Retry after a pause start over. App cleanup cancels pending execution.
 
-The editor uses semantic tap/keyboard controls: palette buttons append commands; each Repeat has its own primitive-only palette and native 2×/3×/4× selector; command buttons remove; adjacent previous/next buttons reorder within a scope. Repeat containers can reorder with other top-level blocks. Moving a primitive between scopes is accomplished by removing and re-adding it; drag-and-drop is unnecessary.
+M1.1 refines the editor with one contextual palette and a local selection/insertion target. Palette buttons insert at a selected `+`, or replace a selected primitive. Select a block to reveal previous/next, before/after, and delete controls. Select a Repeat header to reveal its native 2×/3×/4× selector; its inner `+` routes the shared palette to its body. Repeat containers still reorder with other top-level blocks. Moving a primitive between scopes is accomplished by removing and re-adding it; drag-and-drop is unnecessary. See [M1.1 interface](M1_1_INTERFACE.md).
 
 ## Presentation
 

@@ -2,13 +2,15 @@
 
 A deaf-first visual computational-thinking game for elementary learners, built for the M-One Telkomsel Coding Competition 2026.
 
-## M1: Core mechanics
+## M1.1: Gameplay interface
 
 The original Forward-only kernel remains at `/`. Open `/?fixture=turning` for Forward/Left/Right, or `/?fixture=loops` for those commands plus editable **Repeat 2×, 3×, 4×**. These small deterministic fixtures exercise mechanics; they are not the final curriculum. The scene retains the curated animated cat, enlarged default clownfish, and optional trout asset.
 
-Tap commands to add/remove them. Use previous/next buttons to reorder top-level blocks or Repeat bodies; each Repeat has its own primitive palette and count selector. Run and Retry start from the original board with the existing program. One Step advances exactly one primitive, including inside Repeat. The active block and loop iteration stay visible. Editing after Step resets the board. Hapus semua restores `initialProgram`. Berhenti cancels Run and preserves the result for inspection/Step continuation. Invalid movement keeps the cat in place and identifies the exact failing block. Completion is awarded only when a valid program ends with every fish collected.
+Tap the shared palette to add commands at the selected `+`. Tap a program block to select it: the palette replaces a primitive, while contextual controls insert before/after, reorder, or delete. Tap a Repeat header to change its count; its inner `+` selects the primitive-only body palette. Escape returns to the end of the outer program. The horizontal strip scrolls to the insertion target and active command without moving the page.
 
-Nested loops, obstacle mechanics, drag-and-drop, expedition, curriculum, onboarding, persistence, audio, and themes are deferred. See [M1 architecture](docs/M1_ARCHITECTURE.md) for interpreter/editor contracts and fixture URLs.
+The dominant green button runs the program and becomes Stop during execution. Run and Retry start from the original board with the existing program. One Step advances exactly one primitive, including inside Repeat. The active block and numbered loop iteration stay visible. Editing after Step resets the board. Hapus semua restores `initialProgram`. Berhenti cancels Run and preserves the result for inspection/Step continuation. Invalid movement keeps the cat in place and identifies the exact failing block. Completion is awarded only when a valid program ends with every fish collected.
+
+Nested loops, obstacle mechanics, drag-and-drop, expedition, curriculum, onboarding, persistence, audio, and themes are deferred. See [M1 architecture](docs/M1_ARCHITECTURE.md) for interpreter contracts and fixture URLs, and [M1.1 interface](docs/M1_1_INTERFACE.md) for editing, feedback, and responsive decisions.
 
 ## Run and verify
 
@@ -35,4 +37,4 @@ See [attribution](docs/ATTRIBUTIONS.md). No BISINDO media is integrated; validat
 
 ## Current limits
 
-WebGL is required. The JavaScript renderer bundle is about 332 kB gzip and triggers Vite's size advisory. This is an architecture milestone; learner comprehension and physical-device behavior are not yet validated.
+WebGL is required. The JavaScript renderer bundle is about 334 kB gzip and triggers Vite's size advisory. Learner comprehension and physical-device behavior are not yet validated.

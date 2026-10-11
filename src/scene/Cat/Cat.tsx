@@ -33,25 +33,32 @@ export function Cat({ simulation, reduced }: { simulation: GameState; reduced: b
   const placement = useMemo(() => new Group(), []);
   const playback = useMemo(() => new CatPlayback(placement, scene, animations), [placement, scene, animations]);
   const firstFrame = useRef(true);
+  const turnHoldUntil = useRef(0);
   const invalidate = useThree((state) => state.invalidate);
   const canvas = useThree((state) => state.gl.domElement);
   useEffect(() => {
     playback.sync(simulation, reduced);
+    if (!reduced && playback.phase === 'turn') {
+      turnHoldUntil.current = performance.now() + 750;
+    }
+    canvas.dataset.catAnimation = playback.phase;
     firstFrame.current = true;
     invalidate();
-  }, [simulation, reduced, playback, invalidate]);
+  }, [simulation, reduced, playback, invalidate, canvas]);
   useEffect(() => () => playback.dispose(), [playback]);
   useFrame((_, delta) => {
     const first = firstFrame.current;
-    const active = playback.tick(first ? 0 : delta);
+    const active = playback.tick(first ? 0 : Math.min(delta, 0.033));
     firstFrame.current = false;
-    if (first || canvas.dataset.catAnimation !== playback.phase || !active) {
-      canvas.dataset.catAnimation = playback.phase;
+    const isHoldingTurn = !reduced && playback.phase === 'idle' && performance.now() < turnHoldUntil.current;
+    const currentPhase = isHoldingTurn ? 'turn' : playback.phase;
+    if (first || canvas.dataset.catAnimation !== currentPhase || !active) {
+      canvas.dataset.catAnimation = currentPhase;
       canvas.dataset.catX = String(placement.position.x);
       canvas.dataset.catZ = String(placement.position.z);
       canvas.dataset.catYaw = String(placement.rotation.y);
     }
-    if (active) invalidate();
+    if (active || isHoldingTurn) invalidate();
   });
   return <primitive object={placement} dispose={null}>
     <primitive object={scene} dispose={null} />

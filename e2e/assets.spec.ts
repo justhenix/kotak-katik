@@ -27,17 +27,20 @@ test('GLB gameplay: phases, movement, collection, interruption, and reduced moti
   expect([...models].sort()).toEqual(['/assets/models/cat.glb', '/assets/models/fish.glb']);
   await press(add);
   await press(add);
+  const walking = waitForPhase('walk');
   await press(step);
-  await waitForPhase('walk');
+  await walking;
   await expect(canvas).toHaveAttribute('data-cat-animation', 'idle');
   await expect(canvas).toHaveAttribute('data-cat-x', '1');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-step.png`, fullPage: true });
+  const eating = waitForPhase('eat');
   await press(step);
   await expect(page.getByLabel('1 dari 1 ikan terkumpul')).toBeVisible();
-  await waitForPhase('eat');
+  await eating;
   await expect(canvas).toHaveAttribute('data-cat-x', '2');
+  const dancing = waitForPhase('dance');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-eat.png`, fullPage: true });
-  await waitForPhase('dance');
+  await dancing;
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-dance.png`, fullPage: true });
   await press(reset);
   await expect(canvas).toHaveAttribute('data-cat-x', '0');
@@ -47,8 +50,9 @@ test('GLB gameplay: phases, movement, collection, interruption, and reduced moti
   await press(add);
   await press(add);
   await press(step);
+  const interruptedEat = waitForPhase('eat');
   await press(step);
-  await waitForPhase('eat');
+  await interruptedEat;
   await press(reset);
   await expect(canvas).toHaveAttribute('data-cat-x', '0');
   await page.waitForTimeout(800);
@@ -56,8 +60,9 @@ test('GLB gameplay: phases, movement, collection, interruption, and reduced moti
 
   await press(add);
   await press(add);
+  const interruptedWalk = waitForPhase('walk');
   await press(step);
-  await waitForPhase('walk');
+  await interruptedWalk;
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(canvas).toHaveAttribute('data-cat-animation', 'static');
   await expect(canvas).toHaveAttribute('data-cat-x', '1');
