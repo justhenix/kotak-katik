@@ -2,7 +2,13 @@
 
 ## Original visuals
 
-The tile island, command SVG, direction arrows, and collection marker are created directly in this repository using primitive geometry. M0.5 renders the curated cat and fish GLBs below; the former procedural character and collectible have been replaced. Tree, rock, crate, and bush remain prepared for future levels. No reference-game art, stock images, BISINDO clips, or AI-generated raster assets are included.
+The tile island, command SVG, direction arrows, and collection marker are created directly in this repository using primitive geometry. M0.5 renders the curated cat and fish GLBs below; the former procedural character and collectible have been replaced. Tree, rock, crate, and bush remain prepared for future levels. No reference-game art, photography, BISINDO clips, or AI-generated raster assets are included. The original Kenney tutorial pointer is credited separately below.
+
+## Tutorial pointer (2026-10-13)
+
+`public/assets/tutorial/hand-point.png` is Kenney's original **64×64** `PNG/Outline/Double/hand_point_n.png` from **Cursor Pack 1.1**. Downloaded from the [official pack page](https://kenney.nl/assets/cursor-pack), using its [official ZIP](https://kenney.nl/media/pages/assets/cursor-pack/461b29df18-1717599281/kenney_cursor-pack.zip). The preview and original hand sprites were inspected before selecting the north-pointing double-outline hand.
+
+The delivered `License.txt` identifies **Creative Commons Zero (CC0)** and is retained verbatim at `public/licenses/kenney-cursor-pack.txt`. The shipped PNG is byte-for-byte unchanged: SHA-256 `7451ebc54a375a1bb0e13b53d29e8c2aef719e09c42c9345024417a710951708`. CSS displays it proportionally at 52×52 and animates its position and tap; it does not redraw or alter the asset. The hand is a UI pointer, not BISINDO material. The full pack and ZIP are excluded from the runtime and Git.
 
 ## Curated 3D models (2026-10-10)
 

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGameStore, selectInitialLevel } from './game-store';
-import { createLessonStore, visibleHints, DEMO_COMMAND_MS, DEMO_ACTION_MS, DEMO_RESULT_MS } from './lesson-store';
+import { createLessonStore, visibleHints, DEMO_COMMAND_MS, DEMO_ACTION_MS, DEMO_RESULT_MS, DEMO_TAP_MS, tutorialTarget } from './lesson-store';
 import { curriculumLevels, findCurriculumLevel } from '../game/levels/curriculum';
 import { kernelLevel } from '../game/levels/kernel';
 import { loopLevel } from '../game/levels/mechanics';
@@ -18,6 +18,78 @@ beforeEach(() => vi.useFakeTimers());
 afterEach(() => { for (const { game, lesson } of stores.splice(0)) { lesson.getState().dispose(); game.getState().dispose(); } vi.useRealTimers(); });
 
 describe('authored demonstrations and linear lesson progression', () => {
+  it('teaches placement before execution through the real store and fingertip tap timing', () => {
+    const { game, lesson } = setup('m2-move-watch');
+    lesson.getState().startDemo();
+    expect(game.getState().program).toEqual([]);
+    expect(tutorialTarget(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState())).toEqual({ type: 'palette', command: 'forward', loopIndex: undefined });
+    vi.advanceTimersByTime(DEMO_COMMAND_MS);
+    expect(game.getState().program).toEqual([]);
+    vi.advanceTimersByTime(DEMO_TAP_MS);
+    expect(game.getState().program).toEqual([{ type: 'forward' }]);
+    expect(game.getState().simulation.nextCommandIndex).toBe(0);
+    vi.advanceTimersByTime(DEMO_ACTION_MS + DEMO_RESULT_MS);
+    expect(lesson.getState().demoAction?.type).toBe('run');
+    vi.runAllTimers();
+    expect(game.getState().simulation.completion).toBe(true);
+  });
+  it('guided practice never inserts a block or advances the cat for the child', () => {
+    const { game, lesson } = setup('m2-move-try');
+    vi.advanceTimersByTime(30000);
+    expect(game.getState().program).toEqual([{ type: 'forward' }]);
+    expect(game.getState().simulation.nextCommandIndex).toBe(0);
+    expect(lesson.getState().guideIndex).toBe(0);
+    game.getState().addCommand('forward');
+    expect(lesson.getState().guideIndex).toBe(1);
+    expect(tutorialTarget(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState())).toEqual({ type: 'run' });
+    game.getState().run(); vi.runAllTimers();
+    expect(game.getState().simulation.completion).toBe(true);
+    lesson.getState().resetLesson();
+    expect(lesson.getState().guideIndex).toBe(0);
+  });
+  it('interruption cancels pending placement/play and replay restores a clean sequence', () => {
+    const { game, lesson } = setup('m2-move-watch');
+    lesson.getState().startDemo();
+    vi.advanceTimersByTime(DEMO_COMMAND_MS + DEMO_TAP_MS);
+    lesson.getState().interruptDemo(); vi.runAllTimers();
+    expect(lesson.getState().demoPhase).toBe('interrupted');
+    expect(game.getState().simulation.nextCommandIndex).toBe(0);
+    lesson.getState().startDemo(); vi.runAllTimers();
+    expect(game.getState().program).toHaveLength(1);
+    expect(game.getState().simulation.completion).toBe(true);
+  });
+  it('undoing a guided edit restores its cue while observed debugging attempts stay observed', () => {
+    const { game, lesson } = setup('m2-move-try');
+    game.getState().addCommand('forward');
+    game.getState().removeCommand(1);
+    expect(lesson.getState().guideIndex).toBe(0);
+    expect(tutorialTarget(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState())).toEqual({ type: 'palette', command: 'forward' });
+    game.getState().addCommand('forward');
+    expect(lesson.getState().guideIndex).toBe(1);
+    const debug = setup('m2-debug-together');
+    debug.game.getState().run(); vi.runAllTimers();
+    debug.game.getState().addCommand('forward');
+    debug.game.getState().removeCommand(3);
+    expect(debug.lesson.getState().guideIndex).toBe(1);
+    expect(debug.lesson.getState().observedAttempt).toBe(true);
+  });
+  it('unsuccessful guided attempts retain both requested and observed visual hints', () => {
+    const { game, lesson } = setup('m2-right-together');
+    game.getState().addCommand('turn-left');
+    game.getState().addCommand('forward');
+    game.getState().run(); vi.runAllTimers();
+    expect(game.getState().simulation.status).toBe('failed');
+    expect(lesson.getState().hintStrength).toBe(1);
+    expect(lesson.getState().revealed).toContain('continue-turn');
+    expect(lesson.getState().revealed).toContain('cat-right');
+  });
+  it('every independent lesson begins empty and never exposes a procedural hand target', () => {
+    for (const candidate of curriculumLevels.filter((item) => item.learning.phase === 'independent')) {
+      const { game, lesson } = setup(candidate.id);
+      expect(game.getState().program).toEqual([]);
+      expect(tutorialTarget(candidate, game.getState().program, game.getState().simulation, lesson.getState())).toBeNull();
+    }
+  });
   it('starts beginners in the curriculum and retains fixture/fallback routes', () => {
     expect(selectInitialLevel('').id).toBe('m2-move-watch');
     expect(selectInitialLevel('?fish=trout').id).toBe('m2-move-watch');
@@ -43,11 +115,10 @@ describe('authored demonstrations and linear lesson progression', () => {
   it('shows a turn at a fixed tile and holds the result before the next action', () => {
     const { game, lesson } = setup('m2-left-watch');
     lesson.getState().startDemo();
-    vi.advanceTimersByTime(DEMO_COMMAND_MS + DEMO_ACTION_MS + DEMO_RESULT_MS + DEMO_COMMAND_MS);
+    for (let elapsed = 0; elapsed < 15000 && game.getState().simulation.nextCommandIndex < 2; elapsed += 20) vi.advanceTimersByTime(20);
     expect(game.getState().simulation.avatar).toEqual({ position: { x: 1, z: 0 }, orientation: 'north' });
     expect(game.getState().simulation.nextCommandIndex).toBe(2);
-    vi.advanceTimersByTime(DEMO_ACTION_MS);
-    expect(lesson.getState().demoPhase).toBe('result');
+    vi.advanceTimersByTime(100);
     expect(game.getState().simulation.nextCommandIndex).toBe(2);
   });
   it('observes a failure, restarts, steps through the turn, then repairs and retries', () => {
@@ -91,7 +162,7 @@ describe('authored demonstrations and linear lesson progression', () => {
     lesson.getState().skipDemo();
     lesson.getState().nextLesson();
     expect(game.getState().level.id).toBe('m2-move-try');
-    game.getState().addCommand('forward'); game.getState().step();
+    game.getState().addCommand('forward'); game.getState().step(); game.getState().step();
     lesson.getState().nextLesson();
     expect(game.getState().level.id).toBe('m2-sequence-watch');
     expect(game.getState().program).toHaveLength(2);
@@ -104,7 +175,7 @@ describe('authored demonstrations and linear lesson progression', () => {
     expect(lesson.getState().demoPhase).toBe('idle');
     expect(game.getState().simulation.levelId).toBe('m2-move-try');
     game.getState().addCommand('turn-left');
-    expect(game.getState().program).toEqual([]);
+    expect(game.getState().program).toEqual([{ type: 'forward' }]);
     game.getState().addCommand('forward'); game.getState().run();
     game.getState().loadLevel(level('m2-turn-alone'));
     vi.runAllTimers();
@@ -116,6 +187,8 @@ describe('authored demonstrations and linear lesson progression', () => {
     const candidate = level('m2-debug-watch');
     expect(() => validateDemonstration({ ...candidate, learning: { ...candidate.learning, demonstration: [{ type: 'replace', path: [1], command: 'turn-left' }] } })).toThrow('Invalid demonstration repair');
     expect(() => validateDemonstration({ ...candidate, learning: { ...candidate.learning, demonstration: [{ type: 'step' }] } })).toThrow('Unfinished demonstration');
+    const movement = level('m2-move-watch');
+    expect(() => validateDemonstration({ ...movement, learning: { ...movement.learning, demonstration: [{ type: 'add', command: 'forward', index: 9 }, { type: 'run' }] } })).toThrow('Invalid demonstration insertion');
   });
 });
 
@@ -133,7 +206,7 @@ describe('hint reveal and fading', () => {
     game.getState().step();
     expect(lesson.getState().revealed).toContain('cat-right');
     game.getState().resetSimulation();
-    expect(visibleHints(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState().revealed)).toEqual([]);
+    expect(visibleHints(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState().revealed).map((hint) => hint.id)).not.toContain('cat-right');
     lesson.getState().showHint();
     expect(lesson.getState().revealed).toContain('continue-turn');
   });

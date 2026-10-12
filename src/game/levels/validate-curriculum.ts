@@ -39,10 +39,28 @@ export function validateDemonstration(level: LevelDefinition): void {
     return;
   }
   if (level.learning.phase !== 'demonstration' || actions.length === 0 || actions.length > 12) throw new Error(`Invalid demonstration in ${level.id}`);
-  let program = structuredClone(level.initialProgram);
+  let program: Program = level.learning.demonstrationFromEmpty ? [] : structuredClone(level.initialProgram);
   let state = createInitialState(level);
   let observedFault = false;
   for (const action of actions) {
+    if (action.type === 'select') {
+      if (!commandAt(program, action.path)) throw new Error(`Invalid demonstration selection in ${level.id}`);
+      state = createInitialState(level);
+    }
+    if (action.type === 'add') {
+      const insertionLoop = action.loopIndex === undefined ? undefined : program[action.loopIndex];
+      const scope = action.loopIndex === undefined ? program : insertionLoop?.type === 'repeat' ? insertionLoop.commands : undefined;
+      if (!scope || !Number.isInteger(action.index) || action.index < 0 || action.index > scope.length
+        || action.loopIndex !== undefined && (!Number.isInteger(action.loopIndex) || action.loopIndex < 0)) throw new Error(`Invalid demonstration insertion in ${level.id}`);
+      const command = action.command === 'repeat' ? { type: 'repeat' as const, count: 2 as const, commands: [] } : { type: action.command };
+      if (action.loopIndex === undefined) program = [...program.slice(0, action.index), command, ...program.slice(action.index)];
+      else {
+        const loop = program[action.loopIndex];
+        if (loop?.type !== 'repeat' || command.type === 'repeat') throw new Error(`Invalid demonstration insertion in ${level.id}`);
+        program = program.map((entry, index) => index === action.loopIndex ? { ...loop, commands: [...loop.commands.slice(0, action.index), command, ...loop.commands.slice(action.index)] } : entry);
+      }
+      if (programError(level, program, true)) throw new Error(`Invalid demonstration insertion in ${level.id}`);
+    }
     if (action.type === 'restart') state = createInitialState(level);
     if (action.type === 'run') state = executeForValidation(level, program);
     if (action.type === 'step') {
@@ -173,13 +191,37 @@ export function validateCurriculum(levels: readonly CurriculumLevel[]): void {
     if (level.learning.phase === 'independent' && level.learning.visualHints.length) fail(level, 'Independent support did not fade');
     if (level.learning.phase === 'guided' && !level.learning.visualHints.length) fail(level, 'Guided stage lacks support');
     if (level.learning.phase === 'demonstration' && !initialProgram.length) fail(level, 'Demonstration lacks starter');
-    if (level.learning.phase === 'independent' && level.learning.concept !== 'debugging' && initialProgram.length) fail(level, 'Independent stage is pre-solved');
+    if (level.learning.phase === 'independent' && initialProgram.length) fail(level, 'Independent stage must start empty');
     if (level.learning.concept === 'debugging') {
-      if (!initialProgram.length || executeForValidation(level, initialProgram).completion) fail(level, 'Debug starter is not faulty');
+      if (initialProgram.length ? executeForValidation(level, initialProgram).completion : level.learning.phase !== 'independent') fail(level, 'Debug starter is not faulty');
     } else if (level.learning.phase === 'demonstration') {
       verifySolution(level, initialProgram);
     } else if (initialProgram.length && executeForValidation(level, initialProgram).completion) {
       fail(level, 'Guided stage is already solved');
+    }
+    const guidance = level.learning.guidance ?? [];
+    if (level.learning.phase === 'guided' ? guidance.length === 0 : guidance.length > 0) fail(level, 'Invalid guided interactions');
+    const withinProgram = (path: CommandPath) => path.every((position) => Number.isInteger(position) && position >= 0)
+      && path[0] < level.maxProgramSlots!
+      && (path.length === 1 || initialProgram[path[0]]?.type === 'repeat' && path[1] < level.maxLoopBodySlots!);
+    for (const { target, complete } of guidance) {
+      if (complete.type === 'command') {
+        if (!withinProgram(complete.path) || !complete.choices.length
+          || complete.choices.some((type) => !level.allowedCommands.includes(type) || complete.path.length === 2 && type === 'repeat')) fail(level, 'Invalid guided command');
+        const original = commandAt(initialProgram, complete.path);
+        if (original && complete.choices.includes(original.type)) fail(level, 'Guided edit is already complete');
+      }
+      if (complete.type === 'count') {
+        const loop = initialProgram[complete.index];
+        if (loop?.type !== 'repeat' || loop.count !== complete.differentFrom) fail(level, 'Invalid guided count');
+      }
+      if (target.type === 'palette' && target.command && !level.allowedCommands.includes(target.command)
+        || target.type === 'command' && !withinProgram(target.path)
+        || target.type === 'count' && initialProgram[target.index]?.type !== 'repeat') fail(level, 'Invalid guided target');
+      if (target.type === 'slot') {
+        const path: CommandPath = target.loopIndex === undefined ? [target.index] : [target.loopIndex, target.index];
+        if (!withinProgram(path) || complete.type !== 'command' || path.join('.') !== complete.path.join('.')) fail(level, 'Invalid guided slot');
+      }
     }
     validateDemonstration(level);
   }

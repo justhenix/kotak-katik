@@ -1,73 +1,61 @@
-import { Cat, Eye, RotateCcw, SkipForward, Lightbulb, ArrowRight, Check, Pencil } from 'lucide-react';
-import { CommandIcon, commandLabels } from '../commands/CommandIcon';
-import { ControlIcon } from '../controls/ControlIcon';
-import { gameStore, useGameStore } from '../../stores/game-store';
-import { demoPlaying, useLessonStore, visibleHints } from '../../stores/lesson-store';
+import { useEffect, useRef } from 'react';
+import { ArrowRight, Check, Ellipsis, RotateCcw, SkipForward } from 'lucide-react';
+import { useGameStore, gameStore } from '../../stores/game-store';
+import { demoPlaying, lessonStore, useLessonStore } from '../../stores/lesson-store';
 import { curriculumLevels } from '../../game/levels/curriculum';
+import { GhostHand } from './GhostHand';
+
+export function LessonOptions() {
+  const level = useGameStore((state) => state.level);
+  const lesson = useLessonStore((state) => state);
+  const menu = useRef<HTMLDetailsElement>(null);
+  if (level.learning.phase === 'practice') return null;
+  const close = () => { if (menu.current) menu.current.open = false; };
+  return <details className="lesson-options" ref={menu}>
+    <summary aria-label="Pilihan"><Ellipsis aria-hidden="true" /></summary>
+    <div className="lesson-options-list">
+      {level.learning.demonstration ? <>
+        <button onClick={() => { lesson.startDemo(); close(); }}><RotateCcw aria-hidden="true" />Ulang contoh</button>
+        <button onClick={() => { lesson.skipDemo(); close(); }}><SkipForward aria-hidden="true" />Lewati contoh</button>
+      </> : <button onClick={() => { lesson.resetLesson(); close(); }}><RotateCcw aria-hidden="true" />Mulai ulang</button>}
+    </div>
+  </details>;
+}
 
 export function LessonScaffold({ ready }: { ready: boolean }) {
-  const { level, program, simulation } = useGameStore((state) => state);
+  const level = useGameStore((state) => state.level);
+  const simulation = useGameStore((state) => state.simulation);
   const lesson = useLessonStore((state) => state);
+  useEffect(() => {
+    if (ready && level.learning.demonstration && lesson.demoPhase === 'idle') lessonStore.getState().startDemo();
+  }, [ready, level.id, level.learning.demonstration, lesson.demoPhase]);
+  useEffect(() => {
+    const interrupt = () => { if (document.hidden) lessonStore.getState().interruptDemo(); };
+    document.addEventListener('visibilitychange', interrupt);
+    return () => document.removeEventListener('visibilitychange', interrupt);
+  }, []);
+  useEffect(() => {
+    if (level.learning.phase !== 'guided' || simulation.completion || simulation.status === 'running' || lesson.hintStrength >= 2) return;
+    const timer = setTimeout(() => lessonStore.getState().showHint(), lesson.hintStrength === 0 ? 8000 : 14000);
+    return () => clearTimeout(timer);
+  }, [level.id, level.learning.phase, simulation.completion, simulation.status, lesson.guideIndex, lesson.guideChoice, lesson.hintStrength]);
   if (level.learning.phase === 'practice') return null;
   const watching = demoPlaying(lesson.demoPhase);
-  const demo = level.learning.demonstration;
-  const hints = visibleHints(level, program, simulation, lesson.revealed);
-  const current = lesson.demoPath ? program[lesson.demoPath[0]] : undefined;
-  const command = current?.type === 'repeat' && lesson.demoPath?.length === 2 ? current.commands[lesson.demoPath[1]] : current;
-  const next = curriculumLevels.findIndex((candidate) => candidate.id === level.id) + 1;
-  const canContinue = !watching && (simulation.completion || demo && lesson.demoPhase === 'skipped');
-  const action = lesson.demoAction;
-  const result = action?.type === 'restart' ? 'Kembali ke awal.'
-    : action?.type === 'replace' ? 'Belokan berubah.'
-    : simulation.status === 'failed' ? 'Jalan habis.'
-    : simulation.completion ? 'Semua ikan terkumpul!'
-    : simulation.events.some((event) => event.type === 'turned') ? 'Hadap berubah. Petak tetap.'
-    : simulation.events.some((event) => event.type === 'collected') ? 'Ikan terkumpul!'
-    : 'Maju satu petak.';
-  const caption = watching ? action?.type === 'replace' ? 'Pilih blok, lalu ganti belokan.'
-    : action?.type === 'restart' ? 'Kembali. Periksa satu per satu.'
-    : action?.type === 'run' ? 'Tekan Main. Lihat hasilnya.' : 'Tekan satu langkah.'
-    : lesson.demoPhase === 'done' ? 'Sekarang giliranmu.'
-    : level.learning.instruction;
+  const index = curriculumLevels.findIndex((candidate) => candidate.id === level.id);
+  const canContinue = !watching && (simulation.completion || lesson.demoPhase === 'skipped');
+  const inspect = level.learning.concept === 'debugging' && (simulation.status === 'failed' || simulation.status === 'finished')
+    && (!watching || lesson.demoAction?.type === 'restart');
   return <section className="lesson-scaffold" aria-label="Bantuan belajar" data-phase={level.learning.phase} data-demo-phase={lesson.demoPhase}>
-    <div className="lesson-heading">
-      <div className="lesson-prompt" tabIndex={-1}>
-        <span className="lesson-phase">{next} / {curriculumLevels.length} · {level.learning.phase === 'demonstration' ? 'Lihat' : level.learning.phase === 'guided' ? 'Coba bersama' : 'Coba sendiri'}</span>
-        <p>{caption}</p>
-      </div>
-      <div className="lesson-actions">
-        {demo && !watching && <button disabled={!ready || simulation.status === 'running'} onClick={lesson.startDemo}>
-          {lesson.demoPhase === 'idle' ? <Eye aria-hidden="true" /> : <RotateCcw aria-hidden="true" />}<span>{lesson.demoPhase === 'idle' ? 'Lihat contoh' : 'Ulang contoh'}</span>
-        </button>}
-        {demo && (watching || !simulation.completion) && lesson.demoPhase !== 'skipped' && <button className="skip-demo" onClick={lesson.skipDemo}>
-          <SkipForward aria-hidden="true" /><span>Lewati</span>
-        </button>}
-        {!watching && !simulation.completion && level.learning.visualHints?.some((hint) => hint.reveal.when === 'on-request') && <button aria-pressed={level.learning.visualHints.filter((hint) => hint.reveal.when === 'on-request').every((hint) => lesson.revealed.includes(hint.id))} onClick={lesson.showHint}>
-          <Lightbulb aria-hidden="true" /><span>Petunjuk</span>
-        </button>}
-        {canContinue && next < curriculumLevels.length && <button className="next-lesson" onClick={() => {
-          lesson.nextLesson();
-          requestAnimationFrame(() => document.querySelector<HTMLElement>('.lesson-prompt')?.focus({ preventScroll: true }));
-        }}><span>Lanjut</span><ArrowRight aria-hidden="true" /></button>}
-        {canContinue && next === curriculumLevels.length && <span className="journey-complete"><Check aria-hidden="true" />Semua tahap selesai!</span>}
-      </div>
-    </div>
-    {watching && <div className="demo-trace" aria-label="Perintah, kucing bergerak, hasil" data-demo-action={action?.type}>
-      <span className={lesson.demoPhase === 'command' ? 'trace-current' : ''}>
-        {action?.type === 'replace' ? <><Pencil aria-hidden="true" /><CommandIcon type={action.command} /></>
-          : action?.type === 'restart' ? <RotateCcw aria-hidden="true" />
-          : <><ControlIcon type={action?.type === 'run' ? 'play' : 'step'} />{command && <CommandIcon type={command.type} />}</>}
-        <span>{action?.type === 'replace' ? `Ganti: ${commandLabels[action.command]}` : action?.type === 'restart' ? 'Dari awal' : command ? commandLabels[command.type] : 'Main'}</span>
-      </span>
-      <ArrowRight aria-hidden="true" />
-      <span className={lesson.demoPhase === 'action' ? 'trace-current' : ''}><Cat aria-hidden="true" /><span>Lihat kucing</span></span>
-      <ArrowRight aria-hidden="true" />
-      <span className={lesson.demoPhase === 'result' ? 'trace-current' : ''}><span aria-hidden="true">{simulation.status === 'failed' ? '!' : '✓'}</span><span>{lesson.demoPhase === 'result' ? result : 'Hasil'}</span></span>
-    </div>}
-    {!watching && hints.length > 0 && <div className="lesson-hint" role="status"><Eye aria-hidden="true" /><p>{hints[0].text}</p></div>}
-    {!watching && level.learning.concept === 'debugging' && lesson.observedAttempt && ['failed', 'finished'].includes(simulation.status) && <button className="inspect-action" onClick={() => {
+    <GhostHand />
+    {inspect && <button className="inspect-action" disabled={watching} onClick={() => {
       gameStore.getState().resetSimulation();
       requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.step-button')?.focus({ preventScroll: true }));
-    }}><ControlIcon type="step" /><span>Periksa satu per satu</span></button>}
+    }}>Periksa satu per satu</button>}
+    {lesson.demoPhase === 'interrupted' && <button className="continue-lesson" onClick={lesson.startDemo}><RotateCcw aria-hidden="true" />Ulang contoh</button>}
+    {canContinue && index < curriculumLevels.length - 1 && <button className="next-lesson" onClick={() => {
+      lesson.nextLesson();
+      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.next-lesson, .palette-command, .run-button')?.focus({ preventScroll: true }));
+    }}>Lanjut<ArrowRight aria-hidden="true" /></button>}
+    {canContinue && index === curriculumLevels.length - 1 && <span className="journey-complete"><Check aria-hidden="true" />Semua tahap selesai!</span>}
   </section>;
 }

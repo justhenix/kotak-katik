@@ -4,10 +4,10 @@ import { CommandPalette } from '../commands/CommandPalette';
 import { ControlIcon } from '../controls/ControlIcon';
 import { RunControls } from '../controls/RunControls';
 import { gameStore, useGameStore } from '../../stores/game-store';
-import { demoPlaying, lessonStore, useLessonStore, visibleHints } from '../../stores/lesson-store';
+import { demoPlaying, lessonStore, useLessonStore, tutorialTarget } from '../../stores/lesson-store';
 import type { CommandType, PrimitiveCommand, RepeatCount } from '../../game/types';
 
-type Target = { kind: 'insert' | 'select'; index: number; loopIndex?: number };
+type Target = { kind: 'insert' | 'select'; index: number; loopIndex?: number; manual?: boolean };
 const pathFor = (index: number, loopIndex?: number) => loopIndex === undefined ? `${index}` : `${loopIndex}.${index}`;
 const scopeLabel = (index: number, loopIndex?: number) => `perintah ${index + 1}${loopIndex === undefined ? '' : ` di Ulangi ${loopIndex + 1}`}`;
 
@@ -40,21 +40,30 @@ export function ProgramTray({ ready }: { ready: boolean }) {
   const simulation = useGameStore((s) => s.simulation);
   const lesson = useLessonStore((s) => s);
   const watching = demoPlaying(lesson.demoPhase);
-  const locked = running || watching;
-  const hints = visibleHints(level, program, simulation, lesson.revealed);
-  const cuePaths = hints.flatMap(({ cue }) => cue.type === 'command' ? [cue.path.join('.')]
-    : cue.type === 'repeat-count' ? [String(cue.commandIndex)] : []);
-  const slotCues = hints.flatMap(({ cue }) => cue.type === 'program-slot' ? [pathFor(cue.index, cue.loopIndex)] : []);
-  const demoPath = watching && lesson.demoPhase === 'command' ? lesson.demoPath?.join('.') : undefined;
+  const curriculum = level.learning.phase !== 'practice';
+  const canArrange = !curriculum || !['movement', 'sequencing'].includes(level.learning.concept);
+  const completed = simulation.completion || lesson.demoPhase === 'skipped';
+  const locked = running || watching || level.learning.phase === 'demonstration';
+  const focus = tutorialTarget(level, program, simulation, lesson);
+  const guidance = level.learning.guidance?.[lesson.guideIndex];
+  const preparedPrefix = program.length >= level.initialProgram.length && level.initialProgram.every((command, index) => program[index]?.type === command.type);
+  const choices = watching && lesson.demoAction?.type === 'add' ? [lesson.demoAction.command]
+    : !replacing && preparedPrefix && level.learning.phase === 'guided' && focus?.type === 'palette' && guidance?.complete.type === 'command' ? guidance.complete.choices : undefined;
+  const showControls = !curriculum || !completed && (level.learning.phase === 'independent' || level.learning.concept === 'debugging'
+    || focus?.type === 'run' || focus?.type === 'step' || running);
+  const showPalette = !countOnly && (!curriculum || !completed && !running && (replacing || target.manual || focus?.type !== 'run' && focus?.type !== 'step')
+    && (level.learning.phase !== 'demonstration' || lesson.demoAction?.type === 'add' || lesson.demoAction?.type === 'replace'));
   const resetLabel = level.initialProgram.length > 0 ? 'Mulai ulang' : 'Hapus semua';
   const wasWatching = useRef(false);
   useEffect(() => {
     const action = lesson.demoAction;
-    if (watching && action?.type === 'replace') {
+    if (watching && (action?.type === 'replace' || action?.type === 'select' && simulation.status === 'idle')) {
       setTarget({ kind: 'select', index: action.path[action.path.length - 1], loopIndex: action.path.length === 2 ? action.path[0] : undefined });
+    } else if (watching && action?.type === 'add') {
+      setTarget({ kind: 'insert', index: action.index, loopIndex: action.loopIndex });
     } else if (wasWatching.current && !watching) setTarget({ kind: 'insert', index: program.length });
     wasWatching.current = watching;
-  }, [watching, lesson.demoAction, program.length]);
+  }, [watching, lesson.demoAction, program.length, simulation.status]);
 
   useEffect(() => {
     // Reset/Clear can originate outside the editor; discard stale scope pointers.
@@ -74,15 +83,21 @@ export function ProgramTray({ ready }: { ready: boolean }) {
   const focusPath = (path: string, insertion = false) => requestAnimationFrame(() => {
     editor.current?.querySelector<HTMLButtonElement>(`[${insertion ? 'data-insert-path' : 'data-command-path'}="${path}"]`)?.focus({ preventScroll: true });
   });
-  const insertAt = (index: number, loopIndex?: number) => setTarget({ kind: 'insert', index, loopIndex });
+  const insertAt = (index: number, loopIndex?: number, manual = false) => {
+    setTarget({ kind: 'insert', index, loopIndex, manual });
+    if (manual && (focus?.type === 'slot' && focus.index === index && focus.loopIndex === loopIndex || focus?.type === 'run')) lessonStore.getState().chooseGuideTarget();
+  };
   const select = (index: number, loopIndex?: number) => {
     gameStore.getState().resetSimulation();
     setTarget({ kind: 'select', index, loopIndex });
+    if (focus?.type === 'command' && focus.path.join('.') === pathFor(index, loopIndex)
+      || scope[index]?.type !== 'repeat' && (focus?.type === 'run' || focus?.type === 'slot' || status === 'failed')) lessonStore.getState().chooseGuideTarget();
   };
   const choose = (type: CommandType) => {
     const store = gameStore.getState();
     if (replacing && type !== 'repeat') {
       store.replaceCommand(target.index, type, target.loopIndex);
+      if (level.learning.phase === 'guided' && gameStore.getState().program !== program) setTarget({ kind: 'insert', index: program.length });
       return;
     }
     const index = selected ? target.index + 1 : Math.min(target.index, scope.length);
@@ -103,19 +118,24 @@ export function ProgramTray({ ready }: { ready: boolean }) {
     insertAt(scope.length - 1, target.loopIndex);
     focusPath(pathFor(scope.length - 1, target.loopIndex), true);
   };
-  const insertion = (index: number, loopIndex?: number, temporary = false) => <button
-    className={`insert-slot ${target.kind === 'insert' && target.index === index && target.loopIndex === loopIndex ? 'chosen-target' : ''} ${temporary ? 'between-slot' : ''} ${slotCues.includes(pathFor(index, loopIndex)) ? 'learning-target' : ''}`}
-    data-insert-path={pathFor(index, loopIndex)} data-learning-cue={slotCues.includes(pathFor(index, loopIndex)) || undefined} disabled={locked}
+  const insertion = (index: number, loopIndex?: number, temporary = false) => {
+    const insertionLoop = loopIndex === undefined ? undefined : program[loopIndex];
+    const insertionScope = insertionLoop?.type === 'repeat' ? insertionLoop.commands : program;
+    const insertionLimit = loopIndex === undefined ? level.maxProgramSlots : level.maxLoopBodySlots;
+    const insertionFull = insertionLimit !== undefined && insertionScope.length >= insertionLimit;
+    return curriculum && (completed || level.learning.phase === 'demonstration' && program.length > 0 || insertionFull && !temporary) ? null : <button
+    className={`insert-slot ${target.kind === 'insert' && target.index === index && target.loopIndex === loopIndex ? 'chosen-target' : ''} ${temporary ? 'between-slot' : ''}`}
+    data-insert-path={pathFor(index, loopIndex)} disabled={locked}
     aria-label={loopIndex === undefined ? `Tambah di posisi ${index + 1}` : `Tambah di posisi ${index + 1} dalam Ulangi ${loopIndex + 1}`}
     aria-pressed={target.kind === 'insert' && target.index === index && target.loopIndex === loopIndex}
-    onClick={() => insertAt(index, loopIndex)}><ControlIcon type="plus" />{slotCues.includes(pathFor(index, loopIndex)) && <span className="target-label">Di sini</span>}</button>;
+    onClick={() => insertAt(index, loopIndex, true)}><ControlIcon type="plus" /></button>;
+  };
   const primitive = (command: PrimitiveCommand, index: number, loopIndex?: number) => {
     const active = activePath === pathFor(index, loopIndex);
     const isSelected = target.kind === 'select' && target.index === index && target.loopIndex === loopIndex;
     return <li className="primitive-item" key={index}>
       {target.kind === 'insert' && target.index === index && target.loopIndex === loopIndex && insertion(index, loopIndex, true)}
-      <button className={`command-block puzzle-block ${command.type} ${active ? 'active-command' : ''} ${active && status === 'failed' ? 'failed-command' : ''} ${cuePaths.includes(pathFor(index, loopIndex)) || demoPath === pathFor(index, loopIndex) ? 'learning-target' : ''}`}
-        data-learning-cue={cuePaths.includes(pathFor(index, loopIndex)) || demoPath === pathFor(index, loopIndex) || undefined}
+      <button className={`command-block puzzle-block ${command.type} ${active ? 'active-command' : ''} ${active && status === 'failed' ? 'failed-command' : ''} ${watching && lesson.demoAction?.type === 'add' && lesson.demoPhase !== 'command' && lesson.demoPath?.join('.') === pathFor(index, loopIndex) ? 'block-arrival' : ''}`}
         disabled={locked} onClick={() => select(index, loopIndex)} aria-pressed={isSelected}
         aria-label={`Pilih ${scopeLabel(index, loopIndex)}: ${commandLabels[command.type]}`} aria-current={active ? 'step' : undefined}
         data-command-path={pathFor(index, loopIndex)}>
@@ -125,18 +145,18 @@ export function ProgramTray({ ready }: { ready: boolean }) {
     </li>;
   };
   return <div className="editor" ref={editor} onKeyDown={(event) => {
-    if (event.key === 'Escape' && !locked) { insertAt(program.length); focusPath(String(program.length), true); }
+    if (event.key === 'Escape' && !locked) { insertAt(program.length, undefined, true); focusPath(String(program.length), true); }
   }}>
     <section aria-labelledby="program-title" className="program-area">
-      <div className="program-heading">
-        <h2 id="program-title" className="sr-only">Urutanmu</h2>
+      <h2 id="program-title" className="sr-only">Urutanmu</h2>
+      {!curriculum && <div className="program-heading">
         {level.maxProgramSlots !== undefined && <span className="slot-count" aria-label={`${program.length} dari ${level.maxProgramSlots} tempat terisi`}>{program.length} / {level.maxProgramSlots}</span>}
         <button className="delete-program-button clear-button" disabled={program.length === 0 || locked}
           aria-label={resetLabel} title={resetLabel} onClick={() => {
             if (level.learning.phase === 'practice') resetProgram(); else lessonStore.getState().resetLesson();
             insertAt(level.initialProgram.length);
           }}><ControlIcon type={level.initialProgram.length > 0 ? 'reset' : 'delete'} />{level.initialProgram.length > 0 && <span className="reset-label">Ulang</span>}</button>
-      </div>
+      </div>}
       <div className="program-scroll">
         <div className="program-sequence" ref={strip}>
           <ol className="program-list" aria-label="Urutan perintah">
@@ -144,8 +164,7 @@ export function ProgramTray({ ready }: { ready: boolean }) {
               {target.kind === 'insert' && target.index === index && target.loopIndex === undefined && insertion(index, undefined, true)}
               <div className={`repeat-item ${activeCommandPath?.[0] === index ? 'active-loop' : ''}`}>
                 <div className="repeat-head">
-                  <button className={`repeat-select ${cuePaths.includes(String(index)) ? 'learning-target' : ''}`} disabled={locked} onClick={() => select(index)}
-                    data-learning-cue={cuePaths.includes(String(index)) || undefined}
+                  <button className="repeat-select" disabled={locked} onClick={() => select(index)}
                     aria-label={`Pilih Ulangi ${index + 1}`} data-command-path={String(index)}
                     aria-pressed={target.kind === 'select' && target.index === index && target.loopIndex === undefined}>
                     <CommandIcon type="repeat" /><span>{command.count}×</span>
@@ -163,22 +182,23 @@ export function ProgramTray({ ready }: { ready: boolean }) {
           </ol>
           {insertion(program.length)}
         </div>
-        <RunControls ready={ready} watching={watching} demoControl={watching && lesson.demoPhase === 'command' && (lesson.demoAction?.type === 'step' || lesson.demoAction?.type === 'run') ? lesson.demoAction.type : undefined} />
+        {showControls && <RunControls ready={ready} watching={watching} showStep={!curriculum || level.learning.concept === 'debugging' || level.learning.concept === 'mixed-application'} />}
       </div>
     </section>
-    {selected && <div className={`selection-tools ${countOnly ? 'count-tools' : ''}`} role="group" aria-label={`Ubah ${scopeLabel(target.index, target.loopIndex)}`}>
-      <span className="selection-label">{commandLabels[selected.type]} {target.index + 1}</span>
-      {selected.type === 'repeat' && <select className={cuePaths.includes(String(target.index)) ? 'learning-target' : ''} aria-label={`Banyaknya Ulangi ${target.index + 1}`} value={selected.count} disabled={locked}
+    {selected && !watching && (!curriculum || !completed) && <div className={`selection-tools ${countOnly ? 'count-tools' : ''}`} role="group" aria-label={`Ubah ${scopeLabel(target.index, target.loopIndex)}`}>
+      {!curriculum && <span className="selection-label">{commandLabels[selected.type]} {target.index + 1}</span>}
+      {selected.type === 'repeat' && <select data-count-index={target.index} aria-label={`Banyaknya Ulangi ${target.index + 1}`} value={selected.count} disabled={locked}
         onChange={(event) => gameStore.getState().setRepeatCount(target.index, Number(event.target.value) as RepeatCount)}>
         {[2, 3, 4].map((count) => <option key={count} value={count}>{count}×</option>)}
       </select>}
+      {canArrange && <>
       <button disabled={locked || target.index === 0} aria-label={`Geser ${scopeLabel(target.index, target.loopIndex)} sebelumnya`} onClick={() => move(-1)}><ControlIcon type="before" /></button>
       <button disabled={locked || target.index === scope.length - 1} aria-label={`Geser ${scopeLabel(target.index, target.loopIndex)} berikutnya`} onClick={() => move(1)}><ControlIcon type="after" /></button>
-      <button disabled={locked || full} onClick={() => { insertAt(target.index, target.loopIndex); focusPath(pathFor(target.index, target.loopIndex), true); }}>+ Sebelum</button>
-      <button disabled={locked || full} onClick={() => { insertAt(target.index + 1, target.loopIndex); focusPath(pathFor(target.index + 1, target.loopIndex), true); }}>+ Sesudah</button>
+      <button disabled={locked || full} onClick={() => { insertAt(target.index, target.loopIndex, true); focusPath(pathFor(target.index, target.loopIndex), true); }}>+ Sebelum</button>
+      <button disabled={locked || full} onClick={() => { insertAt(target.index + 1, target.loopIndex, true); focusPath(pathFor(target.index + 1, target.loopIndex), true); }}>+ Sesudah</button>
+      </>}
       <button className="delete-selected" disabled={locked} aria-label={selected.type === 'repeat' ? `Hapus Ulangi ${target.index + 1}` : `Hapus ${scopeLabel(target.index, target.loopIndex)}: ${commandLabels[selected.type]}`} onClick={remove}><ControlIcon type="delete" /><span>Hapus</span></button>
     </div>}
-    {!countOnly && <CommandPalette loopIndex={target.loopIndex} replacing={replacing} full={full} watching={watching}
-      highlighted={watching && lesson.demoAction?.type === 'replace' ? lesson.demoAction.command : undefined} onChoose={choose} />}
+    {showPalette && <CommandPalette loopIndex={target.loopIndex} replacing={replacing} full={full} watching={watching} choices={choices} onChoose={choose} />}
   </div>;
 }

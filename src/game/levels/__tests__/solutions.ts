@@ -7,7 +7,7 @@ const R: PrimitiveCommand = { type: 'turn-right' };
 // Verification witnesses stay out of the app's imports and child-facing hint metadata.
 export const curriculumSolutions: Readonly<Record<string, Program>> = {
   'm2-move-watch': [F],
-  'm2-move-try': [F],
+  'm2-move-try': [F, F],
   'm2-sequence-watch': [F, F],
   'm2-sequence-build': [F, F, F],
   'm2-left-watch': [F, L, F],

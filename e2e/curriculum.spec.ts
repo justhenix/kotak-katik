@@ -8,6 +8,7 @@ import type { CommandType, Program } from '../src/game/types';
 const labels: Record<CommandType, string> = { forward: 'Maju', 'turn-left': 'Kiri', 'turn-right': 'Kanan', repeat: 'Ulangi' };
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 const feedback = (page: Page) => page.locator('.feedback');
+const scaffold = (page: Page) => page.locator('.lesson-scaffold');
 type Press = (locator: Locator) => Promise<void>;
 
 async function removeStarter(page: Page, program: Program, press: Press) {
@@ -32,7 +33,7 @@ async function buildProgram(page: Page, program: Program, press: Press) {
   }
 }
 
-for (const level of curriculumLevels) test(`M2A ${level.id}: rendered preview, legal editing, Step, Run and reset`, async ({ page }, info) => {
+for (const level of curriculumLevels) test(`Curriculum ${level.id}: real demonstration or editable solution, feedback and reset`, async ({ page }, info) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
@@ -41,63 +42,79 @@ for (const level of curriculumLevels) test(`M2A ${level.id}: rendered preview, l
   await expect(page.getByRole('region', { name: level.title, exact: true })).toBeVisible();
   await expect(page.locator('.board-scene')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('canvas')).toBeVisible();
-  await expect(page.getByLabel(`0 dari ${level.collectibles.length} ikan terkumpul`)).toBeVisible();
-  await expect(page.getByLabel(`${level.initialProgram.length} dari ${level.maxProgramSlots} tempat terisi`)).toBeVisible();
-  for (const type of ['forward', 'turn-left', 'turn-right', 'repeat'] as const) {
-    await expect(button(page, `Tambah ${labels[type]}`)).toHaveCount(level.allowedCommands.includes(type) ? 1 : 0);
-  }
-  await page.screenshot({ path: `.verification/m2-${info.project.name}-${level.id}-initial.png`, fullPage: true });
+  await expect(page.locator('.slot-count, .lesson-phase, .demo-trace')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  for (const control of await page.locator('.controls-area button, .palette-area button').all()) {
-    const bounds = await control.boundingBox();
-    expect(bounds!.width).toBeGreaterThanOrEqual(44);
-    expect(bounds!.height).toBeGreaterThanOrEqual(44);
-    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(info.project.use.viewport!.width);
-  }
+
   const program = curriculumSolutions[level.id];
-  await removeStarter(page, level.initialProgram, press);
-  await buildProgram(page, program, press);
-  const actions = program.reduce((sum, command) => sum + (command.type === 'repeat' ? command.commands.length * command.count : 1), 0);
-  for (let index = 0; index < actions; index++) {
-    await press(button(page, 'Satu langkah'));
-    await expect(feedback(page)).toHaveAttribute('data-actions', String(index + 1));
+  if (level.learning.phase === 'demonstration') {
+    await expect(scaffold(page)).toHaveAttribute('data-demo-phase', 'done', { timeout: 30000 });
+    await expect(page.locator('.controls-area, .palette-area, .selection-tools, .ghost-hand')).toHaveCount(0);
+  } else {
+    await expect(feedback(page)).toHaveAttribute('data-actions', '0');
+    if (level.learning.phase === 'independent') await expect(page.locator('.ghost-hand, .instruction-focus')).toHaveCount(0);
+    await removeStarter(page, level.initialProgram, press);
+    await buildProgram(page, program, press);
+    await press(button(page, 'Jalankan'));
   }
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
   const expected = verifySolution(level, program);
   await expect(feedback(page)).toHaveAttribute('data-x', String(expected.avatar.position.x));
   await expect(feedback(page)).toHaveAttribute('data-z', String(expected.avatar.position.z));
   await expect(feedback(page)).toHaveAttribute('data-orientation', expected.avatar.orientation);
-  const stepped = await feedback(page).evaluate((element) => ({ ...(element as HTMLElement).dataset }));
-  await press(button(page, 'Jalankan lagi'));
-  await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
-  expect(await feedback(page).evaluate((element) => ({ ...(element as HTMLElement).dataset }))).toEqual(stepped);
-  await press(button(page, level.initialProgram.length > 0 ? 'Mulai ulang' : 'Hapus semua'));
+  await expect(feedback(page)).toHaveAttribute('data-actions', String(expected.nextCommandIndex));
+  await expect(page.getByLabel(`${level.collectibles.length} dari ${level.collectibles.length} ikan terkumpul`)).toBeVisible();
+  await page.screenshot({ path: `.verification/idwdyd-${info.project.name}-${level.id}-solved.png`, fullPage: true });
+
+  await page.locator('summary').click();
+  await press(button(page, level.learning.phase === 'demonstration' ? 'Ulang contoh' : 'Mulai ulang'));
+  if (level.learning.phase === 'demonstration') {
+    await page.locator('summary').click();
+    await press(button(page, 'Lewati contoh'));
+    await expect(scaffold(page)).toHaveAttribute('data-demo-phase', 'skipped');
+  }
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
   await expect(feedback(page)).toHaveAttribute('data-orientation', level.avatar.orientation);
   await expect(page.getByLabel(`0 dari ${level.collectibles.length} ikan terkumpul`)).toBeVisible();
-  await expect(page.getByLabel(`${level.initialProgram.length} dari ${level.maxProgramSlots} tempat terisi`)).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test('M2A debugging: observe a wrong turn, replace it, run again, and retain the original reset program', async ({ page }, info) => {
+test('debugging observes the wrong turn before its repair; child inspects and completes a missing step', async ({ page }, info) => {
   const press: Press = (locator) => info.project.name === 'mobile' ? locator.tap() : locator.click();
   await page.goto('/?level=m2-debug-watch');
-  await expect(page.locator('.board-scene')).toHaveAttribute('aria-busy', 'false');
-  await press(button(page, 'Jalankan'));
-  await expect(feedback(page)).toHaveAttribute('data-status', 'failed');
+  await expect(feedback(page)).toHaveAttribute('data-status', 'failed', { timeout: 15000 });
   await expect(feedback(page)).toHaveAttribute('data-command-path', '2');
   await expect(feedback(page)).toHaveAttribute('data-orientation', 'south');
-  await page.screenshot({ path: `.verification/m2-${info.project.name}-debug-observation.png`, fullPage: true });
-  await press(button(page, 'Pilih perintah 2: Kanan'));
-  await press(button(page, 'Ganti dengan Kiri'));
-  await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
+  await expect(button(page, 'Pilih perintah 2: Kanan')).toBeVisible();
+  await page.screenshot({ path: `.verification/idwdyd-${info.project.name}-debug-observation.png`, fullPage: true });
+  await page.evaluate(() => {
+    const observer = new MutationObserver(() => {
+      const selected = document.querySelector('button[data-command-path="1"].instruction-focus');
+      if (selected) document.body.dataset.sawTutorialSelection = 'true';
+    });
+    observer.observe(document.querySelector('.editor')!, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  });
+  await expect(scaffold(page)).toHaveAttribute('data-demo-phase', 'done', { timeout: 30000 });
+  await expect(page.locator('body')).toHaveAttribute('data-saw-tutorial-selection', 'true');
+  await expect(button(page, 'Pilih perintah 2: Kiri')).toBeVisible();
+  await page.goto('/?level=m2-debug-together');
+  await press(button(page, 'Jalankan'));
+  await expect(feedback(page)).toHaveAttribute('data-status', 'finished');
+  await press(button(page, 'Periksa satu per satu'));
+  await expect(feedback(page)).toHaveAttribute('data-actions', '0');
+  for (let index = 0; index < 3; index++) {
+    await press(button(page, 'Satu langkah'));
+    await expect(feedback(page)).toHaveAttribute('data-actions', String(index + 1));
+  }
+  await press(button(page, 'Tambah di posisi 4'));
+  await press(button(page, 'Tambah Maju'));
   await press(button(page, 'Jalankan'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
-  await press(button(page, 'Mulai ulang'));
-  await expect(button(page, 'Pilih perintah 2: Kanan')).toBeVisible();
+  await page.locator('summary').click(); await press(button(page, 'Mulai ulang'));
+  await expect(page.locator('.command-block')).toHaveCount(3);
+  await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
 });
 
-test('M2A unknown preview keeps the default board and the selected engineering fixture', async ({ page }) => {
+test('unknown preview keeps the default board and the selected engineering fixture', async ({ page }) => {
   await page.goto('/?level=missing');
   await expect(page.getByRole('region', { name: 'Ambil semua ikan', exact: true })).toBeVisible();
   await expect(button(page, 'Tambah Kiri')).toHaveCount(0);

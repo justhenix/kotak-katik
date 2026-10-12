@@ -29,7 +29,21 @@ export type VisualHint = Readonly<{
 }>;
 export type DemonstrationAction =
   | Readonly<{ type: 'step' | 'run' | 'restart' }>
+  | Readonly<{ type: 'add'; command: CommandType; index: number; loopIndex?: number }>
+  | Readonly<{ type: 'select'; path: CommandPath }>
   | Readonly<{ type: 'replace'; path: CommandPath; command: PrimitiveType }>;
+export type TutorialTarget =
+  | Readonly<{ type: 'palette'; command?: CommandType; loopIndex?: number }>
+  | Readonly<{ type: 'slot'; index: number; loopIndex?: number }>
+  | Readonly<{ type: 'command'; path: CommandPath }>
+  | Readonly<{ type: 'count'; index: number }>
+  | Readonly<{ type: 'run' | 'step' | 'inspect' }>;
+export type GuidedInteraction = Readonly<{
+  target: TutorialTarget;
+  complete: Readonly<{ type: 'command'; path: CommandPath; choices: readonly CommandType[] }>
+    | Readonly<{ type: 'count'; index: number; differentFrom: RepeatCount }>
+    | Readonly<{ type: 'attempt' }>;
+}>;
 export type LearningMetadata = Readonly<{
   concept: LearningConcept;
   phase: LearningPhase;
@@ -38,6 +52,8 @@ export type LearningMetadata = Readonly<{
   instruction?: string;
   visualHints?: readonly VisualHint[];
   demonstration?: readonly DemonstrationAction[];
+  demonstrationFromEmpty?: boolean;
+  guidance?: readonly GuidedInteraction[];
 }>;
 
 export type LevelDefinition = Readonly<{

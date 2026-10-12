@@ -716,3 +716,122 @@ A cleaner, roomier, more cohesive gameplay GUI that feels like a toy puzzle game
 - Verified: all 56 Vitest unit tests pass, production build passes cleanly, all 6 Playwright refinement e2e tests pass.
 - `docs/PROMPT_JOURNAL.md` remains untouched.
 
+### 2026-10-13 — IDWDYD visual onboarding redesign
+
+**Original prompt (verbatim)**
+
+```text
+Redesign and implement the **I Do → We Do → You Do (IDWDYD)** learning experience in Kotak-Katik.
+
+Read `AGENTS.md`, `pedagogy.md`, `gameplay.md`, `accessibility.md`, `design.md`, and the existing tutorial implementation first.&#x20;
+
+### Problem
+
+The current tutorial is overly text-heavy and control-heavy. It presents Play, Step, Retry, See Example, Skip, command slots, and instructional text simultaneously.
+
+For SDLB-B children in grades 1–3, the interface itself becomes a cognitive obstacle.
+
+**Replace instruction-heavy onboarding with visual, interactive, step-by-step teaching.**
+
+### Desired experience
+
+**1. I DO - Watch the demonstration**
+
+- Automatically demonstrate the mechanic when the stage begins, without requiring a "Lihat contoh" click.
+- Use an animated, stylized **ghost hand/cursor** to demonstrate real interactions:
+  1. Hand moves toward the Forward command.
+  2. Hand taps it; the block enters the program tray.
+  3. Hand moves toward Play and taps it.
+  4. The active command highlights.
+  5. The cat visibly moves one tile and collects the fish.
+- Synchronize animations with actual gameplay state.
+- Introduce only one mechanic at a time.
+- Keep the demonstration brief, calm, and replayable.
+- After completion, offer one clear continuation action.
+
+**2. WE DO - Try together**
+
+- Present a partially completed, genuinely solvable program.
+- Highlight only the next relevant interaction.
+- Use a ghost hand or subtle animated pointer to indicate where to tap, without performing the child's action.
+- After the child taps the correct command, guide attention toward Play.
+- Each hint disappears after the corresponding interaction.
+- Never reveal or automatically complete the child's reasoning step.
+- If the child struggles, provide progressively stronger visual hints.
+
+**3. YOU DO - Play independently**
+
+- Start with an empty program tray.
+- Remove procedural ghost-hand guidance.
+- Let the child build, run, observe, and retry independently.
+- Preserve permanent accessibility cues and clear gameplay feedback.
+
+### UI/UX requirements
+
+- The 3D board, cat, and fish remain the primary focal point.
+- Only show controls necessary for the current learning phase.
+- Do not show Play and Step as equally prominent actions during introductory movement tutorials. Introduce Step when pedagogically appropriate, especially debugging.
+- Move Skip, Replay, Reset, and other secondary controls out of the primary attention path.
+- Remove redundant text, duplicate instructions, unnecessary panels, and tutorial counters.
+- Use at most one short Indonesian instruction at a time, preferably none when the animation communicates the action.
+- Apply contextual spotlight/highlighting to the actual command, program slot, or execution control.
+- Keep the ghost hand visually consistent with Kotak-Katik's pastel, tactile design. It is a pointer, not a BISINDO gesture.
+- Avoid full-screen tutorial modals, intrusive overlays, and excessive animation.
+- Ensure desktop and mobile layouts remain comfortable for touch interaction.
+
+### Engineering constraints
+
+- Inspect and reuse existing stage metadata and gameplay architecture.
+- Build a lightweight, reusable, data-driven tutorial sequence instead of hardcoding separate tutorials for every level.
+- Anchor the ghost hand to real UI targets, including responsive repositioning.
+- Use existing program and execution actions; never fake gameplay by manually moving Three.js meshes.
+- Support replay, interruption, navigation, retry, and cleanup without stale animations or corrupted state.
+- Respect reduced-motion preferences with persistent visual indicators.
+- Preserve mute-first accessibility, engine determinism, and existing progression logic.
+- Verify that tutorial demonstrations and guided programs actually solve their corresponding boards.
+
+### Acceptance criteria
+
+1. A child can understand the first Forward command by watching, without reading instructions.
+2. I Do demonstrates placement → execution → observable result.
+3. We Do requires genuine child participation.
+4. You Do removes procedural prompts without removing accessibility.
+5. Only the currently relevant action receives strong visual emphasis.
+6. No unnecessary scrolling, obscured board elements, or competing primary buttons.
+7. Tutorial state remains correct after replay, interruption, or navigation.
+8. Desktop, mobile, muted audio, reduced motion, and existing gameplay remain functional.
+
+**Implement the redesign, not merely a mockup or proposal.** Prioritize the first movement onboarding and establish a reusable pattern for later concepts. Avoid unrelated refactors or new dependencies unless necessary.
+
+Run relevant tests and `bun run build`.
+
+
+
+For the IDWDYD ghost-hand tutorial, use the existing **Kenney Cursor Pack (CC0)**:
+
+[https://kenney.nl/assets/cursor-pack](https://kenney.nl/assets/cursor-pack) [@Browser](plugin://browser@openai-bundled)&#x20;
+
+Download and inspect the pack, then select its existing hand-pointer sprite(s).
+
+- DO NOT generate, manually draw, or invent another hand asset.
+- Use the original PNG/SVG and preserve its proportions.
+- Animate movement, tapping, and dragging using Motion/CSS transforms.
+- Anchor the pointer to actual UI elements, not hardcoded screen coordinates.
+- Respect reduced-motion preferences.
+- Include the asset source and license in project attribution documentation.
+- Keep the implementation lightweight and reuse existing tutorial/gameplay actions.
+
+Focus on instructional behavior, not asset creation.
+
+
+
+Report concisely: what changed, what was verified, and remaining risks.
+```
+
+**Result**
+
+- Implemented automatic placement/execution demonstrations, child-led prepared programs, empty independent trays and one contextual visual target at a time.
+- Downloaded and inspected the official Kenney Cursor Pack; shipped its unchanged original hand PNG and exact CC0 notice. No hand was generated or drawn.
+- Preserved the interpreter, relative direction, real edit/execution actions, assets and fixed concept progression. Verification and remaining limits are recorded in `docs/IDWDYD_REDESIGN.md`.
+- Worked only on `henix/m2b-visual-learning`; no push or merge to main. `docs/PROMPT_JOURNAL.md` remains untouched.
+

@@ -99,6 +99,9 @@ describe('M2A uses the existing M1 execution and editor', () => {
     const snapshot = structuredClone(level);
     const store = createGameStore(level);
     const state = () => store.getState();
+    if (level.id === 'm2-debug-alone') {
+      state().addCommand('repeat'); state().addCommand('forward', 0); state().setRepeatCount(0, 4);
+    }
     state().run(); vi.runAllTimers();
     const failed = state().simulation;
     expect(['failed', 'finished']).toContain(failed.status);

@@ -40,7 +40,7 @@ describe('M2A authored curriculum', () => {
     expect(new Set(curriculumLevels.map((level) => level.learning.concept))).toEqual(new Set(CURRICULUM_CONCEPTS));
     expect(Object.keys(curriculumSolutions).sort()).toEqual(curriculumLevels.map((level) => level.id).sort());
     expect(() => validateCurriculum(curriculumLevels)).not.toThrow();
-    expect(curriculumLevels.map((level) => level.tiles.length)).toEqual([2, 2, 3, 4, 3, 3, 3, 4, 4, 3, 4, 4, 3, 4, 4, 5]);
+    expect(curriculumLevels.map((level) => level.tiles.length)).toEqual([2, 3, 3, 4, 3, 3, 3, 4, 4, 3, 4, 4, 3, 4, 4, 5]);
   });
 
   it.each(curriculumLevels)('$id has a legal, deterministic solution that collects every fish and exhausts the program', (level) => {
@@ -123,7 +123,7 @@ describe('M2A authored curriculum', () => {
     expect(verifySolution(level, solution(level)).status).toBe('completed');
   });
 
-  it.each(curriculumLevels.filter((level) => level.learning.concept === 'debugging'))('$id begins with a legal editable mistake and withholds fault hints until observation', (level) => {
+  it.each(curriculumLevels.filter((level) => level.learning.concept === 'debugging' && level.initialProgram.length))('$id begins with a legal editable mistake and withholds fault hints until observation', (level) => {
     expect(programError(level, level.initialProgram)).toBeNull();
     expect(['failed', 'finished']).toContain(executeForValidation(level, level.initialProgram).status);
     expect(() => verifySolution(level, level.initialProgram)).toThrow('Unsolved level');
@@ -134,7 +134,7 @@ describe('M2A authored curriculum', () => {
   it('distinguishes a wrong turn, a missing step, and overrun after collecting all fish', () => {
     const results = ['m2-debug-watch', 'm2-debug-together', 'm2-debug-alone'].map((id) => {
       const level = getLevel(id);
-      return executeForValidation(level, level.initialProgram);
+      return executeForValidation(level, id === 'm2-debug-alone' ? [{ type: 'repeat', count: 4, commands: [F] }] : level.initialProgram);
     });
     expect(results.map((state) => state.status)).toEqual(['failed', 'finished', 'failed']);
     expect(results.map((state) => state.objectiveSatisfied)).toEqual([false, false, true]);
@@ -161,9 +161,12 @@ describe('M2A data validation rejects authoring mistakes', () => {
     ['missing reveal action', 'm2-sequence-watch', (level) => hints(level, [{ ...level.learning.visualHints[0], reveal: { when: 'after-action', path: [8] } }]), 'reveal path'],
     ['incorrect facing cue', 'm2-left-watch', (level) => hints(level, [{ ...level.learning.visualHints[0], cue: { type: 'relative-turn', position: { x: 1, z: 0 }, orientation: 'west', direction: 'left' } }]), 'disagrees'],
     ['early fault reveal', 'm2-debug-watch', (level) => hints(level, [{ ...level.learning.visualHints[0], reveal: { when: 'on-entry' } }]), 'before observation'],
-    ['correct debug starter', 'm2-debug-alone', (level) => ({ ...level, initialProgram: solution(level) }), 'not faulty'],
+    ['prepared independent stage', 'm2-debug-alone', (level) => ({ ...level, initialProgram: solution(level) }), 'start empty'],
     ['relocked commands', 'm2-repeat-together', (level) => ({ ...level, allowedCommands: ['forward', 'repeat'] }), 'relocked'],
-    ['solved guided task', 'm2-move-try', (level) => ({ ...level, initialProgram: [F] }), 'already solved'],
+    ['solved guided task', 'm2-move-try', (level) => ({ ...level, initialProgram: [F, F] }), 'already solved'],
+    ['unreachable guided target', 'm2-move-try', (level) => ({ ...level, learning: { ...level.learning, guidance: [{ target: { type: 'slot', index: 8 }, complete: { type: 'command', path: [1], choices: ['forward'] } }] } }), 'guided slot'],
+    ['unavailable guided choice', 'm2-move-try', (level) => ({ ...level, learning: { ...level.learning, guidance: [{ target: { type: 'palette' }, complete: { type: 'command', path: [1], choices: ['repeat'] } }] } }), 'guided command'],
+    ['pre-completed interaction', 'm2-move-try', (level) => ({ ...level, learning: { ...level.learning, guidance: [{ target: { type: 'palette' }, complete: { type: 'command', path: [0], choices: ['forward'] } }] } }), 'already complete'],
   ];
   it.each(mutations)('rejects %s', (_, id, change, message) => {
     expect(() => validateCurriculum(replaceLevel(id, change))).toThrow(message);

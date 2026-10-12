@@ -267,3 +267,33 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - `bun x playwright test e2e/refinement.spec.ts`: **6 passed** across desktop and mobile viewports.
 - `docs/PROMPT_JOURNAL.md` remains untouched.
 
+### 2026-10-13 — IDWDYD ghost-hand learning redesign
+
+**Original prompt:** [PROMPT_LOG / IDWDYD visual onboarding redesign](PROMPT_LOG.md#2026-10-13--idwdyd-visual-onboarding-redesign).
+
+**Implemented**
+- Replaced opt-in, text-heavy tutorials with automatic real block placement and execution. The pointer follows real controls, taps before the shared action, and withdraws during Run. Completion offers one continuation.
+- Added authored guide interactions and progressive visual support. Prepared movement now needs a child-entered second Forward. Turn choice remains a choice between both relative turns; Repeat uses the child's count. Independent stages start empty and have no procedural hand.
+- Hid Step during introductory concepts and moved replay/skip/reset into the header options. Removed trace panels, counters and redundant instruction text. Retained the M1.1 workbench/scene hierarchy, original mechanics, assets and permanent visual accessibility cues.
+- Downloaded and inspected Kenney Cursor Pack 1.1. Shipped the unchanged original hand PNG with its exact CC0 notice; no new asset was invented, drawn or generated. Added source, original filename and hash to attribution.
+- Preserved real store actions and interpreter authority. Added interrupt/replay cleanup, undo-aware guide progression, responsive anchors and persistent reduced-motion cues. No dependencies, package versions, main branch or other worktree contents changed.
+
+**Verification-driven corrections**
+- Updated historical curriculum/browser expectations for automatic, read-only demonstrations, hidden early Step, prepared guided movement and empty independent debugging.
+- Corrected turn-choice pointer placement to the group center, so its geometry does not imply a correct answer.
+- Corrected guided hint merging and cue restoration after undo. Strengthened authored insertion/guide validation. Adjusted an obsolete hint expectation after the fix and resolved a TypeScript narrowing error before the successful build.
+- Broader editing checks exposed loop-body slot visibility depending on a full outer program, and guided insertion leaving the palette hidden after rebuilding a starter. Fixed slot capacity per scope and made explicit child editing reopen the palette. The latter initially timed out in E2E; its targeted desktop/mobile rerun passed.
+- Visual failure inspection caught a command-path selector also matching the feedback element. Scoped the pointer selector to the editor so demonstrations and mistakes anchor to actual command buttons, and added button-bound assertions.
+- Inspected actual desktop/mobile renders for first movement and 200% text size. The board remains primary; the original hand and a single contextual outline identify the next action. Software WebGL checks run serially to avoid contention.
+
+**Executed verification**
+- `bun run test`: **227 passed**, nine files.
+- `bun run build`: **passed**, zero TypeScript errors; existing large renderer chunk advisory, approximately **345.64 kB gzip**.
+- `bun run test:e2e --config playwright.curriculum.config.ts`: **76 passed** across serial desktop/mobile projects (19.0 minutes). All 16 real curriculum boards complete on both viewports; includes tutorial progression/recovery, real editing, turns, Repeat, debugging, kernel, assets, keyboard, zoom and reduced motion.
+- After the final pointer selector correction, rebuilt and reran `e2e/learning.spec.ts` and `e2e/curriculum.spec.ts` filtered to `guided mistakes remain|debugging observes`: **4 passed** on desktop/mobile. Actual command-button bounds and demonstration selection are asserted. Inspected the corrected rendered failure capture; no instructional outline remains on feedback.
+- Asset hash equality verified for the original and shipped hand; source/license copied without redrawing or PNG modifications. No runtime/console errors were reported in the checked flows. Screenshots remain excluded from Git in `.verification/`.
+
+**Limits and scope**
+- Physical-device and SDLB-B learner/teacher comprehension testing remain outstanding. Touch is browser-emulated; WebGL is required. At large text size/short landscape heights, vertical scrolling can be necessary.
+- No BISINDO material, Home Menu, Expedition Map, sound requirement, persistence or unrelated feature was added. `docs/PROMPT_JOURNAL.md` remains untouched. No push or merge to main.
+

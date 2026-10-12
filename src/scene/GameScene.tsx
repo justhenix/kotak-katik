@@ -45,7 +45,8 @@ function World({ reduced, onReady }: { reduced: boolean; onReady: (ready: boolea
   const simulation = useGameStore((s) => s.simulation);
   const program = useGameStore((s) => s.program);
   const revealed = useLessonStore((s) => s.revealed);
-  const hints = visibleHints(level, program, simulation, revealed);
+  const hintStrength = useLessonStore((s) => s.hintStrength);
+  const hints = hintStrength >= 2 ? visibleHints(level, program, simulation, revealed) : [];
   useEffect(() => {
     onReady(true);
     return () => onReady(false);

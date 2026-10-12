@@ -1,5 +1,7 @@
 # M2B: Visual Learning Experience
 
+This records the original 2026-10-12 integration. The current automatic, ghost-hand IDWDYD behavior is documented in [IDWDYD redesign](IDWDYD_REDESIGN.md).
+
 Date: 2026-10-12 (Asia/Jakarta).
 Branch: `henix/m2b-visual-learning`.
 Starting checkpoint: `d9cd881`.
