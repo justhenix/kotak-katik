@@ -4,6 +4,8 @@ import { ProgramTray } from '../components/program/ProgramTray';
 import { ControlIcon } from '../components/controls/ControlIcon';
 import { CommandIcon, commandLabels } from '../components/commands/CommandIcon';
 import { gameStore, useGameStore } from '../stores/game-store';
+import { LessonScaffold } from '../components/learning/LessonScaffold';
+import { lessonStore } from '../stores/lesson-store';
 
 function Feedback() {
   const simulation = useGameStore((s) => s.simulation);
@@ -43,7 +45,8 @@ export function App() {
   const title = useGameStore((s) => s.level.title);
   const collected = useGameStore((s) => s.simulation.collectedIds.length);
   const total = useGameStore((s) => s.level.collectibles.length);
-  useEffect(() => () => gameStore.getState().dispose(), []);
+  const levelId = useGameStore((s) => s.level.id);
+  useEffect(() => () => { lessonStore.getState().resetLesson(); gameStore.getState().dispose(); }, []);
   return <main className="game-shell">
     <header className="game-header"><h1 className="wordmark">Kotak-Katik</h1>
       <div className={`fish-progress ${collected === total ? 'all-collected' : ''}`} role="img" aria-label={`${collected} dari ${total} ikan terkumpul`}>
@@ -55,7 +58,8 @@ export function App() {
       <Feedback />
     </section>
     <div className="workbench">
-      <ProgramTray ready={sceneReady} />
+      <LessonScaffold ready={sceneReady} />
+      <ProgramTray key={levelId} ready={sceneReady} />
     </div>
   </main>;
 }

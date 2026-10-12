@@ -8,9 +8,10 @@ import {
   ArrowRight,
   Plus,
   Check,
+  RotateCcw,
 } from 'lucide-react';
 
-export type ControlSymbol = 'play' | 'step' | 'stop' | 'delete' | 'before' | 'after' | 'plus' | 'check' | 'pause';
+export type ControlSymbol = 'play' | 'step' | 'stop' | 'delete' | 'before' | 'after' | 'plus' | 'check' | 'pause' | 'reset';
 
 export function ControlIcon({ type }: { type: ControlSymbol }) {
   switch (type) {
@@ -24,6 +25,8 @@ export function ControlIcon({ type }: { type: ControlSymbol }) {
       return <Pause className="control-icon" fill="currentColor" strokeWidth={0} aria-hidden="true" focusable="false" />;
     case 'delete':
       return <Trash2 className="control-icon" strokeWidth={2.5} aria-hidden="true" focusable="false" />;
+    case 'reset':
+      return <RotateCcw className="control-icon" strokeWidth={2.5} aria-hidden="true" focusable="false" />;
     case 'before':
       return <ArrowLeft className="control-icon" strokeWidth={2.8} aria-hidden="true" focusable="false" />;
     case 'after':

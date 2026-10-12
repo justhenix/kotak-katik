@@ -27,6 +27,9 @@ export type VisualHint = Readonly<{
     | Readonly<{ when: 'after-action'; path: CommandPath }>;
   cue: HintCue;
 }>;
+export type DemonstrationAction =
+  | Readonly<{ type: 'step' | 'run' | 'restart' }>
+  | Readonly<{ type: 'replace'; path: CommandPath; command: PrimitiveType }>;
 export type LearningMetadata = Readonly<{
   concept: LearningConcept;
   phase: LearningPhase;
@@ -34,6 +37,7 @@ export type LearningMetadata = Readonly<{
   learningGoal: string;
   instruction?: string;
   visualHints?: readonly VisualHint[];
+  demonstration?: readonly DemonstrationAction[];
 }>;
 
 export type LevelDefinition = Readonly<{

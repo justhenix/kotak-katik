@@ -32,6 +32,39 @@ export function verifySolution(level: LevelDefinition, program: Program): GameSt
   return state;
 }
 
+export function validateDemonstration(level: LevelDefinition): void {
+  const actions = level.learning.demonstration;
+  if (!actions) {
+    if (level.learning.phase === 'demonstration') throw new Error(`Missing demonstration in ${level.id}`);
+    return;
+  }
+  if (level.learning.phase !== 'demonstration' || actions.length === 0 || actions.length > 12) throw new Error(`Invalid demonstration in ${level.id}`);
+  let program = structuredClone(level.initialProgram);
+  let state = createInitialState(level);
+  let observedFault = false;
+  for (const action of actions) {
+    if (action.type === 'restart') state = createInitialState(level);
+    if (action.type === 'run') state = executeForValidation(level, program);
+    if (action.type === 'step') {
+      if (['failed', 'finished', 'completed'].includes(state.status)) state = createInitialState(level);
+      const next = executeNextAction(level, program, state);
+      if (next === state) throw new Error(`Demonstration cannot step in ${level.id}`);
+      state = next;
+    }
+    if (action.type === 'replace') {
+      const command = commandAt(program, action.path);
+      if (!command || command.type === 'repeat' || !level.allowedCommands.includes(action.command)
+        || level.learning.concept === 'debugging' && !observedFault) throw new Error(`Invalid demonstration repair in ${level.id}`);
+      program = program.map((entry, index) => index !== action.path[0] ? entry
+        : action.path.length === 1 ? { type: action.command }
+        : entry.type === 'repeat' ? { ...entry, commands: entry.commands.map((child, body) => body === action.path[1] ? { type: action.command } : child) } : entry);
+      state = createInitialState(level);
+    }
+    observedFault ||= state.status === 'failed' || state.status === 'finished';
+  }
+  if (!state.completion) throw new Error(`Unfinished demonstration in ${level.id}`);
+}
+
 export function validateCurriculum(levels: readonly CurriculumLevel[]): void {
   const fail = (level: CurriculumLevel, reason: string): never => { throw new Error(`${reason} in ${level.id}`); };
   if (levels.length < 12 || levels.length > 16) throw new Error('Curriculum needs 12–16 stages');
@@ -148,6 +181,7 @@ export function validateCurriculum(levels: readonly CurriculumLevel[]): void {
     } else if (initialProgram.length && executeForValidation(level, initialProgram).completion) {
       fail(level, 'Guided stage is already solved');
     }
+    validateDemonstration(level);
   }
   if (previousConcept !== CURRICULUM_CONCEPTS.length - 1) throw new Error('Curriculum misses concepts');
   for (const concept of ['turning', 'loop', 'debugging'] as const) {

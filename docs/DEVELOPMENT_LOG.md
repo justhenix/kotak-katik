@@ -2,6 +2,38 @@
 
 Record meaningful work after verification and map it to real Git history. Use `Pending commit` until a commit exists. Never invent hashes or chronology.
 
+### 2026-10-12 - M2B visual learning experience
+
+**Prompt:** PROMPT_LOG entry / 2026-10-12 09:45.
+
+**Integration**
+- Started from clean finalized GUI checkpoint `d9cd881` in the supplied detached worktree. Created `henix/m2b-visual-learning` before changes.
+- Verified M2A curriculum commit `b112789` is already an ancestor. Preserved its 16 stages and the finalized M1.1 GUI; no cherry-pick, main merge, force push, or other-worktree mutation.
+- Integrated baseline: 197 unit tests and production build passed after frozen-lockfile dependency installation.
+
+**Implemented**
+- Authored Step/Run/restart/replace demonstrations drive a reusable controller through the real interpreter. Command preview, cat action and held result remain observable without sound.
+- Guided program-slot, relative-turn, board, command and repeat-count cues follow authored reveal rules. Independent stages fade procedural guidance.
+- Default entry starts the fixed curriculum, with completion-gated Lanjut and explicit demonstration skip. Fixture/unknown-route behavior remains available.
+- Debugging exposes the failed attempt before hints or demonstration repair. Inspection preserves the program; edits and retry follow existing mechanics.
+- Starter restoration uses a reset arrow/Ulang label instead of implying nonempty programs are cleared. Full Repeat count tasks hide unavailable choices in curriculum lessons.
+- Corrected the world grid's retained intrinsic canvas width when resizing from desktop to a narrow screen. Rendering remains authoritative only for presentation.
+- Maintained exact prompt history; curated PROMPT_JOURNAL remains unchanged. Full contracts, verification history and limits are in M2B_VISUAL_LEARNING.md.
+
+**Verified**
+- Unit tests: 219 passed across nine files. TypeScript/production build passed; existing renderer size advisory remains (344.12 kB gzip).
+- Development Strict Mode browser smoke: demonstration, lesson transition and guided Step passed without page errors.
+- Final browser coverage: all 78 distinct cases have successful results. The complete 21.1-minute run had 77 passes and one old desktop draw-rest sampling failure; both corrected desktop/mobile draw-rest checks then passed in a targeted 20.3-second rerun. All 12 M2B and 36 M2A cases passed in the full run. Exact commands and prior failures are retained in M2B_VISUAL_LEARNING.md.
+- Rendered beginner, turn, Repeat, debugging, completion and reduced-motion captures inspected at desktop/mobile, including 320 px and 200% text size. New controls satisfy 44 px targets; no page overflow or normal-flow runtime errors.
+- Source whitespace and preserved-scope checks passed; other worktrees, interpreter/simulation, assets, dependencies and curated prompt journal are unchanged.
+
+**Commit**
+- Pending commit.
+
+**Limits**
+- Learner/teacher comprehension and physical touch devices remain unvalidated. Browser emulation establishes interaction behavior only.
+- Session-only progression, WebGL requirement, no invented BISINDO, no new assets or dependencies. No push or merge to main.
+
 ### 2026-10-07 — Set up AI-development logs
 
 **Prompt:** PROMPT_LOG entry / 2026-10-07 17:38

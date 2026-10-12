@@ -2,8 +2,8 @@ import { CommandIcon, commandLabels } from './CommandIcon';
 import { useGameStore } from '../../stores/game-store';
 import type { CommandType } from '../../game/types';
 
-export function CommandPalette({ loopIndex, replacing, full, onChoose }: {
-  loopIndex?: number; replacing: boolean; full: boolean; onChoose: (type: CommandType) => void;
+export function CommandPalette({ loopIndex, replacing, full, watching = false, highlighted, onChoose }: {
+  loopIndex?: number; replacing: boolean; full: boolean; watching?: boolean; highlighted?: CommandType; onChoose: (type: CommandType) => void;
 }) {
   const allowed = useGameStore((s) => s.level.allowedCommands);
   const running = useGameStore((s) => s.simulation.status === 'running');
@@ -12,7 +12,7 @@ export function CommandPalette({ loopIndex, replacing, full, onChoose }: {
     <h2 id="palette-title" className="sr-only">{title}</h2>
     <div className="palette-commands">
       {allowed.filter((type) => (loopIndex === undefined && !replacing) || type !== 'repeat').map((type) => <button key={type}
-        className={`palette-command puzzle-block ${type}`} disabled={running || (!replacing && full)}
+        className={`palette-command puzzle-block ${type} ${highlighted === type ? 'learning-target' : ''}`} disabled={running || watching || (!replacing && full)}
         aria-label={replacing ? `Ganti dengan ${commandLabels[type]}` : `Tambah ${commandLabels[type]}${loopIndex === undefined ? '' : ` ke Ulangi ${loopIndex + 1}`}`}
         onClick={() => onChoose(type)}>
         <CommandIcon type={type} /><span>{commandLabels[type]}</span>

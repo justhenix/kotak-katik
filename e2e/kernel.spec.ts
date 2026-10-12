@@ -9,7 +9,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/');
+  await page.goto('/?fixture=kernel');
   await expect(page.locator('canvas')).toBeVisible();
   await expect(page.getByText('Menyiapkan papan…')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Jalankan', exact: true })).toBeDisabled();

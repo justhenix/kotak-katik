@@ -39,6 +39,7 @@ const stages: readonly Stage[] = [
       concept: 'movement', phase: 'demonstration', introducesNewConcept: true,
       learningGoal: 'Maju memindahkan kucing satu petak sesuai arah hadapnya.',
       instruction: 'Tekan satu langkah. Lihat kucing maju.',
+      demonstration: [{ type: 'step' }],
       visualHints: [{ id: 'one-tile', text: 'Satu Maju, satu petak.', reveal: { when: 'on-entry' },
         cue: { type: 'board-region', positions: [{ x: 0, z: 0 }, { x: 1, z: 0 }] } }],
     },
@@ -63,6 +64,7 @@ const stages: readonly Stage[] = [
       concept: 'sequencing', phase: 'demonstration', introducesNewConcept: true,
       learningGoal: 'Menelusuri perintah pertama lalu perintah berikutnya.',
       instruction: 'Tekan satu langkah dua kali. Lihat urutannya.',
+      demonstration: [{ type: 'step' }, { type: 'step' }],
       visualHints: [{ id: 'next-fish', text: 'Lalu ambil ikan berikutnya.', reveal: { when: 'after-action', path: [0] },
         cue: { type: 'command', path: [1] } }],
     },
@@ -85,6 +87,7 @@ const stages: readonly Stage[] = [
       concept: 'turning', phase: 'demonstration', introducesNewConcept: true,
       learningGoal: 'Kiri mengubah arah hadap tanpa berpindah petak.',
       instruction: 'Lihat kucing berbelok, lalu maju.',
+      demonstration: [{ type: 'step' }, { type: 'step' }, { type: 'step' }],
       visualHints: [{ id: 'cat-left', text: 'Kiri mengikuti arah kucing.', reveal: { when: 'after-action', path: [0] },
         cue: { type: 'relative-turn', position: { x: 1, z: 0 }, orientation: 'east', direction: 'left' } }],
     },
@@ -145,6 +148,7 @@ const stages: readonly Stage[] = [
       concept: 'loop', phase: 'demonstration', introducesNewConcept: true,
       learningGoal: 'Dua Maju yang sudah dikenal dapat dikelompokkan dalam Ulangi.',
       instruction: 'Lihat Maju berjalan dua kali.',
+      demonstration: [{ type: 'step' }, { type: 'step' }],
       visualHints: [{ id: 'repeat-body', text: 'Maju yang sama berjalan lagi.', reveal: { when: 'after-action', path: [0, 0] },
         cue: { type: 'command', path: [0, 0] } }],
     },
@@ -179,6 +183,10 @@ const stages: readonly Stage[] = [
       concept: 'debugging', phase: 'demonstration', introducesNewConcept: true,
       learningGoal: 'Menelusuri salah belok, mengubah satu perintah, dan mencoba lagi.',
       instruction: 'Jalankan. Lihat belokan. Ubah dan coba lagi.',
+      demonstration: [
+        { type: 'run' }, { type: 'restart' }, { type: 'step' }, { type: 'step' },
+        { type: 'replace', path: [1], command: 'turn-left' }, { type: 'run' },
+      ],
       visualHints: [
         { id: 'observe-route', text: 'Lihat kucing dan jalan ke ikan.', reveal: { when: 'after-attempt' },
           cue: { type: 'board-region', positions: [{ x: 1, z: 0 }, { x: 1, z: -1 }] } },
@@ -227,7 +235,7 @@ const stages: readonly Stage[] = [
   },
 ];
 
-// Prerequisites describe instructional order only; M2A does not unlock or persist progress.
+// Stable IDs and prerequisites also drive the linear lesson flow.
 export const curriculumLevels: readonly CurriculumLevel[] = stages.map((stage, index) => ({
   ...stage, objective: { type: 'collect-all' },
   curriculum: { order: index + 1, prerequisiteIds: index === 0 ? [] : [stages[index - 1].id] },

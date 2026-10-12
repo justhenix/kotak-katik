@@ -9,6 +9,8 @@ import { Cat } from './Cat/Cat';
 import { Fish } from './Collectibles/Fish';
 import { sceneConfig } from './config';
 import { ToyboxDressing } from './Environment/ToyboxDressing';
+import { LearningCues } from './LearningCues';
+import { useLessonStore, visibleHints } from '../stores/lesson-store';
 import type { LevelDefinition } from '../game/types';
 
 function FitCamera({ level }: { level: LevelDefinition }) {
@@ -41,6 +43,9 @@ function FitCamera({ level }: { level: LevelDefinition }) {
 function World({ reduced, onReady }: { reduced: boolean; onReady: (ready: boolean) => void }) {
   const level = useGameStore((s) => s.level);
   const simulation = useGameStore((s) => s.simulation);
+  const program = useGameStore((s) => s.program);
+  const revealed = useLessonStore((s) => s.revealed);
+  const hints = visibleHints(level, program, simulation, revealed);
   useEffect(() => {
     onReady(true);
     return () => onReady(false);
@@ -53,6 +58,7 @@ function World({ reduced, onReady }: { reduced: boolean; onReady: (ready: boolea
       <planeGeometry args={[200, 200]} /><shadowMaterial transparent opacity={0.13} />
     </mesh>
     <Board level={level} simulation={simulation} />
+    <LearningCues hints={hints} />
     <ToyboxDressing />
     {level.collectibles.map((fish) => <Fish key={fish.id} position={fish.position} collected={simulation.collectedIds.includes(fish.id)} reduced={reduced} />)}
     <Cat simulation={simulation} reduced={reduced} />

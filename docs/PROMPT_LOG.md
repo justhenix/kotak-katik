@@ -1,5 +1,41 @@
 # Prompt Log
 
+### 2026-10-12 09:45 - M2B Visual Learning Experience
+
+**Prompt**
+
+```text
+# Kotak-Katik - M2B: Visual Learning Experience
+
+Read `AGENTS.md`, relevant `.agents/*.md`, and M2A's curriculum report.
+
+First, verify M2A's committed work and safely integrate it with the finalized M1.1 GUI. Preserve both implementations. Do not overwrite unfinished worktree changes.
+
+Implement M2B:
+
+1. Short, visual-first I Do demonstrations showing command → cat action → result.
+2. We Do stages with partially prepared programs, obvious insertion targets, and contextual visual hints.
+3. You Do stages with gradually reduced guidance.
+4. Progressive command introduction, following the fixed curriculum.
+5. Clear visual feedback for completion and mistakes, understandable without sound.
+6. One reusable tutorial/scaffolding system driven by authored level metadata.
+
+Keep the existing game mechanics, assets, and GUI hierarchy. No long tutorial paragraphs, mandatory audio, quiz screens, Home Menu, or Expedition Map.
+
+Verify real beginner, turning, Repeat, and debugging stages on desktop/mobile. Test tutorial progression, skipping/replaying demonstrations, reduced motion, and gameplay regressions.
+
+Document changes, run tests/build/E2E, and commit to a feature branch. Do not push or merge to `main` without confirming integration safety.
+
+**Done when:** A first-time child can learn the controls through visual demonstration, complete guided stages, and transition into independent puzzles.
+```
+
+**Result**
+
+- Verified M2A commit `b112789` is already an ancestor of the finalized GUI checkpoint `d9cd881`; started a clean feature branch without changing other worktrees.
+- Added authored demonstrations, metadata-driven cues, guided/independent fading, and linear lesson transitions through the real game store/interpreter.
+- Preserved M2A curriculum and M1.1 mechanics/assets/editor; explicit fixture URLs remain regression entry points.
+- Verification and limitations are recorded in `docs/M2B_VISUAL_LEARNING.md` and `docs/DEVELOPMENT_LOG.md`. The curated `PROMPT_JOURNAL.md` remains untouched.
+
 ### 2026-10-07 17:38 — Set up AI-development logs
 
 **Prompt**

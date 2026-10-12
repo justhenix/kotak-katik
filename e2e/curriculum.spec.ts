@@ -71,7 +71,7 @@ for (const level of curriculumLevels) test(`M2A ${level.id}: rendered preview, l
   await press(button(page, 'Jalankan lagi'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
   expect(await feedback(page).evaluate((element) => ({ ...(element as HTMLElement).dataset }))).toEqual(stepped);
-  await press(button(page, 'Hapus semua'));
+  await press(button(page, level.initialProgram.length > 0 ? 'Mulai ulang' : 'Hapus semua'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
   await expect(feedback(page)).toHaveAttribute('data-orientation', level.avatar.orientation);
   await expect(page.getByLabel(`0 dari ${level.collectibles.length} ikan terkumpul`)).toBeVisible();
@@ -93,7 +93,7 @@ test('M2A debugging: observe a wrong turn, replace it, run again, and retain the
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
   await press(button(page, 'Jalankan'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
-  await press(button(page, 'Hapus semua'));
+  await press(button(page, 'Mulai ulang'));
   await expect(button(page, 'Pilih perintah 2: Kanan')).toBeVisible();
 });
 
