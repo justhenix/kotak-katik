@@ -3,6 +3,7 @@
 Date: 2026-10-12 (Asia/Jakarta).
 Branch: `henix/m2b-visual-learning`.
 Starting checkpoint: `d9cd881`.
+Implementation commit: `e9d67d46c434b761e1e7e28bbbf4e1444f262843` (`feat(learning): add visual lesson scaffolding`).
 
 ## Integration safety
 
@@ -62,6 +63,7 @@ Final coverage: **219 unit tests and all 78 distinct browser cases have successf
 | Corrected draw-rest check | `bun run test:e2e e2e/assets.spec.ts --grep 'demand rendering' --output .verification/demand-results` | Both desktop and mobile passed, 20.3 seconds. All 78 distinct cases therefore have a successful final result; no application failure remains unresolved. The full suite was not rerun a further time after this isolated test-only change. |
 | Development Strict Mode | `.verification/dev-smoke.ts`, against the Vite development server | Demonstration, next lesson, guided Step and page-error check passed. |
 | Responsive / visual review | Final `.verification/m2b-*` captures, desktop 1440×1000, mobile 390×844 and 320 px / 200% text size | Visually inspected beginner, relative direction, Repeat count/body, debugging evidence, completion and reduced-motion layouts. No page overflow; program scrolling remains contained. |
+| Demonstration trace review | `.verification/capture-demo.ts`, final production build | Desktop turn result and mobile highlighted replacement palette captured and visually inspected; no page errors. |
 | Integration / whitespace | `git diff --check`; read-only worktree status and ancestry checks | Passed. Main and M2A worktrees remain unchanged. No interpreter, simulation, cat/fish asset, dependency or curated-journal diff. |
 
 Frontend audit: **PASS** for inherited design direction and meaningful visual cues (documented rationale and rendered review); **PASS** for functional controls (real mouse/touch/keyboard browser flows); **PASS** for responsive/accessibility behavior (44 px targets, focus, reduced motion, no page overflow and 200% text size); **PASS** for evidence integrity (real completion, no fabricated child-validation claim, unchanged assets/prompt journal). New text contrasts measured 9.48:1 navy/cream, 10.37:1 ink/cream, 7.45:1 white/next-button green and 9.00:1 reset ink/surface. The board's navy region outlines measure 5.85:1 against grass. Normal tested flows report no page or console errors; deliberately missing models retain the tested recovery screen.

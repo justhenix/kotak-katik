@@ -28,7 +28,7 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - Source whitespace and preserved-scope checks passed; other worktrees, interpreter/simulation, assets, dependencies and curated prompt journal are unchanged.
 
 **Commit**
-- Pending commit.
+- `e9d67d46c434b761e1e7e28bbbf4e1444f262843` `feat(learning): add visual lesson scaffolding`.
 
 **Limits**
 - Learner/teacher comprehension and physical touch devices remain unvalidated. Browser emulation establishes interaction behavior only.
