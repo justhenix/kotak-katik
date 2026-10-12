@@ -3,7 +3,6 @@ import {
   StepForward,
   Square,
   Pause,
-  RotateCcw,
   Trash2,
   ArrowLeft,
   ArrowRight,
@@ -11,7 +10,7 @@ import {
   Check,
 } from 'lucide-react';
 
-export type ControlSymbol = 'play' | 'step' | 'stop' | 'retry' | 'delete' | 'before' | 'after' | 'plus' | 'check' | 'pause';
+export type ControlSymbol = 'play' | 'step' | 'stop' | 'delete' | 'before' | 'after' | 'plus' | 'check' | 'pause';
 
 export function ControlIcon({ type }: { type: ControlSymbol }) {
   switch (type) {
@@ -23,8 +22,6 @@ export function ControlIcon({ type }: { type: ControlSymbol }) {
       return <Square className="control-icon" fill="currentColor" strokeWidth={0} aria-hidden="true" focusable="false" />;
     case 'pause':
       return <Pause className="control-icon" fill="currentColor" strokeWidth={0} aria-hidden="true" focusable="false" />;
-    case 'retry':
-      return <RotateCcw className="control-icon" strokeWidth={2.8} aria-hidden="true" focusable="false" />;
     case 'delete':
       return <Trash2 className="control-icon" strokeWidth={2.5} aria-hidden="true" focusable="false" />;
     case 'before':

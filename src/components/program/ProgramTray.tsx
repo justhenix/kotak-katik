@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CommandIcon, commandLabels } from '../commands/CommandIcon';
 import { CommandPalette } from '../commands/CommandPalette';
 import { ControlIcon } from '../controls/ControlIcon';
+import { RunControls } from '../controls/RunControls';
 import { gameStore, useGameStore } from '../../stores/game-store';
 import type { CommandType, PrimitiveCommand, RepeatCount } from '../../game/types';
 
@@ -18,9 +19,10 @@ function reveal(viewport: HTMLDivElement | null, selector: string) {
   if (item.left < bounds.left + 18) viewport.scrollLeft -= bounds.left - item.left + 18;
 }
 
-export function ProgramTray() {
+export function ProgramTray({ ready }: { ready: boolean }) {
   const program = useGameStore((s) => s.program);
   const level = useGameStore((s) => s.level);
+  const resetProgram = useGameStore((s) => s.resetProgram);
   const { status, activeCommandPath, loopIteration } = useGameStore((s) => s.simulation);
   const [target, setTarget] = useState<Target>({ kind: 'insert', index: program.length });
   const strip = useRef<HTMLDivElement>(null);
@@ -53,7 +55,10 @@ export function ProgramTray() {
     editor.current?.querySelector<HTMLButtonElement>(`[${insertion ? 'data-insert-path' : 'data-command-path'}="${path}"]`)?.focus({ preventScroll: true });
   });
   const insertAt = (index: number, loopIndex?: number) => setTarget({ kind: 'insert', index, loopIndex });
-  const select = (index: number, loopIndex?: number) => setTarget({ kind: 'select', index, loopIndex });
+  const select = (index: number, loopIndex?: number) => {
+    gameStore.getState().resetSimulation();
+    setTarget({ kind: 'select', index, loopIndex });
+  };
   const choose = (type: CommandType) => {
     const store = gameStore.getState();
     if (replacing && type !== 'repeat') {
@@ -70,7 +75,7 @@ export function ProgramTray() {
   };
   const move = (offset: -1 | 1) => {
     gameStore.getState().moveCommand(target.index, offset, target.loopIndex);
-    select(target.index + offset, target.loopIndex);
+    setTarget({ kind: 'select', index: target.index + offset, loopIndex: target.loopIndex });
     focusPath(pathFor(target.index + offset, target.loopIndex));
   };
   const remove = () => {
@@ -105,31 +110,35 @@ export function ProgramTray() {
       <div className="program-heading">
         <h2 id="program-title" className="sr-only">Urutanmu</h2>
         {level.maxProgramSlots !== undefined && <span className="slot-count" aria-label={`${program.length} dari ${level.maxProgramSlots} tempat terisi`}>{program.length} / {level.maxProgramSlots}</span>}
+        <button className="delete-program-button clear-button" disabled={program.length === 0 || running}
+          aria-label="Hapus semua" title="Hapus semua" onClick={resetProgram}><ControlIcon type="delete" /></button>
       </div>
-      <div className="program-scroll" ref={strip}>
-        <ol className="program-list" aria-label="Urutan perintah">
-          {program.map((command, index) => command.type !== 'repeat' ? primitive(command, index) : <li key={index} className="repeat-wrapper">
-            {target.kind === 'insert' && target.index === index && target.loopIndex === undefined && insertion(index, undefined, true)}
-            <div className={`repeat-item ${activeCommandPath?.[0] === index ? 'active-loop' : ''}`}>
-              <div className="repeat-head">
-                <button className="repeat-select" disabled={running} onClick={() => select(index)}
-                  aria-label={`Pilih Ulangi ${index + 1}`} data-command-path={String(index)}
-                  aria-pressed={target.kind === 'select' && target.index === index && target.loopIndex === undefined}>
-                  <CommandIcon type="repeat" /><span>{command.count}×</span>
-                </button>
+      <div className="program-scroll">
+        <div className="program-sequence" ref={strip}>
+          <ol className="program-list" aria-label="Urutan perintah">
+            {program.map((command, index) => command.type !== 'repeat' ? primitive(command, index) : <li key={index} className="repeat-wrapper">
+              {target.kind === 'insert' && target.index === index && target.loopIndex === undefined && insertion(index, undefined, true)}
+              <div className={`repeat-item ${activeCommandPath?.[0] === index ? 'active-loop' : ''}`}>
+                <div className="repeat-head">
+                  <button className="repeat-select" disabled={running} onClick={() => select(index)}
+                    aria-label={`Pilih Ulangi ${index + 1}`} data-command-path={String(index)}
+                    aria-pressed={target.kind === 'select' && target.index === index && target.loopIndex === undefined}>
+                    <CommandIcon type="repeat" /><span>{command.count}×</span>
+                  </button>
+                </div>
+                <ol className="program-list loop-body" aria-label={`Isi Ulangi ${index + 1}`}>
+                  {command.commands.map((child, bodyIndex) => primitive(child, bodyIndex, index))}
+                </ol>
+                {insertion(command.commands.length, index)}
+                <span className="loop-progress" data-loop={index} aria-label={activeCommandPath?.[0] === index && loopIteration !== null ? `Putaran ${loopIteration} dari ${command.count}` : `${command.count} kali`}>
+                  {Array.from({ length: command.count }, (_, iteration) => <span key={iteration} className={activeCommandPath?.[0] === index && loopIteration === iteration + 1 ? 'current-iteration' : ''}>{iteration + 1}</span>)}
+                </span>
               </div>
-              <ol className="program-list loop-body" aria-label={`Isi Ulangi ${index + 1}`}>
-                {command.commands.map((child, bodyIndex) => primitive(child, bodyIndex, index))}
-              </ol>
-              {insertion(command.commands.length, index)}
-              <span className="loop-progress" data-loop={index} aria-label={activeCommandPath?.[0] === index && loopIteration !== null ? `Putaran ${loopIteration} dari ${command.count}` : `${command.count} kali`}>
-                {Array.from({ length: command.count }, (_, iteration) => <span key={iteration} className={activeCommandPath?.[0] === index && loopIteration === iteration + 1 ? 'current-iteration' : ''}>{iteration + 1}</span>)}
-              </span>
-            </div>
-          </li>)}
-        </ol>
-        {insertion(program.length)}
-        {program.length === 0 && <p className="empty-hint">Ketuk perintah di bawah.</p>}
+            </li>)}
+          </ol>
+          {insertion(program.length)}
+        </div>
+        <RunControls ready={ready} />
       </div>
     </section>
     {selected && <div className="selection-tools" role="group" aria-label={`Ubah ${scopeLabel(target.index, target.loopIndex)}`}>

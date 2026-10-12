@@ -11,14 +11,14 @@ The existing M1 engine, fixture data, execution cursor, 400 ms pacing, GLBs, ass
 
 ## Editing contract
 
-`ProgramTray` owns a presentation-only target `{ kind: 'insert' | 'select', index, loopIndex? }`. It never advances the simulation. Selecting a block does not delete it or reset the board.
+`ProgramTray` owns a target `{ kind: 'insert' | 'select', index, loopIndex? }`. It does not advance the simulation. Touching a command card resets the board and execution cursor to the level start while preserving the program. Program edits do the same through the store's edit boundary.
 
 | Interaction | Result |
 | --- | --- |
 | Tap the palette | Insert at the selected `+`; continue inserting after the new block |
 | Add Repeat | Insert an empty 2× Repeat and select its inner `+`; execution stays disabled until filled |
-| Tap a primitive | Select it; the shared palette offers replacement primitives |
-| Tap a Repeat header | Select the container; reveal its 2×/3×/4× native selector |
+| Tap a primitive | Reset the board, select the command, and offer replacement primitives in the shared palette |
+| Tap a Repeat header | Reset the board, select the container, and reveal its 2×/3×/4× native selector |
 | Previous / next | Move the selected block within its scope; retain selection and keyboard focus |
 | Before / after | Show a visible insertion target at that exact position |
 | Delete | Remove only the selected command; focus the scope's final `+` |
@@ -31,7 +31,7 @@ The palette exists once. Repeat body context excludes Repeat. Existing top-level
 
 ## Execution and visual feedback
 
-The green Play button changes to a square Stop control in the same location. Step has a triangle-and-bar icon and the visible label `Satu langkah`. Retry and Clear use smaller neutral controls. Run/Retry still restart, Stop preserves the current cursor, and Step continues that cursor.
+Play and Step are the only execution actions. The green Play button changes to a square Stop control in the same location. Touching a command card or editing the program resets the board and execution cursor while preserving the program. Delete is isolated in the tray's top corner and clears the program to `initialProgram`. Step has a triangle-and-bar icon and the visible label `Satu langkah`. Pressing Play after failure or completion starts the retained program from the original board. Stop preserves the current cursor, and Step continues that cursor.
 
 Active command paths come directly from the interpreter. A solid outline and a small play marker identify the active primitive; a dashed outline/check identifies selection. Failure adds a persistent exclamation marker, warning outline, red cat ring, and an X at the blocked board edge. The edge marker stays near the cat instead of being lost beyond the board bounds. It does not change the collision coordinates or rules.
 

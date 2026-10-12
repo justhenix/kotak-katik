@@ -79,7 +79,7 @@ for (const level of curriculumLevels) test(`M2A ${level.id}: rendered preview, l
   expect(errors).toEqual([]);
 });
 
-test('M2A debugging: observe wrong turn, replace it, retry, and retain the original reset program', async ({ page }, info) => {
+test('M2A debugging: observe a wrong turn, replace it, run again, and retain the original reset program', async ({ page }, info) => {
   const press: Press = (locator) => info.project.name === 'mobile' ? locator.tap() : locator.click();
   await page.goto('/?level=m2-debug-watch');
   await expect(page.locator('.board-scene')).toHaveAttribute('aria-busy', 'false');
@@ -91,7 +91,7 @@ test('M2A debugging: observe wrong turn, replace it, retry, and retain the origi
   await press(button(page, 'Pilih perintah 2: Kanan'));
   await press(button(page, 'Ganti dengan Kiri'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
-  await press(button(page, 'Coba lagi'));
+  await press(button(page, 'Jalankan'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
   await press(button(page, 'Hapus semua'));
   await expect(button(page, 'Pilih perintah 2: Kanan')).toBeVisible();

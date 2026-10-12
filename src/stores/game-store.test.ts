@@ -58,6 +58,19 @@ describe('kernel integration', () => {
     expect(store.getState().simulation).toEqual(createInitialState(kernelLevel));
     expect(store.getState().program).toEqual(kernelLevel.initialProgram);
   });
+  it('Reset restores the board and cursor while retaining the program and cancelling Run', () => {
+    vi.useFakeTimers();
+    const store = createSolution();
+    const program = store.getState().program;
+    store.getState().run();
+    vi.advanceTimersByTime(ACTION_PACE_MS);
+    expect(store.getState().simulation.nextCommandIndex).toBe(1);
+    store.getState().resetSimulation();
+    expect(store.getState().simulation).toEqual(createInitialState(kernelLevel));
+    expect(store.getState().program).toEqual(program);
+    vi.runAllTimers();
+    expect(store.getState().simulation).toEqual(createInitialState(kernelLevel));
+  });
   it('Run after a partial Step restarts; disposal cancels pending actions', () => {
     vi.useFakeTimers();
     const store = createSolution();

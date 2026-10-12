@@ -90,7 +90,7 @@ test('keyboard focus, text zoom and long programs remain reachable without page 
     expect(box!.height).toBeGreaterThanOrEqual(44);
     const fits = await control.evaluate((element) => {
       const bounds = element.getBoundingClientRect();
-      return [...element.querySelectorAll('span')].every((label) => {
+      return [...element.querySelectorAll('span')].filter((label) => getComputedStyle(label).display !== 'none').every((label) => {
         const rect = label.getBoundingClientRect();
         return rect.left >= bounds.left && rect.right <= bounds.right;
       });

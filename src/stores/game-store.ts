@@ -20,6 +20,7 @@ type GameStore = {
   step: () => void;
   run: () => void;
   retry: () => void;
+  resetSimulation: () => void;
   resetProgram: () => void;
   stop: () => void;
   dispose: () => void;
@@ -108,6 +109,10 @@ export function createGameStore(level: LevelDefinition) {
       retry: () => {
         if (get().simulation.status === 'running') return;
         start();
+      },
+      resetSimulation: () => {
+        cancel();
+        set({ simulation: resetSimulation() });
       },
       resetProgram: () => {
         if (get().simulation.status === 'running') return;

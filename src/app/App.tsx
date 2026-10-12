@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GameScene } from '../scene/GameScene';
 import { ProgramTray } from '../components/program/ProgramTray';
-import { RunControls } from '../components/controls/RunControls';
 import { ControlIcon } from '../components/controls/ControlIcon';
 import { CommandIcon, commandLabels } from '../components/commands/CommandIcon';
 import { gameStore, useGameStore } from '../stores/game-store';
@@ -56,8 +55,7 @@ export function App() {
       <Feedback />
     </section>
     <div className="workbench">
-      <ProgramTray />
-      <RunControls ready={sceneReady} />
+      <ProgramTray ready={sceneReady} />
     </div>
   </main>;
 }

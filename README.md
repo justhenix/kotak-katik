@@ -8,7 +8,7 @@ The original Forward-only kernel remains at `/`. Open `/?fixture=turning` for Fo
 
 Tap the shared palette to add commands at the selected `+`. Tap a program block to select it: the palette replaces a primitive, while contextual controls insert before/after, reorder, or delete. Tap a Repeat header to change its count; its inner `+` selects the primitive-only body palette. Escape returns to the end of the outer program. The horizontal strip scrolls to the insertion target and active command without moving the page.
 
-The dominant green button runs the program and becomes Stop during execution. Run and Retry start from the original board with the existing program. One Step advances exactly one primitive, including inside Repeat. The active block and numbered loop iteration stay visible. Editing after Step resets the board. Hapus semua restores `initialProgram`. Berhenti cancels Run and preserves the result for inspection/Step continuation. Invalid movement keeps the cat in place and identifies the exact failing block. Completion is awarded only when a valid program ends with every fish collected.
+The action pair is Play and Step. Play runs the program and becomes Stop during execution; after failure or completion, Play starts the retained program from the original board. Touching a command card or editing the program resets the board and execution cursor while keeping the program. One Step advances exactly one primitive, including inside Repeat. The active block and numbered loop iteration stay visible. Hapus semua is isolated in the dock's top corner and restores `initialProgram`. Berhenti cancels Run and preserves the result for inspection/Step continuation. Invalid movement keeps the cat in place and identifies the exact failing block. Completion is awarded only when a valid program ends with every fish collected.
 
 Nested loops, obstacle mechanics, drag-and-drop, expedition, curriculum, onboarding, persistence, audio, and themes are deferred. See [M1 architecture](docs/M1_ARCHITECTURE.md) for interpreter contracts and fixture URLs, and [M1.1 interface](docs/M1_1_INTERFACE.md) for editing, feedback, and responsive decisions.
 
@@ -27,7 +27,7 @@ Browser smoke tests use the production build at port 4173. Rebuild after source 
 
 ## Boundaries
 
-`src/game/` owns typed level/program data, movement/turning, collection, validation, reset, and a live execution cursor. `src/stores/` owns command editing and 400 ms Run pacing, including a visible reset before replay and timer cancellation. Run/Step share one pure primitive executor. `src/components/` edits/observes logical state. `src/scene/` renders that state with R3F; mesh transforms never decide game rules. Demand rendering sleeps when the scene settles. Reduced motion skips position/yaw interpolation.
+`src/game/` owns typed level/program data, movement/turning, collection, validation, reset, and a live execution cursor. `src/stores/` owns command editing and 400 ms Run pacing, including resetting the board before execution and cancelling timers. Run/Step share one pure primitive executor. `src/components/` edits/observes logical state. `src/scene/` renders that state with R3F; mesh transforms never decide game rules. Demand rendering sleeps when the scene settles. Reduced motion skips position/yaw interpolation.
 
 ## Design decisions
 

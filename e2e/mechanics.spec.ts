@@ -98,11 +98,11 @@ for (const count of [2, 3, 4]) test(`${count}× Repeat: exact primitive Steps, i
   }
   const logical = await feedback(page).evaluate((element) => ({ ...((element as HTMLElement).dataset) }));
   await expect(feedback(page)).toHaveAttribute('data-status', count === 2 ? 'finished' : 'completed');
-  await press(button(page, 'Coba lagi'));
-  await expect(page.getByLabel('0 dari 3 ikan terkumpul')).toBeVisible();
-  await expect(button(page, 'Pilih Ulangi 1')).toBeDisabled();
-  await expect(button(page, 'Tambah Maju ke Ulangi 1')).toBeDisabled();
-  await expect(button(page, 'Pilih perintah 1 di Ulangi 1: Maju')).toBeDisabled();
+  await expect(button(page, 'Coba lagi')).toHaveCount(0);
+  const replayStarted = page.waitForFunction(() => document.querySelector('.feedback')?.getAttribute('data-status') === 'running', undefined, { polling: 'raf' });
+  await press(button(page, 'Jalankan lagi'));
+  await replayStarted;
+  await expect(feedback(page)).toHaveAttribute('data-actions', String(count * 2), { timeout: 5000 });
   await expect(feedback(page)).toHaveAttribute('data-status', logical.status!);
   expect(await feedback(page).evaluate((element) => ({ ...((element as HTMLElement).dataset) }))).toEqual(logical);
   await press(button(page, 'Hapus semua'));
@@ -159,7 +159,9 @@ test('tap editor: body/top ordering, removal, slot limits, editing after Step/er
   await expect(button(page, 'Tambah Maju ke Ulangi 1')).toBeEnabled();
   await press(button(page, 'Pilih perintah 2 di Ulangi 1: Kanan'));
   await press(button(page, 'Hapus perintah 2 di Ulangi 1: Kanan'));
+  const replayStarted = page.waitForFunction(() => document.querySelector('.feedback')?.getAttribute('data-status') === 'running', undefined, { polling: 'raf' });
   await press(button(page, 'Jalankan'));
+  await replayStarted;
   await expect(feedback(page)).toHaveAttribute('data-status', 'failed');
   await expect(feedback(page)).toHaveAttribute('data-command-path', '0.0');
   await expect(feedback(page)).toHaveAttribute('data-loop-iteration', '2');
@@ -206,7 +208,7 @@ test('tap editor: body/top ordering, removal, slot limits, editing after Step/er
   expect(errors).toEqual([]);
 });
 
-test('Stop cancels Run; Step continues; Retry restarts; reduced-motion loops retain highlights', async ({ page }, info) => {
+test('Stop cancels Run; Step continues; Play restarts; reduced-motion loops retain highlights', async ({ page }, info) => {
   const errors = watchErrors(page);
   const press = (control: Locator) => info.project.name === 'mobile' ? control.tap() : control.click();
   await page.goto('/?fixture=loops');
@@ -214,19 +216,20 @@ test('Stop cancels Run; Step continues; Retry restarts; reduced-motion loops ret
   await press(button(page, 'Tambah Ulangi'));
   await setCount(page, 4);
   await press(button(page, 'Tambah Maju ke Ulangi 1')); await press(button(page, 'Tambah Kanan ke Ulangi 1'));
-  await press(button(page, 'Jalankan'));
-  await expect(feedback(page)).toHaveAttribute('data-actions', '2');
-  await press(button(page, 'Berhenti'));
+  await button(page, 'Jalankan').evaluate((element) => (element as HTMLButtonElement).click());
+  await page.waitForFunction(() => {
+    const state = document.querySelector<HTMLElement>('.feedback');
+    return state?.dataset.status === 'running' && Number(state.dataset.actions) >= 2;
+  }, undefined, { polling: 'raf' });
+  await button(page, 'Berhenti').evaluate((element) => (element as HTMLButtonElement).click());
   await expect(feedback(page)).toHaveAttribute('data-status', 'paused');
   const stopped = Number(await feedback(page).getAttribute('data-actions'));
   await page.waitForTimeout(850);
   await expect(feedback(page)).toHaveAttribute('data-actions', String(stopped));
   await press(step(page));
   await expect(feedback(page)).toHaveAttribute('data-actions', String(stopped + 1));
-  const restored = page.waitForFunction(() => document.querySelector('.feedback')?.getAttribute('data-actions') === '0'
-    && document.querySelector('.fish-progress')?.getAttribute('aria-label') === '0 dari 3 ikan terkumpul', undefined, { polling: 'raf' });
-  await press(button(page, 'Coba lagi'));
-  await restored;
+  await press(button(page, 'Jalankan'));
+  await expect(feedback(page)).toHaveAttribute('data-actions', '8');
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');
   await press(button(page, 'Hapus semua'));
   await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -79,7 +79,7 @@ export function GameScene({ onReady }: { onReady: (ready: boolean) => void }) {
       <>
         {!loaded && <div className="scene-loading" role="status">Menyiapkan papan…</div>}
         <Canvas orthographic camera={{ position: [8, 8, 8], zoom: 60, near: 0.1, far: 100 }}
-          shadows="percentage" dpr={sceneConfig.dpr} frameloop="demand" fallback={<SceneFallback />}>
+          shadows="percentage" dpr={sceneConfig.dpr} frameloop="demand" fallback={loaded ? null : <SceneFallback />}>
           <Suspense fallback={null}>
             <World reduced={reduced} onReady={ready} />
           </Suspense>
