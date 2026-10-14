@@ -88,7 +88,7 @@ test('title starts immediately; leaving a demonstration cancels it and replay st
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Kotak-Katik' })).toBeVisible();
-  await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(page.locator('.board-scene, .ghost-hand')).toHaveCount(0);
   await page.getByRole('button', { name: 'Mulai', exact: true }).click();
   await expect(page.locator('.lesson-scaffold')).toHaveAttribute('data-demo-phase', 'command');
   await page.getByRole('button', { name: 'Ekspedisi', exact: true }).click();

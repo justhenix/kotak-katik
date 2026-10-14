@@ -976,3 +976,160 @@ Reference: the user's attached screenshot of the open Ulang contoh / Lewati cont
 - Inspected the actual menu using Browser Computer Use. No gameplay or tutorial behavior changed; the prompt journal remains untouched.
 - `PROMPT_JOURNAL.md` remains uncurated and untouched.
 
+## 2026-10-15: Reference 3D title screen
+
+**Original prompt (verbatim)**
+
+```text
+# Kotak-Katik - Pixel-Accurate 3D Title Screen
+
+Implement a high-fidelity recreation of the attached `title-screen-target.png` in the existing Kotak-Katik codebase.
+
+**Goal: Match the reference as closely as technically possible, including composition, geometry, colors, materials, lighting, atmospheric effects, and UI.**
+
+This is an implementation task, not a redesign or planning exercise.
+
+## 1. Inspect before implementing
+
+Read `AGENTS.md`, relevant `.agents/` documentation, and the existing title screen, React Three Fiber scene, GLB assets, and CSS.
+
+Preserve the current Vite + React + TypeScript + Three.js architecture.
+
+**The reference image is the visual source of truth.** Match its specific appearance rather than interpreting it loosely.
+
+## 2. Recreate the title composition
+
+Target the reference's 1672×941 desktop composition.
+
+**Upper section**
+
+- Large centered "Kotak-Katik" wordmark using the existing Fredoka font.
+- Subtitle: "Susun langkah. Bantu kucing ambil ikan."
+- Large yellow "Mulai" button with tactile depth.
+- Smaller cream "Ekspedisi" button with the existing map icon.
+- Match spacing, proportions, contrast, outlines, and hierarchy.
+
+**Lower section: real 3D diorama**
+
+- Reuse the existing animated cube-cat GLB on the left.
+- Reuse the existing clownfish GLB on the right.
+- Connect them with approximately five raised, walkable tiles forming one geometrically valid path.
+- Preserve clear starting and destination positions.
+- Use pale-green grassy tops, warm brown sides, softly beveled edges, and consistent tile dimensions.
+- Include the circular marker beneath the cat.
+- Match the reference's orthographic isometric camera angle and framing.
+
+**Environmental dressing**
+
+- Small floating islands containing stylized trees, rocks, flowers, and grass.
+- Soft clouds in the background.
+- Tiny isolated decorative blocks.
+- Plenty of turquoise negative space.
+- Match the arrangement and relative scale shown in the reference.
+
+Use existing licensed assets where appropriate and simple procedural geometry elsewhere. No manual Blender workflow.
+
+Do not randomly scatter props or make decorative tiles look like alternative puzzle paths.
+
+## 3. Shader and lighting implementation
+
+Implement a lightweight, original stylized water shader using Three.js GLSL/ShaderMaterial or an equivalent maintainable approach.
+
+Required visual characteristics:
+
+- Pastel aqua/turquoise base.
+- Subtle tonal depth and smooth water gradients.
+- Gentle, slow-moving surface variation.
+- Soft, sparse ripple accents around floating islands.
+- Controlled highlights and soft ambient reflections.
+- Visually compatible with the reference's toy-diorama aesthetic.
+
+The shader should feel like calm animated illustrated water, not photorealistic ocean simulation.
+
+Improve scene lighting with:
+
+- Soft directional shadows.
+- Broad ambient/hemisphere illumination.
+- Subtle contact shadows beneath tiles and props.
+- Matte, slightly varied materials.
+- Gentle atmospheric depth.
+
+Keep effects inexpensive. Avoid excessive bloom, neon, strong reflections, complicated postprocessing, or high-frequency animation.
+
+Respect `prefers-reduced-motion` by freezing procedural motion while retaining the same visual composition.
+
+## 4. Important implementation constraints
+
+- **Do not use the reference PNG as the rendered background or flatten the scene into an image.** Recreate it as actual UI and 3D geometry.
+- The buttons must remain real, functional, keyboard-accessible React controls.
+- The existing Mulai, Lanjutkan, Ekspedisi, progression, and localStorage behavior must continue working.
+- Maintain support for direct `?level=` and `?fixture=` entry.
+- Isolate title-specific shaders and assets from gameplay rendering.
+- Preserve existing cat and fish assets, animation compatibility, and material integrity.
+- Reuse existing packages wherever possible.
+- Avoid unnecessary dependencies and asset downloads.
+- Do not modify the gameplay engine, curriculum, or working puzzle UI.
+
+## 5. Responsive implementation
+
+Desktop should closely match the supplied reference.
+
+For mobile, recompose intelligently:
+
+- Preserve the title and both buttons.
+- Keep the cat, logical tile path, and fish visible.
+- Fit the orthographic camera to the available area.
+- Reduce or hide secondary decorative islands when space is limited.
+- Maintain large touch targets and readable text.
+- Prevent horizontal overflow and overlapping controls.
+
+Test 1672×941, 1440×900, 390×844, and 320×740.
+
+Do not simply scale the desktop screen down.
+
+## 6. Visual verification is mandatory
+
+After implementing, launch the actual application in a browser.
+
+Capture desktop screenshots at the reference resolution and compare them directly against `title-screen-target.png`.
+
+Iteratively correct:
+
+1. Overall composition and placement.
+2. Camera perspective and tile geometry.
+3. Character and fish scale/position.
+4. UI typography, button dimensions, and spacing.
+5. Water shader and lighting.
+6. Environmental colors, density, and proportions.
+7. Shadows and small material details.
+
+Do not declare completion after the first render. Continue improving visible mismatches until the result is convincingly close to the reference.
+
+Prefer screenshot inspection over assumptions from code.
+
+## 7. Release requirements
+
+Run the production build and relevant existing tests. Check for WebGL errors, broken models, rendering issues, layout overflow, and regressions.
+
+Commit the finished implementation with a descriptive commit message. Preserve the project's append-only development history and do not automatically curate its prompt journal.
+
+Report concisely:
+
+- What was implemented.
+- Visual differences still remaining from the reference.
+- Shader implementation and performance impact.
+- Desktop/mobile verification results.
+- Build/test status.
+- Commit SHA.
+
+**Definition of done:** The title screen looks recognizably like the generated reference, with a real animated 3D diorama, working interactive buttons, and a subtle procedural water shader. Existing gameplay remains unchanged and functional.
+```
+
+Reference: the supplied 1672×941 PNG attachment, `codex-clipboard-82bb1ad0-4fe3-4a4c-b0ab-0bdddb8a96ee.png`. It is not included in rendered assets.
+
+**Outcome**
+
+- Implemented a separate animated title diorama and functional, responsive menu. Full implementation, remaining visual differences, and review evidence are recorded in `TITLE_SCREEN.md` and the appended development-log entry.
+- Production build, 239 unit tests, and 38 distinct relevant desktop/mobile browser checks pass, including targeted reruns described in the development log.
+- Engine, curriculum, working puzzle UI, original model binaries, and `PROMPT_JOURNAL.md` remain unchanged. No push or deployment performed.
+

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Check, Map } from 'lucide-react';
 import { Expedition } from '../components/journey/Expedition';
 import { progressStore, useProgressStore } from '../stores/progress-store';
@@ -10,6 +10,11 @@ import { CommandIcon, commandLabels } from '../components/commands/CommandIcon';
 import { gameStore, useGameStore } from '../stores/game-store';
 import { LessonScaffold, LessonOptions } from '../components/learning/LessonScaffold';
 import { demoPlaying, lessonStore, useLessonStore, visibleHints } from '../stores/lesson-store';
+
+const TitleScene = lazy(async () => {
+  const { TitleScene } = await import('../scene/title/TitleScene');
+  return { default: TitleScene };
+});
 
 function Feedback() {
   const simulation = useGameStore((s) => s.simulation);
@@ -121,10 +126,13 @@ export function App() {
     onFinish={isPreview ? undefined : () => setScreen('complete')} />;
   return <main className={`journey-shell ${screen}-screen`}>
     {screen === 'title' ? <>
+      <Suspense fallback={null}><TitleScene /></Suspense>
+      <div className="title-controls">
       <h1 className="wordmark" tabIndex={-1} ref={heading}>Kotak-Katik</h1>
       <p>Susun langkah. Bantu kucing ambil ikan.</p>
       <button className="journey-primary" onClick={start}>{progress.completedLevelIds.includes(curriculumLevels.at(-1)!.id) ? 'Main lagi' : progress.unlockedLevelIds.length > 1 ? 'Lanjutkan' : 'Mulai'}</button>
       <button className="journey-secondary" onClick={() => setScreen('expedition')}><Map aria-hidden="true" />Ekspedisi</button>
+      </div>
     </> : screen === 'complete' ? <>
       <h1 tabIndex={-1} ref={heading}><Check aria-hidden="true" />Ekspedisi selesai!</h1>
       <p>{progress.completedLevelIds.length} dari 16 tahap selesai.</p>

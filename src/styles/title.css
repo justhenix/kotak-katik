@@ -1,0 +1,100 @@
+.journey-shell.title-screen {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  min-height: 620px;
+  padding: 0;
+  overflow: hidden;
+  background: #93e4e8;
+  color: #173353;
+}
+.title-diorama { position: absolute; inset: 0; pointer-events: none; }
+.title-controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: min(11.7svh, 6.6vw);
+  text-align: center;
+}
+.title-screen .wordmark {
+  margin: 0;
+  font-size: min(8vw, 14.21svh);
+  font-weight: 700;
+  font-family: 'Fredoka Title', 'Fredoka', sans-serif;
+  line-height: 0.90;
+  letter-spacing: -0.035em;
+  color: #172f50;
+  -webkit-text-stroke: min(0.42vw, 0.74svh) #fffdf6;
+  paint-order: stroke fill;
+  text-shadow: 0 6px 0 #74cdd6;
+}
+.title-controls > p {
+  margin: min(0.55vw, 0.98svh) 16px min(1.45vw, 2.58svh);
+  font: 500 min(1.8vw, 3.2svh)/1.35 'Fredoka', sans-serif;
+}
+.title-screen .journey-primary, .title-screen .journey-secondary {
+  border: 2px solid #3b5060;
+  font-family: 'Fredoka Title', 'Fredoka', sans-serif;
+  font-weight: 600;
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out, filter 120ms ease-out;
+}
+.title-screen .journey-primary {
+  width: min(22.1vw, 39.27svh);
+  min-width: 0;
+  height: min(5.5vw, 9.78svh);
+  padding: 0 20px;
+  border-radius: min(1.5vw, 2.66svh);
+  background: linear-gradient(110deg, #ffdf49, #ffda35);
+  font-size: min(2.5vw, 4.44svh);
+  box-shadow: inset 0 4px 0 #fff5bc, inset 0 -5px 0 #f4b833, 0 6px 0 #69bdc5;
+}
+.title-screen .journey-secondary {
+  gap: min(1.05vw, 1.87svh);
+  width: min(16.4vw, 29.14svh);
+  height: min(4.6vw, 8.17svh);
+  margin-top: min(1.3vw, 2.31svh);
+  padding: 0 16px;
+  border-radius: min(1.25vw, 2.22svh);
+  background: #fff5df;
+  font-size: min(1.8vw, 3.2svh);
+  box-shadow: inset 0 3px 0 #fffdf6, inset 0 -4px 0 #ddd5bf, 0 6px 0 #70bfc5;
+}
+.title-screen .journey-secondary svg { width: min(2.5vw, 4.44svh); height: min(2.5vw, 4.44svh); stroke-width: 2; }
+.title-screen button:active:not(:disabled) { transform: translateY(4px); box-shadow: inset 0 -2px 0 #d2ae43, 0 2px 0 #69bdc5; }
+.title-screen button:focus-visible { outline: 3px solid #173353 !important; outline-offset: 7px; }
+.title-scene-status { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 14px; }
+@media (hover: hover) and (pointer: fine) { .title-screen button:hover { filter: brightness(1.04); } }
+@media (max-width: 600px) {
+  .journey-shell.title-screen { min-height: 640px; }
+  .title-controls { padding: max(56px, 9svh) 16px 0; }
+  .title-screen .wordmark { font-size: clamp(44px, 14.2vw, 70px); line-height: 1.1; -webkit-text-stroke: 4px #fffdf6; text-shadow: 0 4px 0 #74cdd6; }
+  .title-controls > p { max-width: 290px; margin: 15px 0 24px; font-size: 20px; line-height: 1.3; text-wrap: balance; }
+  .title-screen .journey-primary { width: 224px; height: 66px; border-radius: 19px; font-size: 31px; }
+  .title-screen .journey-secondary { width: 194px; height: 58px; margin-top: 18px; gap: 12px; border-radius: 16px; font-size: 24px; }
+  .title-screen .journey-secondary svg { width: 30px; height: 30px; }
+}
+@media (max-width: 350px) {
+  .title-controls { padding-top: max(42px, 7svh); }
+  .title-controls > p { font-size: 18px; margin-bottom: 20px; }
+  .title-screen .journey-primary { width: 210px; height: 60px; font-size: 29px; }
+  .title-screen .journey-secondary { width: 184px; height: 54px; font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .title-screen button { transition: none; } }
+@font-face {
+  font-family: 'Fredoka Title';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('@fontsource/fredoka/files/fredoka-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fredoka Title';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('@fontsource/fredoka/files/fredoka-latin-700-normal.woff2') format('woff2');
+}

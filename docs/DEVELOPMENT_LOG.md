@@ -327,3 +327,14 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - The added root visit in the older Stop/Step mechanics test passed on both viewports, preserving its original first-board assertion after title navigation was added. Final rebuild retained the same runtime asset hash.
 - Fast-forwarded the sprint through `0f409d8` into main and pushed origin only after local/deployed gates and diff safety passed. Vercel's Git deployment from that main commit reached READY. Submission still needs the user's repository visibility change, selected prompt journal entries and organizer submission.
 
+### 2026-10-15: Reference title diorama
+
+- Recreated the supplied title reference as real React controls and an isolated, lazy-loaded R3F scene. Reused unchanged cat/clownfish GLBs; authored beveled connected tiles, fixed procedural dressing, clouds, water, contact patches, and soft baked shadows.
+- Added a two-triangle GLSL water plane with slow tonal variation and sparse shoreline accents. Reduced motion freezes water and both model clips using demand rendering. Mobile uses its own connected route and fitted camera; secondary dressing is omitted.
+- Scoped title Fredoka weights to a separate font-family alias. Gameplay components, engine, curriculum, stores, asset binaries, packages, lockfile, and `PROMPT_JOURNAL.md` are unchanged.
+- Compared successive browser renders with the reference. Saved final production-build captures at 1672×941, 1440×900, 390×844, and 320×740 under `docs/evidence/title-screen/`. No horizontal overflow, overlapping controls, broken models, or inspected WebGL/runtime errors.
+- Production build and 239 unit tests pass. Verified 38 distinct browser checks: 34 existing desktop/mobile journey/assets/kernel/mechanics checks plus four new title checks. The broad run initially passed 32/34; its obsolete zero-title-canvas assertion was corrected and passed on rerun. The other failure was an ENOENT trace teardown caused by concurrent suites sharing an output directory; the affected GLB scenario passed in an isolated rerun. All six final title/GLB checks pass against the final production build.
+- Keyboard tests exercise Tab order, Enter to expedition, Space to start, title unmount, and direct fixture/level entries. Existing checks cover resume/storage/replay, relative turns, collisions, Repeat, stepping, Stop, retry/reset, loading/failure, and completion. Reduced-motion screenshots remain identical; normal-motion screenshots change.
+- Remaining differences are documented in `docs/TITLE_SCREEN.md`: source GLB details, valid staggered tile joins, and simpler procedural shading/atmospheric softness. The existing main-bundle advisory remains. No physical-device or learner-testing claim is made.
+- Committed the title implementation and review evidence. No push or deployment was requested or performed. The pre-existing untracked `screenshots/` folder was not staged.
+
