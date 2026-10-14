@@ -320,3 +320,10 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - Repository still private; user must enable public visibility. User must select curated prompts; `PROMPT_JOURNAL.md` remains untouched.
 - Physical devices and learner comprehension remain unverified. No BISINDO material was invented; WebGL remains required.
 
+**Production release evidence**
+- M3.4 local gate committed/pushed as `c4019a8`; the four earlier milestones retain separate commits.
+- Deployed to [kotak-katik.vercel.app](https://kotak-katik.vercel.app), Vercel production deployment `dpl_En96JqGNhnCPzHXVHdDvrbA3kpe6`, READY. Cloud frozen Bun install and production build passed. Anonymous HTTP 200 confirms the canonical URL is public.
+- Twelve deployed desktop/mobile browser checks passed: ten critical gameplay/persistence checks, then two entry checks after correcting the release config to avoid starting a local server. Resolved configuration points to the public HTTPS host. Live Browser Computer Use confirmed actual tutorial completion with no inspected browser errors.
+- The added root visit in the older Stop/Step mechanics test passed on both viewports, preserving its original first-board assertion after title navigation was added. Final rebuild retained the same runtime asset hash.
+- Integration into main follows successful local and deployed gates. Submission still needs the user's repository visibility change, selected prompt journal entries and organizer submission.
+

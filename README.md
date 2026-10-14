@@ -2,6 +2,8 @@
 
 A deaf-first visual computational-thinking game for elementary learners, built for the M-One Telkomsel Coding Competition 2026.
 
+**Play:** [kotak-katik.vercel.app](https://kotak-katik.vercel.app).
+
 ## Play the MVP
 
 `/` opens the title screen. **Mulai** enters the first lesson; **Lanjutkan** resumes local progression. **Ekspedisi** shows all 16 stages in their authored order: movement, sequencing, relative turns, combined paths, repetition, debugging, then mixed application. Completed stages can be replayed. Locked stages open after the preceding stage succeeds or its demonstration is explicitly skipped. Skipping unlocks the next lesson without awarding completion. The final puzzle leads to the journey completion screen with an accurate completed-stage count.
@@ -52,5 +54,13 @@ WebGL is required. The JavaScript renderer bundle is about 349 kB gzip and trigg
 ## Release and submission
 
 `vercel.json` configures a frozen Bun install, `bun run build`, and static `dist` output. There are no runtime secrets or backend services. The app uses a single root URL plus optional preview query parameters.
+
+The release passed 239 unit tests, all 98 local production-browser checks and 12 deployed desktop/mobile smoke checks. To run browser checks against the deployed game from PowerShell:
+
+```powershell
+$env:MVP_BASE_URL = 'https://kotak-katik.vercel.app'
+bun x playwright test e2e/journey.spec.ts --config playwright.release.config.ts
+Remove-Item Env:MVP_BASE_URL
+```
 
 Before submitting, confirm that the repository is public, the deployed URL opens without authentication, and the organizer's required artifacts are included. `docs/PROMPT_LOG.md` records authentic prompts/outcomes. The user must explicitly select prompts for `docs/PROMPT_JOURNAL.md`; the sprint does not curate it automatically. Release verification and any outstanding actions are recorded in [the sprint report](docs/M3_MVP_SPRINT.md).

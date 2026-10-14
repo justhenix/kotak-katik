@@ -39,7 +39,7 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - Ten journey browser tests passed on desktop/mobile: refresh/resume, replay, skip versus completion, reset/cancel, corrupt storage, blocked storage and preview isolation, plus entry/navigation checks.
 - Inspected actual mobile title and expedition renders using Browser Computer Use. Labels/icons remain distinct without color; controls reflow vertically.
 
-## M3.4: local release gate passed
+## M3.4: MVP release gate passed
 
 - Added a real new-player browser journey through all 16 stages using actual demonstrations and editor actions, then refresh/resume, final completion, map and replay. The targeted journey passed on desktop and touch mobile.
 - Added 1440×900, 390×844 and 320×740 checks, 200% text, reduced motion, keyboard navigation, reset focus/Escape, and leaving a running puzzle.
@@ -51,7 +51,7 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - The interpreter, simulation, 16 curriculum definitions, scene, game/lesson stores, dependencies and lockfile are unchanged from main.
 - Inspected actual title/map/gameplay renders using Browser Computer Use at desktop, mobile and narrow widths. Operated Start, tutorial completion, guided placement/Run, expedition selection and reset confirmation. Read browser error logs in the inspected local flow: none.
 - Contrast calculations: ink on locked nodes 9.10:1; ink on yellow 8.13:1; locked boundary 3.59:1; completed boundary 4.85:1; cream control boundary 5.08:1. Status uses text/icons in addition to color.
-- Vercel authentication is available. Created/linked `justhenixs-projects/kotak-katik` with the existing GitHub repository; deployment waits for the gate. Frozen Bun install/Vite build/static output configured. Dry run excludes local environment files and development evidence.
+- Created/linked `justhenixs-projects/kotak-katik` with the existing GitHub repository. Frozen Bun install/Vite build/static output configured. Dry run excludes local environment files and development evidence. Production deployment and public browser checks passed after the local gate.
 - Tracked-file credential-name/common-token-pattern checks found no matches. This is a focused check, not a comprehensive security audit. Local Vercel credentials/environment files are ignored and not recorded as evidence.
 
 ### Milestone commits
@@ -60,7 +60,17 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - M3.1: `6c3fc6a`
 - M3.2: `ad62072`
 - M3.3: `4c22964`
-- M3.4: local verification complete; deployment evidence follows.
+- M3.4: `c4019a8` (release gate, pushed on the safe feature branch). Deployment evidence is recorded in the follow-up commit.
+
+### Production release
+
+- Game: [https://kotak-katik.vercel.app](https://kotak-katik.vercel.app).
+- Vercel deployment: `dpl_En96JqGNhnCPzHXVHdDvrbA3kpe6`, production, READY. Cloud frozen install used Bun 1.4.1 and the unchanged lockfile; TypeScript/Vite build passed.
+- Anonymous HTTP 200 with the game's actual title; the canonical production URL requires no login. Preview/deployment protection does not prevent public access through this URL.
+- Deployed browser checks: ten passed (3.4 minutes) across desktop/mobile, covering start/demo exit/re-entry, persistent progress and reset, Forward/Step/Run/retry/collision, relative turns/all facings/reduced motion, and 3× Repeat Step/Run parity.
+- Corrected the deployment test configuration to replace the local config's webServer instead of merging it. Inspected its resolved baseURL and empty webServer list, then ran two further desktop/mobile deployed entry checks: both passed (21.9 seconds), with no local server started. All twelve checks targeted the public HTTPS game.
+- Browser Computer Use opened the public game, started the first tutorial and observed real collection/completion. Its inspected error log was empty.
+- Local preview/dev helpers are temporary verification tools. Main integration proceeds after these release checks; no history rewriting or force push is used.
 
 ### Rendered evidence
 
@@ -79,5 +89,5 @@ The single-column route preserves teaching order and limits branching decisions.
 
 - Repository visibility verified as private. The user must enable public visibility before judging.
 - `PROMPT_JOURNAL.md` still contains five unselected placeholders. Only the user can select the actual prompts for curation; it remains untouched.
-- Confirm the final deployed URL and organizer submission requirements before the October 15, 2026 deadline (Asia/Jakarta).
+- Include the verified public game URL in the organizer submission and confirm its remaining required artifacts before the October 15, 2026 deadline (Asia/Jakarta).
 - Physical devices and SDLB-B learner/teacher comprehension remain untested. Touch is browser-emulated. WebGL is required. No BISINDO material or audio dependency was added.
