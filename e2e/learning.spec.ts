@@ -24,6 +24,7 @@ async function capture(page: Page, info: TestInfo, name: string) {
 test('automatic placement and Play; genuine guided participation; independent empty tray', async ({ page }, info) => {
   const tap=press(info);
   await page.goto('/');
+  await tap(button(page,'Mulai'));
   await expect(scaffold(page)).toHaveAttribute('data-demo-phase','command');
   await expect(page.locator('.ghost-hand')).toHaveAttribute('data-target','.palette-command[data-type="forward"]');
   await expect(button(page,'Satu langkah')).toHaveCount(0);
@@ -67,6 +68,7 @@ test('automatic placement and Play; genuine guided participation; independent em
 test('secondary replay and skip cancel old work; responsive pointer stays on its real target', async ({page},info)=>{
   const tap=press(info);
   await page.goto('/');
+  await tap(button(page,'Mulai'));
   await expect(scaffold(page)).toHaveAttribute('data-demo-phase','done',{timeout:15000});
   await page.locator('summary').click(); await tap(button(page,'Ulang contoh'));
   await expect(scaffold(page)).toHaveAttribute('data-demo-phase','command');
@@ -154,6 +156,7 @@ test('reduced motion preserves autoplay, placement, guidance and quiet drawing',
   const tap=press(info);
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');
+  await tap(button(page,'Mulai'));
   await expect(page.locator('.ghost-hand')).toHaveAttribute('data-motion','static');
   expect(await page.locator('.ghost-hand').evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
   await expect(scaffold(page)).toHaveAttribute('data-demo-phase','done',{timeout:15000});

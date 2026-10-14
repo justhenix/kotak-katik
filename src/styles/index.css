@@ -31,6 +31,16 @@ button:disabled, select:disabled { cursor: default; }
 button:disabled:not(.command-block, .repeat-select, .insert-slot), select:disabled { opacity: 0.55; }
 button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--edge); }
 svg { flex-shrink: 0; }
+.journey-shell { width: min(100%, 880px); min-height: 100svh; margin: auto; padding: 28px 20px; }
+.title-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; text-align: center; }
+.title-screen .wordmark { font-size: clamp(2.5rem, 8vw, 4.5rem); }
+.journey-shell h1:not(.wordmark) { font: 500 2rem 'Fredoka', sans-serif; margin: 24px 0; }
+.journey-primary, .journey-secondary, .puzzle-exit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 2px solid var(--edge); border-radius: 12px; background: var(--cream); font-weight: 700; }
+.journey-primary { background: var(--forward); font-size: 1.25rem; box-shadow: 0 4px var(--edge); }
+.title-screen .journey-primary { min-width: 180px; }
+.journey-secondary { background: #fff9e9; }
+.puzzle-exit { padding: 8px 12px; }
+.puzzle-exit svg { width: 22px; height: 22px; }
 h1, h2, p { margin: 0; }
 h2, .wordmark { font-family: 'Fredoka', sans-serif; font-weight: 500; }
 h2 { font-size: 1.25rem; line-height: 1.2; }
