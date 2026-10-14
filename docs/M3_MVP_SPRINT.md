@@ -70,7 +70,8 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - Deployed browser checks: ten passed (3.4 minutes) across desktop/mobile, covering start/demo exit/re-entry, persistent progress and reset, Forward/Step/Run/retry/collision, relative turns/all facings/reduced motion, and 3× Repeat Step/Run parity.
 - Corrected the deployment test configuration to replace the local config's webServer instead of merging it. Inspected its resolved baseURL and empty webServer list, then ran two further desktop/mobile deployed entry checks: both passed (21.9 seconds), with no local server started. All twelve checks targeted the public HTTPS game.
 - Browser Computer Use opened the public game, started the first tutorial and observed real collection/completion. Its inspected error log was empty.
-- Local preview/dev helpers are temporary verification tools. Main integration proceeds after these release checks; no history rewriting or force push is used.
+- Integrated the sprint through `0f409d8` into main by fast-forward after all local/deployed gates and diff safety checks, then pushed main to origin. The working tree was clean. No history rewriting or force push was used.
+- Vercel's Git deployment for main commit `0f409d80301f4d313fbee8bdd73b4dbf84e1644e` reached READY (`kotak-katik-prryrvzcy-justhenixs-projects.vercel.app`). The canonical public URL remains `https://kotak-katik.vercel.app`.
 
 ### Rendered evidence
 
