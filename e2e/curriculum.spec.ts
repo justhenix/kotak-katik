@@ -4,6 +4,7 @@ import { curriculumSolutions } from '../src/game/levels/__tests__/solutions';
 import { curriculumLevels } from '../src/game/levels/curriculum';
 import { verifySolution } from '../src/game/levels/validate-curriculum';
 import type { CommandType, Program } from '../src/game/types';
+import { setRepeatCount } from './repeat-counter';
 
 const labels: Record<CommandType, string> = { forward: 'Maju', 'turn-left': 'Kiri', 'turn-right': 'Kanan', repeat: 'Ulangi' };
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
@@ -26,7 +27,7 @@ async function buildProgram(page: Page, program: Program, press: Press) {
     await press(button(page, `Tambah ${labels[command.type]}`));
     if (command.type === 'repeat') {
       await press(button(page, `Pilih Ulangi ${index + 1}`));
-      await page.getByLabel(`Banyaknya Ulangi ${index + 1}`).selectOption(String(command.count));
+      await setRepeatCount(page, index, command.count, press);
       await press(button(page, `Tambah di posisi 1 dalam Ulangi ${index + 1}`));
       for (const child of command.commands) await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
     }

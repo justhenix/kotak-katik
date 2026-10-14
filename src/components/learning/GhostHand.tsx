@@ -23,10 +23,11 @@ export function GhostHand() {
         for (const layout of document.querySelectorAll('.workbench, .feedback')) resize.observe(layout);
       }
       const bounds = anchor?.getBoundingClientRect();
+      const countTarget = selector.startsWith('[data-count-index=');
       // Kenney's original 64px north-pointing hand has its fingertip at (29, 4).
       setPoint(bounds && bounds.width && bounds.height ? {
-        x: Math.min(innerWidth - 54, Math.max(0, bounds.left + bounds.width * (selector === '.palette-commands' ? 0.5 : 0.76) - 29 / 64 * 52)),
-        y: bounds.top + bounds.height * 0.55 - 4 / 64 * 52,
+        x: Math.min(innerWidth - 54, Math.max(0, bounds.left + bounds.width * (selector === '.palette-commands' || countTarget ? 0.5 : 0.76) - 29 / 64 * 52)),
+        y: bounds.top + bounds.height * (countTarget ? 0.82 : 0.55) - 4 / 64 * 52,
       } : null);
     };
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure); };

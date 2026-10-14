@@ -54,7 +54,7 @@ export function LessonScaffold({ ready }: { ready: boolean }) {
     {lesson.demoPhase === 'interrupted' && <button className="continue-lesson" onClick={lesson.startDemo}><RotateCcw aria-hidden="true" />Ulang contoh</button>}
     {canContinue && index < curriculumLevels.length - 1 && <button className="next-lesson" onClick={() => {
       lesson.nextLesson();
-      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.next-lesson, .palette-command, .run-button')?.focus({ preventScroll: true }));
+      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.next-lesson, .palette-command:not(:disabled), .run-button:not(:disabled)')?.focus({ preventScroll: true }));
     }}>Lanjut<ArrowRight aria-hidden="true" /></button>}
     {canContinue && index === curriculumLevels.length - 1 && <span className="journey-complete"><Check aria-hidden="true" />Semua tahap selesai!</span>}
   </section>;

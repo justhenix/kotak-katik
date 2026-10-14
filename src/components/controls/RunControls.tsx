@@ -19,6 +19,7 @@ export function RunControls({ ready, watching = false, showStep = true }: { read
     </button>
     {showStep && <button className="step-button" disabled={disabled} aria-label="Satu langkah" title="Satu langkah" onClick={step}>
       <ControlIcon type="step" />
+      <span className="step-label" aria-hidden="true">Langkah</span>
     </button>}
   </div>;
 }

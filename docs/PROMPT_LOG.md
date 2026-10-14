@@ -835,3 +835,124 @@ Report concisely: what changed, what was verified, and remaining risks.
 - Preserved the interpreter, relative direction, real edit/execution actions, assets and fixed concept progression. Verification and remaining limits are recorded in `docs/IDWDYD_REDESIGN.md`.
 - Worked only on `henix/m2b-visual-learning`; no push or merge to main. `docs/PROMPT_JOURNAL.md` remains untouched.
 
+### 2026-10-13 — M2B visual UX fix pass
+
+**Prompt**
+
+The user supplied five annotated screenshots of the game's clipping, native count menu, highlights and mobile layout, followed by this request:
+
+```text
+# Kotak-Katik - M2B Visual UX Fix Pass
+
+You are the UI/gameplay engineer responsible for stabilizing M2B before M3.
+
+The previous Computer Use playtest marked M2B as GO because all 16 stages were completable. However, human screenshot review found visible interface and responsive UX problems that the report missed.
+
+**Mission: Fix confirmed visual/interaction problems.**
+
+Read `AGENTS.md`, relevant `.agents/` docs, and `docs/M2B_PLAYTEST_REPORT.md`. Preserve the established toy-like game direction, deterministic engine, 16-stage curriculum, and deaf-first learning experience.
+
+## Required fixes
+
+1. **Clipped command blocks:** Some commands extend beyond the left side of the program tray, particularly in completed states. Fix container padding, overflow, and scroll positioning. First and last blocks must be fully accessible.
+2. **Mobile responsiveness:** At 390×844 and 320×740, the game feels cramped and awkward. Rebalance the 3D board, program editor, and execution controls. Avoid page-wide horizontal overflow, obscured controls, excessive empty space, and unnecessarily difficult scrolling. Ensure the user can readily find Play and edit commands.
+3. **Repeat count control:** The native blue browser dropdown clashes with the game design. Replace it with a cohesive game-styled aesthetic interaction, preferably a visible `− / 2× / +` counter for supported values 2–4. Keep the number explicit and make controls touch-friendly and keyboard-accessible.
+4. **Command highlighting:** Selection, focus, execution, and error states currently feel inconsistent with the game aesthetic. Design distinct, readable visual states. Do not remove focus visibility or sacrifice accessibility for appearance.
+5. **Spacing and alignment:** Refine the command tray and completion screens. Prevent content touching borders or getting clipped. Use consistent padding and visual hierarchy.
+
+## Implementation rules
+
+- Inspect actual source code and fix root causes, not screenshot-specific CSS hacks.
+- Keep changes focused on M2B stabilization.
+- Preserve existing functionality, animations, and pedagogy.
+- Do not implement M3 or redesign the whole game.
+- Do not replace useful visual numbers or labels with ambiguous icon-only controls.
+- Respect minimum comfortable touch-target sizes.
+- Do not alter unrelated gameplay logic or Git history.
+
+## Visual verification is mandatory
+
+Launch the application and use **Codex Computer Use** to operate the rendered game.
+
+Verify desktop 1440×900, mobile 390×844, and narrow mobile 320×740.
+
+At minimum, visually retest:
+
+- Normal command placement and execution.
+- A long command sequence.
+- Repeat count editing and its open/active states.
+- Selection, focus, execution, and failure highlights.
+- Completed-level screens and progression.
+- A tutorial with the ghost-hand pointer.
+- Responsive resizing while controls are visible.
+
+Use direct game screenshots, without browser chrome or emulator workspace obscuring the result. Scroll where necessary, but evaluate usability rather than merely proving controls remain technically reachable.
+
+Automated tests may supplement verification, but **passing tests is not sufficient evidence of visual correctness**.
+
+## Acceptance criteria
+
+- No unintended clipping or overlapping UI.
+- Program blocks have appropriate edge padding.
+- No page-wide horizontal overflow on mobile.
+- Play and editing controls remain discoverable and usable.
+- Repeat count UI matches the game's design language.
+- Clear distinctions among selected, focused, running, and failing blocks.
+- Existing game progression remains functional.
+- All fixes are visually verified, with before/after evidence.
+
+Write `docs/M2B_VISUAL_FIX_REPORT.md` with changes, screenshots, remaining issues, and a GO/FIX FIRST verdict.
+
+Do not claim GO while known P1 visual usability defects remain. Do not commit, push, or proceed to M3 without my approval.
+
+Start implementing the fixes now.
+```
+
+**Result**
+
+- Changed the program tray, responsive control composition, Repeat counter, visual states and completion spacing. Kept the simulation, interpreter, curriculum and assets intact.
+- Operated the game with Browser Computer Use at the three requested CSS viewport sizes and saved direct before/after captures in `docs/evidence/m2b-visual-fix/`. Read the earlier playtest report from the existing QA worktree.
+- Recorded verification, repaired regressions, screenshots and remaining limits in `docs/M2B_VISUAL_FIX_REPORT.md`. Work is uncommitted in the primary checkout; no push or M3 implementation occurred. Earlier prompt entries and `docs/PROMPT_JOURNAL.md` were preserved.
+
+### 2026-10-14: M3 autonomous MVP completion sprint
+
+**Original prompt (verbatim)**
+
+```text
+Implement GitHub issue #1 in `justhenix/kotak-katik` as an autonomous, milestone-driven MVP completion sprint.
+
+**Deadline: October 15, 2026. Priority: functional MVP first, polish later.**
+
+Read `AGENTS.md`, the relevant `.agents/` documents, current source code, and issue #1 before modifying anything.
+
+Execute milestones M3.0 through M3.4 sequentially. Do not stop after planning or scaffolding.
+
+Requirements:
+
+1. Preserve the existing 16-level curriculum, deterministic engine, command editor, 3D scene, and IDWDYD tutorials.
+2. Complete title/start navigation, expedition selection, stage unlocking, and persistent local progress.
+3. Integrate everything into one functional player journey, from opening the game to completing the final level.
+4. Fix regressions immediately. Verify gameplay, accessibility, desktop/mobile usability, and production build.
+5. Commit coherent milestones, preserve authentic development evidence, and prepare the Vercel release.
+
+**Execution rules:**
+
+- Implement before polishing.
+- Prefer minimal changes over architectural rewrites.
+- Do not add unnecessary features or dependencies.
+- Do not weaken tests to conceal failures.
+- Never fabricate prompt history or automatically curate the prompt journal.
+- Avoid asking for confirmation between milestones.
+- Report briefly after each milestone, then continue automatically.
+- Stop only for genuine blockers requiring external authorization.
+
+**Done means:** All 16 existing stages remain playable, progression is functional, progress survives refresh, the final completion screen works, and the release passes build and critical browser tests.
+
+Work through the milestones until the MVP is finished. Report any remaining submission actions accurately.
+```
+
+**Execution outcomes**
+
+- M3.0: preserved the existing working changes on a feature branch; frozen install, 227 unit tests and production build passed. Further milestone results are recorded in `M3_MVP_SPRINT.md` as executed.
+- `PROMPT_JOURNAL.md` remains uncurated and untouched.
+

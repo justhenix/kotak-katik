@@ -32,9 +32,9 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
     const trash = await page.getByRole('button', { name: 'Hapus semua', exact: true }).boundingBox();
     expect(step?.x).toBeGreaterThan(play!.x + play!.width);
     expect(step?.y).toBe(play?.y);
-    expect(play!.width).toBeGreaterThan(step!.width * 2);
+    expect(play!.width).toBeGreaterThan(step!.width);
     await expect(page.locator('.run-label')).toBeVisible();
-    expect(trash?.width).toBe(56);
+    expect(trash?.width).toBe(48);
   }
   await page.screenshot({ path: `.verification/${testInfo.project.name}-initial.png`, fullPage: true });
 

@@ -53,7 +53,8 @@ test('one shared palette edits Repeat bodies at their slot limit and can return 
   await press(button(page, 'Hapus perintah 3 di Ulangi 1: Kanan'));
   await expect(button(page, 'Tambah di posisi 3 dalam Ulangi 1')).toBeFocused();
   await press(button(page, 'Pilih Ulangi 1'));
-  await page.getByLabel('Banyaknya Ulangi 1').selectOption('4');
+  await press(button(page, 'Tambah banyaknya Ulangi 1'));
+  await press(button(page, 'Tambah banyaknya Ulangi 1'));
   await expect(button(page, 'Pilih Ulangi 1')).toContainText('4×');
   await page.keyboard.press('Escape');
   await expect(button(page, 'Tambah di posisi 2')).toBeFocused();
@@ -72,7 +73,7 @@ test('keyboard focus, text zoom and long programs remain reachable without page 
   await page.keyboard.press('Enter');
   await expect(button(page, 'Pilih perintah 2: Maju')).toHaveAttribute('aria-pressed', 'true');
   await expect(button(page, 'Pilih perintah 2: Maju')).toBeFocused();
-  expect(await button(page, 'Pilih perintah 2: Maju').evaluate((el) => getComputedStyle(el).outlineColor)).toBe('rgb(23, 63, 118)');
+  expect(await button(page, 'Pilih perintah 2: Maju').evaluate((el) => getComputedStyle(el).outlineColor)).toBe('rgb(38, 61, 69)');
   await page.keyboard.press('Escape');
   await expect(button(page, 'Tambah di posisi 3')).toBeFocused();
   for (let index = 0; index < 10; index++) await button(page, 'Tambah Kiri').click();

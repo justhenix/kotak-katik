@@ -3,21 +3,30 @@ import { CommandIcon, commandLabels } from '../commands/CommandIcon';
 import { CommandPalette } from '../commands/CommandPalette';
 import { ControlIcon } from '../controls/ControlIcon';
 import { RunControls } from '../controls/RunControls';
+import { RepeatCounter } from './RepeatCounter';
 import { gameStore, useGameStore } from '../../stores/game-store';
 import { demoPlaying, lessonStore, useLessonStore, tutorialTarget } from '../../stores/lesson-store';
-import type { CommandType, PrimitiveCommand, RepeatCount } from '../../game/types';
+import type { CommandType, PrimitiveCommand } from '../../game/types';
 
 type Target = { kind: 'insert' | 'select'; index: number; loopIndex?: number; manual?: boolean };
 const pathFor = (index: number, loopIndex?: number) => loopIndex === undefined ? `${index}` : `${loopIndex}.${index}`;
 const scopeLabel = (index: number, loopIndex?: number) => `perintah ${index + 1}${loopIndex === undefined ? '' : ` di Ulangi ${loopIndex + 1}`}`;
 
-function reveal(viewport: HTMLDivElement | null, selector: string) {
-  const block = viewport?.querySelector<HTMLElement>(selector);
+function editingBlock(viewport: HTMLDivElement | null, target: Target) {
+  const block = viewport?.querySelector<HTMLElement>(`[${target.kind === 'insert' ? 'data-insert-path' : 'data-command-path'}="${pathFor(target.index, target.loopIndex)}"]`);
+  // A full scope has no trailing insertion slot; keep its last block in view.
+  return block ?? (target.kind === 'insert' && target.index > 0
+    ? viewport?.querySelector<HTMLElement>(`[data-command-path="${pathFor(target.index - 1, target.loopIndex)}"]`) : null);
+}
+
+function reveal(viewport: HTMLDivElement | null, block: HTMLElement | null | undefined) {
   if (!viewport || !block) return;
-  const bounds = viewport.getBoundingClientRect(), item = block.getBoundingClientRect();
+  const bounds = viewport.getBoundingClientRect();
+  const loop = block.closest<HTMLElement>('.repeat-item');
+  const item = (loop && loop.offsetWidth <= viewport.clientWidth - 28 ? loop : block).getBoundingClientRect();
   // Follow the program horizontally without scrolling the board out of view.
-  if (item.right > bounds.right - 18) viewport.scrollLeft += item.right - bounds.right + 18;
-  if (item.left < bounds.left + 18) viewport.scrollLeft -= bounds.left - item.left + 18;
+  if (item.right > bounds.right - 14) viewport.scrollLeft += item.right - bounds.right + 14;
+  if (item.left < bounds.left + 14) viewport.scrollLeft -= bounds.left - item.left + 14;
 }
 
 export function ProgramTray({ ready }: { ready: boolean }) {
@@ -28,6 +37,7 @@ export function ProgramTray({ ready }: { ready: boolean }) {
   const [target, setTarget] = useState<Target>({ kind: 'insert', index: program.length });
   const strip = useRef<HTMLDivElement>(null);
   const editor = useRef<HTMLDivElement>(null);
+  const [scrollEdges, setScrollEdges] = useState({ overflow: false, start: true, end: true });
   const running = status === 'running';
   const loop = target.loopIndex === undefined ? undefined : program[target.loopIndex];
   const scope = loop?.type === 'repeat' ? loop.commands : program;
@@ -73,15 +83,37 @@ export function ProgramTray({ ready }: { ready: boolean }) {
   }, [program, loop, target.loopIndex]);
 
   useEffect(() => {
-    reveal(strip.current, `[data-command-path="${activePath}"]`);
-  }, [activePath, loopIteration]);
+    if (completed) strip.current?.scrollTo({ left: 0 });
+    else reveal(strip.current, strip.current?.querySelector<HTMLElement>(`[data-command-path="${activePath}"]`));
+  }, [activePath, loopIteration, completed]);
 
   useEffect(() => {
-    reveal(strip.current, `[${target.kind === 'insert' ? 'data-insert-path' : 'data-command-path'}="${pathFor(target.index, target.loopIndex)}"]`);
-  }, [target, program]);
+    if (!completed && !running) reveal(strip.current, editingBlock(strip.current, target));
+  }, [target, program, completed, running]);
+
+  useEffect(() => {
+    const viewport = strip.current;
+    const content = viewport?.firstElementChild;
+    if (!viewport || !content) return;
+    const measure = () => {
+      const end = viewport.scrollWidth - viewport.clientWidth;
+      setScrollEdges({ overflow: end > 1, start: viewport.scrollLeft < 1, end: viewport.scrollLeft >= end - 1 });
+    };
+    const resize = new ResizeObserver(() => {
+      if (!completed) reveal(viewport, running ? viewport.querySelector<HTMLElement>(`[data-command-path="${activePath}"]`) : editingBlock(viewport, target));
+      measure();
+    });
+    resize.observe(viewport); resize.observe(content);
+    viewport.addEventListener('scroll', measure);
+    measure();
+    return () => { resize.disconnect(); viewport.removeEventListener('scroll', measure); };
+  }, [target, activePath, running, completed]);
 
   const focusPath = (path: string, insertion = false) => requestAnimationFrame(() => {
-    editor.current?.querySelector<HTMLButtonElement>(`[${insertion ? 'data-insert-path' : 'data-command-path'}="${path}"]`)?.focus({ preventScroll: true });
+    const slot = editor.current?.querySelector<HTMLButtonElement>(`[${insertion ? 'data-insert-path' : 'data-command-path'}="${path}"]`);
+    const commands = insertion && !slot ? editor.current?.querySelectorAll<HTMLButtonElement>('.program-list button:not(:disabled)') : undefined;
+    // Full scopes have no trailing slot; keep Escape inside the editor.
+    (slot ?? commands?.[commands.length - 1])?.focus({ preventScroll: true });
   });
   const insertAt = (index: number, loopIndex?: number, manual = false) => {
     setTarget({ kind: 'insert', index, loopIndex, manual });
@@ -135,17 +167,20 @@ export function ProgramTray({ ready }: { ready: boolean }) {
     const isSelected = target.kind === 'select' && target.index === index && target.loopIndex === loopIndex;
     return <li className="primitive-item" key={index}>
       {target.kind === 'insert' && target.index === index && target.loopIndex === loopIndex && insertion(index, loopIndex, true)}
-      <button className={`command-block puzzle-block ${command.type} ${active ? 'active-command' : ''} ${active && status === 'failed' ? 'failed-command' : ''} ${watching && lesson.demoAction?.type === 'add' && lesson.demoPhase !== 'command' && lesson.demoPath?.join('.') === pathFor(index, loopIndex) ? 'block-arrival' : ''}`}
+      <button className={`command-block puzzle-block ${command.type} ${active ? completed ? 'completed-command' : 'active-command' : ''} ${active && status === 'failed' ? 'failed-command' : ''} ${watching && lesson.demoAction?.type === 'add' && lesson.demoPhase !== 'command' && lesson.demoPath?.join('.') === pathFor(index, loopIndex) ? 'block-arrival' : ''}`}
         disabled={locked} onClick={() => select(index, loopIndex)} aria-pressed={isSelected}
         aria-label={`Pilih ${scopeLabel(index, loopIndex)}: ${commandLabels[command.type]}`} aria-current={active ? 'step' : undefined}
         data-command-path={pathFor(index, loopIndex)}>
         <span className="command-number" aria-hidden="true">{index + 1}</span><CommandIcon type={command.type} />
-        <span className="block-state" aria-hidden="true">{active ? status === 'failed' ? '!' : '▶' : isSelected ? '✓' : ''}</span>
+        <span className="block-state" aria-hidden="true">{active ? status === 'failed' ? '!' : completed ? '✓' : '▶' : isSelected ? '✓' : ''}</span>
       </button>
     </li>;
   };
   return <div className="editor" ref={editor} onKeyDown={(event) => {
-    if (event.key === 'Escape' && !locked) { insertAt(program.length, undefined, true); focusPath(String(program.length), true); }
+    if (event.key === 'Escape' && !locked) {
+      insertAt(program.length, undefined, level.maxProgramSlots === undefined || program.length < level.maxProgramSlots);
+      focusPath(String(program.length), true);
+    }
   }}>
     <section aria-labelledby="program-title" className="program-area">
       <h2 id="program-title" className="sr-only">Urutanmu</h2>
@@ -158,7 +193,10 @@ export function ProgramTray({ ready }: { ready: boolean }) {
           }}><ControlIcon type={level.initialProgram.length > 0 ? 'reset' : 'delete'} />{level.initialProgram.length > 0 && <span className="reset-label">Ulang</span>}</button>
       </div>}
       <div className="program-scroll">
-        <div className="program-sequence" ref={strip}>
+        <div className="program-sequence" ref={strip} onFocusCapture={(event) => {
+          if (event.target instanceof HTMLElement) reveal(strip.current, event.target);
+        }}>
+          <div className="program-strip">
           <ol className="program-list" aria-label="Urutan perintah">
             {program.map((command, index) => command.type !== 'repeat' ? primitive(command, index) : <li key={index} className="repeat-wrapper">
               {target.kind === 'insert' && target.index === index && target.loopIndex === undefined && insertion(index, undefined, true)}
@@ -181,16 +219,20 @@ export function ProgramTray({ ready }: { ready: boolean }) {
             </li>)}
           </ol>
           {insertion(program.length)}
+          </div>
         </div>
-        {showControls && <RunControls ready={ready} watching={watching} showStep={!curriculum || level.learning.concept === 'debugging' || level.learning.concept === 'mixed-application'} />}
       </div>
+      {scrollEdges.overflow && <div className="program-navigation" role="group" aria-label="Geser urutan">
+        <button disabled={scrollEdges.start} aria-label="Lihat awal urutan" onClick={() => strip.current?.scrollBy({ left: -strip.current.clientWidth * 0.8 })}><ControlIcon type="before" /></button>
+        <span>Geser urutan</span>
+        <button disabled={scrollEdges.end} aria-label="Lihat akhir urutan" onClick={() => strip.current?.scrollBy({ left: strip.current.clientWidth * 0.8 })}><ControlIcon type="after" /></button>
+      </div>}
     </section>
+    {showControls && <RunControls ready={ready} watching={watching} showStep={!curriculum || level.learning.concept === 'debugging' || level.learning.concept === 'mixed-application'} />}
     {selected && !watching && (!curriculum || !completed) && <div className={`selection-tools ${countOnly ? 'count-tools' : ''}`} role="group" aria-label={`Ubah ${scopeLabel(target.index, target.loopIndex)}`}>
       {!curriculum && <span className="selection-label">{commandLabels[selected.type]} {target.index + 1}</span>}
-      {selected.type === 'repeat' && <select data-count-index={target.index} aria-label={`Banyaknya Ulangi ${target.index + 1}`} value={selected.count} disabled={locked}
-        onChange={(event) => gameStore.getState().setRepeatCount(target.index, Number(event.target.value) as RepeatCount)}>
-        {[2, 3, 4].map((count) => <option key={count} value={count}>{count}×</option>)}
-      </select>}
+      {selected.type === 'repeat' && <RepeatCounter index={target.index} count={selected.count} disabled={locked}
+        onChange={(count) => gameStore.getState().setRepeatCount(target.index, count)} />}
       {canArrange && <>
       <button disabled={locked || target.index === 0} aria-label={`Geser ${scopeLabel(target.index, target.loopIndex)} sebelumnya`} onClick={() => move(-1)}><ControlIcon type="before" /></button>
       <button disabled={locked || target.index === scope.length - 1} aria-label={`Geser ${scopeLabel(target.index, target.loopIndex)} berikutnya`} onClick={() => move(1)}><ControlIcon type="after" /></button>

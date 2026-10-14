@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Locator, Page, TestInfo } from '@playwright/test';
+import { setRepeatCount } from './repeat-counter';
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 const feedback = (page: Page) => page.locator('.feedback');
 const scaffold = (page: Page) => page.getByRole('region', { name: 'Bantuan belajar' });
@@ -103,7 +104,7 @@ test('turn choice is not supplied; Repeat uses a genuine count choice; debugging
   await expect(feedback(page)).toHaveAttribute('data-loop-iteration','2');
   await tap(button(page,'Lanjut')); await tap(button(page,'Pilih Ulangi 1'));
   await expect(page.locator('.ghost-hand')).toHaveAttribute('data-target','[data-count-index="0"]');
-  await page.getByLabel('Banyaknya Ulangi 1').selectOption('3');
+  await setRepeatCount(page, 0, 3, tap);
   await tap(button(page,'Jalankan')); await expect(feedback(page)).toHaveAttribute('data-status','completed');
   await page.goto('/?level=m2-debug-watch');
   await expect(scaffold(page)).toHaveAttribute('data-demo-phase','done',{timeout:30000});

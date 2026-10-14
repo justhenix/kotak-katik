@@ -1,12 +1,14 @@
 import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
+import type { RepeatCount } from '../src/game/types';
+import { setRepeatCount } from './repeat-counter';
 
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 const feedback = (page: Page) => page.locator('.feedback');
 const step = (page: Page) => button(page, 'Satu langkah');
-async function setCount(page: Page, count: number, index = 1) {
+async function setCount(page: Page, count: RepeatCount, index = 1) {
   await button(page, `Pilih Ulangi ${index}`).click();
-  await page.getByLabel(`Banyaknya Ulangi ${index}`).selectOption(String(count));
+  await setRepeatCount(page, index - 1, count);
   const length = await page.getByRole('list', { name: `Isi Ulangi ${index}`, exact: true }).locator('.command-block').count();
   await button(page, `Tambah di posisi ${length + 1} dalam Ulangi ${index}`).click();
 }
@@ -74,7 +76,7 @@ test('relative turning, every facing, cyan/orange cues, and reduced motion', asy
   expect(errors).toEqual([]);
 });
 
-for (const count of [2, 3, 4]) test(`${count}× Repeat: exact primitive Steps, iteration highlights, and Run parity`, async ({ page }, info) => {
+for (const count of [2, 3, 4] as const) test(`${count}× Repeat: exact primitive Steps, iteration highlights, and Run parity`, async ({ page }, info) => {
   const errors = watchErrors(page);
   const press = (control: Locator) => info.project.name === 'mobile' ? control.tap() : control.click();
   await page.goto('/?fixture=loops');
