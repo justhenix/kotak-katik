@@ -958,5 +958,21 @@ Work through the milestones until the MVP is finished. Report any remaining subm
 - M3.4 local gate: 239 unit tests, production build and all 98 production-browser checks passed. Real all-16 journeys passed on desktop/mobile. Keyboard testing and narrow visual inspection found two reset-focus defects; both were fixed and retested. No tests were weakened. Genuine screenshots are saved in `docs/evidence/m3/`; release/submission outcomes continue in `M3_MVP_SPRINT.md`.
 - Production release: deployed the tested sprint to `https://kotak-katik.vercel.app`. Cloud build passed, anonymous access returned the actual game, and twelve deployed desktop/mobile browser checks passed. The live tutorial was operated and completed with Browser Computer Use. The safe branch was pushed; main integration follows the successful gates. Repository visibility and prompt selection remain user submission actions.
 - Integration outcome: after the release gates, main was fast-forwarded through `0f409d8` and pushed. Its Vercel Git deployment reached READY. No competition history was rewritten or force-pushed; no prompt journal entries were curated.
+
+### 2026-10-14: Tutorial menu padding
+
+**Original prompt (verbatim)**
+
+```text
+give padding
+```
+
+Reference: the user's attached screenshot of the open Ulang contoh / Lewati contoh menu.
+
+**Outcome**
+
+- Increased menu outer padding to 12px, button padding to 12px 16px, action spacing to 8px and icon/text spacing to 12px. Added a 12px dropdown offset and kept the header controls aligned right when they wrap.
+- Production build passed. Browser-rendered bounds at 1440, 390 and 320px widths, at normal and 200% text, stayed inside the viewport with no horizontal page overflow. Normal action targets measured 192×48px.
+- Inspected the actual menu using Browser Computer Use. No gameplay or tutorial behavior changed; the prompt journal remains untouched.
 - `PROMPT_JOURNAL.md` remains uncurated and untouched.
 
