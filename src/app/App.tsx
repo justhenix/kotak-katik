@@ -81,6 +81,7 @@ export function App() {
   );
   const isPreview = preview.has('level') || preview.has('fixture');
   const progress = useProgressStore(state => state);
+  const [confirmReset, setConfirmReset] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [screen]);
   useEffect(() => {
@@ -124,6 +125,7 @@ export function App() {
     </> : screen === 'complete' ? <>
       <h1 tabIndex={-1} ref={heading}><Check aria-hidden="true" />Ekspedisi selesai!</h1>
       <p>{progress.completedLevelIds.length} dari 16 tahap selesai.</p>
+      {!progress.persistenceAvailable && <p role="status">Progres belum bisa disimpan. Kamu tetap bisa bermain.</p>}
       {progress.completedLevelIds.length < curriculumLevels.length && <p>Contoh yang dilewati bisa dilihat lagi.</p>}
       <button className="journey-primary" onClick={() => setScreen('expedition')}>Lihat ekspedisi</button>
       <button className="journey-secondary" onClick={() => setScreen('title')}>Beranda</button>
@@ -131,8 +133,21 @@ export function App() {
       <button className="journey-secondary" onClick={() => setScreen('title')}><ArrowLeft aria-hidden="true" />Beranda</button>
       <h1 tabIndex={-1} ref={heading}>Ekspedisi</h1>
       <p>{progress.completedLevelIds.length} dari 16 tahap selesai.</p>
+      {!progress.persistenceAvailable && <p role="status">Progres belum bisa disimpan. Kamu tetap bisa bermain.</p>}
       {progress.completedLevelIds.includes(curriculumLevels.at(-1)!.id) && <button className="journey-secondary" onClick={() => setScreen('complete')}>Ekspedisi selesai!</button>}
       <Expedition onSelect={openLevel} />
+      <details className="progress-options" onToggle={event => { if (!event.currentTarget.open) setConfirmReset(false); }}
+        onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
+        <summary>Progres</summary>
+        {confirmReset ? <div className="progress-reset"><p>Hapus progres dan mulai dari tahap 1?</p>
+          <button className="journey-secondary" onClick={() => setConfirmReset(false)}>Batal</button>
+          <button className="journey-secondary" onClick={() => {
+            progressStore.getState().reset(); setConfirmReset(false);
+            document.querySelector<HTMLDetailsElement>('.progress-options')?.removeAttribute('open');
+            heading.current?.focus();
+          }}>Hapus progres</button>
+        </div> : <button className="journey-secondary" onClick={() => setConfirmReset(true)}>Mulai dari awal</button>}
+      </details>
     </>}
   </main>;
 }

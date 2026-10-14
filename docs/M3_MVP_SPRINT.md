@@ -29,3 +29,12 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - `bun run test`: 230 passed. Production build passed.
 - Four journey browser checks passed on desktop/mobile, covering order, locks, demo cancellation, skip, success, replay and deterministic re-entry.
 - Browser Computer Use inspection confirmed desktop route readability. Remaining responsive, full-route and final-screen checks continue at the release gate.
+
+## M3.3: local persistence
+
+- Added version 1 localStorage records for completion, allowed unlocks and selected/resume stage only. Cat state, programs, execution, effects and timers remain ephemeral.
+- Restore filters stale IDs/duplicates, guards the authored route, and recovers malformed or unsupported data. Denied reads/writes preserve session play and show a visual saving notice.
+- Added a secondary Progres disclosure with an explicit reset confirmation, cancel and Escape support. Reset survives refresh.
+- `bun run test`: 239 passed; production build passed.
+- Ten journey browser tests passed on desktop/mobile: refresh/resume, replay, skip versus completion, reset/cancel, corrupt storage, blocked storage and preview isolation, plus entry/navigation checks.
+- Inspected actual mobile title and expedition renders using Browser Computer Use. Labels/icons remain distinct without color; controls reflow vertically.
