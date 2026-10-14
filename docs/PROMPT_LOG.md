@@ -954,5 +954,7 @@ Work through the milestones until the MVP is finished. Report any remaining subm
 **Execution outcomes**
 
 - M3.0: preserved the existing working changes on a feature branch; frozen install, 227 unit tests and production build passed. Further milestone results are recorded in `M3_MVP_SPRINT.md` as executed.
+- M3.1–M3.3: implemented title/start/resume, the original 16-stage expedition, separate completion/skip unlocks, replay, final completion and versioned local progress. Committed each milestone independently.
+- M3.4 local gate: 239 unit tests, production build and all 98 production-browser checks passed. Real all-16 journeys passed on desktop/mobile. Keyboard testing and narrow visual inspection found two reset-focus defects; both were fixed and retested. No tests were weakened. Genuine screenshots are saved in `docs/evidence/m3/`; release/submission outcomes continue in `M3_MVP_SPRINT.md`.
 - `PROMPT_JOURNAL.md` remains uncurated and untouched.
 

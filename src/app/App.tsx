@@ -58,7 +58,7 @@ function Puzzle({ onExit, onContinue, onFinish }: { onExit: () => void; onContin
   const phase = useGameStore((s) => s.level.learning.phase);
   useEffect(() => () => { lessonStore.getState().resetLesson(); gameStore.getState().dispose(); }, []);
   return <main className="game-shell" data-learning-phase={phase}>
-    <header className="game-header"><button className="puzzle-exit" onClick={onExit}><Map aria-hidden="true" /><span>Ekspedisi</span></button>
+    <header className="game-header"><h1 className="sr-only">{title}</h1><button className="puzzle-exit" onClick={onExit}><Map aria-hidden="true" /><span>Ekspedisi</span></button>
       <div className="header-actions"><div className={`fish-progress ${collected === total ? 'all-collected' : ''}`} role="img" aria-label={`${collected} dari ${total} ikan terkumpul`}>
         <FishIcon /><span>{collected} / {total}</span>
       </div><LessonOptions /></div>
@@ -82,8 +82,11 @@ export function App() {
   const isPreview = preview.has('level') || preview.has('fixture');
   const progress = useProgressStore(state => state);
   const [confirmReset, setConfirmReset] = useState(false);
+  const cancelReset = useRef<HTMLButtonElement>(null);
+  const resetAction = useRef<HTMLButtonElement>(null);
+  useEffect(() => { (confirmReset ? cancelReset : resetAction).current?.focus(); }, [confirmReset]);
   const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [screen]);
+  useEffect(() => { heading.current?.focus(); }, [screen]);
   useEffect(() => {
     if (screen !== 'puzzle' || isPreview) return;
     const observe = () => {
@@ -140,13 +143,13 @@ export function App() {
         onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
         <summary>Progres</summary>
         {confirmReset ? <div className="progress-reset"><p>Hapus progres dan mulai dari tahap 1?</p>
-          <button className="journey-secondary" onClick={() => setConfirmReset(false)}>Batal</button>
+          <button className="journey-secondary" ref={cancelReset} onClick={() => setConfirmReset(false)}>Batal</button>
           <button className="journey-secondary" onClick={() => {
             progressStore.getState().reset(); setConfirmReset(false);
             document.querySelector<HTMLDetailsElement>('.progress-options')?.removeAttribute('open');
             heading.current?.focus();
           }}>Hapus progres</button>
-        </div> : <button className="journey-secondary" onClick={() => setConfirmReset(true)}>Mulai dari awal</button>}
+        </div> : <button className="journey-secondary" ref={resetAction} onClick={() => setConfirmReset(true)}>Mulai dari awal</button>}
       </details>
     </>}
   </main>;

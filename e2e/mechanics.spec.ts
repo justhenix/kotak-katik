@@ -245,6 +245,8 @@ test('Stop cancels Run; Step continues; Play restarts; reduced-motion loops reta
   await expect(page.locator('[aria-current="step"]')).toHaveAttribute('data-command-path', '0.1');
   await page.screenshot({ path: `.verification/${info.project.name}-m1-reduced.png`, fullPage: true });
   await page.goto('/');
+  await button(page, 'Mulai').click();
+  await expect(page.getByRole('region', { name: 'Satu langkah', exact: true })).toBeVisible();
   await expect(button(page, 'Tambah Kiri')).toHaveCount(0);
   await expect(button(page, 'Tambah Ulangi')).toHaveCount(0);
   expect(errors).toEqual([]);

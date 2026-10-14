@@ -297,3 +297,26 @@ Record meaningful work after verification and map it to real Git history. Use `P
 - Physical-device and SDLB-B learner/teacher comprehension testing remain outstanding. Touch is browser-emulated; WebGL is required. At large text size/short landscape heights, vertical scrolling can be necessary.
 - No BISINDO material, Home Menu, Expedition Map, sound requirement, persistence or unrelated feature was added. `docs/PROMPT_JOURNAL.md` remains untouched. No push or merge to main.
 
+### 2026-10-14: M3 MVP completion sprint
+
+**Original prompt:** [M3 execution prompt](PROMPT_LOG.md#2026-10-14-m3-autonomous-mvp-completion-sprint).
+
+**Implemented**
+- Preserved the uncommitted M2B fixes and original evidence on `henix/m3-mvp-completion`; committed the verified baseline and each M3 milestone separately.
+- Added title/start/resume navigation, a fixed expedition of all 16 original stages, explicit node states, legal unlocks, completed-stage replay and final journey screen.
+- Separated completion from demonstration skip unlocks. Engineering previews preserve their original behavior and do not award local progress.
+- Added versioned localStorage for completed IDs, allowed unlocks and resume selection. Restore normalizes stale/corrupt data; unavailable storage retains session play with a visual notice. Reset requires an explicit confirmation.
+- Navigation cancels execution/demonstration timers and resets runtime deterministically. The engine, curriculum, scene, existing game/lesson stores and dependency versions remain intact.
+- Fixed reset-confirmation focus loss found by keyboard tests, then ensured new focus stays in the viewport after narrow-screen visual inspection. Added regression assertions instead of weakening tests.
+- Prepared Vercel frozen Bun install and static Vite output. Authenticated project link established; release waits for the complete browser gate.
+
+**Executed verification so far**
+- Frozen install passed. Unit tests: 239 passed across ten files. Production build passed, including TypeScript; existing renderer advisory is approximately 349 kB gzip.
+- M3.1: four targeted desktop/mobile journey checks passed. M3.2: four passed. M3.3: ten passed, including refresh, skip/completion, reset, corrupt/denied storage and preview isolation.
+- Final full production-browser suite: 98 passed (32.7 minutes), including all original stages plus real all-16 player journeys on desktop and touch mobile. Responsive/keyboard repair checks passed after both focus fixes. No checks were skipped or weakened.
+- Operated/inspected actual desktop/mobile/narrow renders using Browser Computer Use; contrast checked with the installed skill's calculator. Selected genuine captures are preserved in `docs/evidence/m3/`. Detailed evidence and final release results are recorded in [M3 sprint report](M3_MVP_SPRINT.md).
+
+**Submission boundaries**
+- Repository still private; user must enable public visibility. User must select curated prompts; `PROMPT_JOURNAL.md` remains untouched.
+- Physical devices and learner comprehension remain unverified. No BISINDO material was invented; WebGL remains required.
+
