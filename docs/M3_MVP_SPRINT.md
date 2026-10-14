@@ -20,3 +20,12 @@ No curriculum, engine, asset, dependency or prompt journal changes in this check
 - Production build passed. Four targeted browser checks passed on desktop/mobile: start, demo exit/re-entry, and the original demonstration/guided/independent journey.
 - Operated the title's Mulai action in Browser Computer Use and inspected the actual title render. Full responsive inspection remains part of M3.4.
 - Design follows the existing cream/yellow raised controls and Fredoka/Inter roles. No new dependencies or assets.
+
+## M3.2: expedition and unlocking
+
+- Added all 16 authored stages in exact order, with explicit locked, available, current and completed labels/icons, large controls and mobile reflow.
+- Kept progress separate from simulation. Actual success unlocks the next node; explicit demonstration skip unlocks without completion. Preview URLs do not award journey progress.
+- Added final journey screen with accurate completion count and replay/map navigation. A skipped example is never described as completed.
+- `bun run test`: 230 passed. Production build passed.
+- Four journey browser checks passed on desktop/mobile, covering order, locks, demo cancellation, skip, success, replay and deterministic re-entry.
+- Browser Computer Use inspection confirmed desktop route readability. Remaining responsive, full-route and final-screen checks continue at the release gate.

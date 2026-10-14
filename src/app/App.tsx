@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Map } from 'lucide-react';
+import { ArrowLeft, Check, Map } from 'lucide-react';
+import { Expedition } from '../components/journey/Expedition';
+import { progressStore, useProgressStore } from '../stores/progress-store';
 import { curriculumLevels } from '../game/levels/curriculum';
 import { GameScene } from '../scene/GameScene';
 import { ProgramTray } from '../components/program/ProgramTray';
@@ -7,7 +9,7 @@ import { ControlIcon } from '../components/controls/ControlIcon';
 import { CommandIcon, commandLabels } from '../components/commands/CommandIcon';
 import { gameStore, useGameStore } from '../stores/game-store';
 import { LessonScaffold, LessonOptions } from '../components/learning/LessonScaffold';
-import { lessonStore, useLessonStore, visibleHints } from '../stores/lesson-store';
+import { demoPlaying, lessonStore, useLessonStore, visibleHints } from '../stores/lesson-store';
 
 function Feedback() {
   const simulation = useGameStore((s) => s.simulation);
@@ -47,7 +49,7 @@ function FishIcon() {
   return <svg viewBox="0 0 64 40" aria-hidden="true" className="fish-icon"><path d="m17 20-13-12v24Z" fill="#ee9657" stroke="#80502e" strokeWidth="2" /><path d="M15 20C20-2 53-2 61 20c-8 22-41 22-46 0Z" fill="#f5b453" stroke="#80502e" strokeWidth="2" /><path d="M32 5c-7 9-7 21 0 30M43 5c-6 10-6 20 0 30" fill="none" stroke="#fff3d6" strokeWidth="6" /><circle cx="51" cy="16" r="3" fill="#263d45" /></svg>;
 }
 
-function Puzzle({ onExit }: { onExit: () => void }) {
+function Puzzle({ onExit, onContinue, onFinish }: { onExit: () => void; onContinue?: () => void; onFinish?: () => void }) {
   const [sceneReady, setSceneReady] = useState(false);
   const title = useGameStore((s) => s.level.title);
   const collected = useGameStore((s) => s.simulation.collectedIds.length);
@@ -66,7 +68,7 @@ function Puzzle({ onExit }: { onExit: () => void }) {
       <Feedback />
     </section>
     <div className="workbench">
-      <LessonScaffold ready={sceneReady} />
+      <LessonScaffold ready={sceneReady} onContinue={onContinue} onFinish={onFinish} />
       <ProgramTray key={levelId} ready={sceneReady} />
     </div>
   </main>;
@@ -74,33 +76,63 @@ function Puzzle({ onExit }: { onExit: () => void }) {
 
 export function App() {
   const preview = new URLSearchParams(window.location.search);
-  const [screen, setScreen] = useState<'title' | 'expedition' | 'puzzle'>(
+  const [screen, setScreen] = useState<'title' | 'expedition' | 'puzzle' | 'complete'>(
     preview.has('level') || preview.has('fixture') ? 'puzzle' : 'title',
   );
+  const isPreview = preview.has('level') || preview.has('fixture');
+  const progress = useProgressStore(state => state);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [screen]);
-  const start = () => {
+  useEffect(() => {
+    if (screen !== 'puzzle' || isPreview) return;
+    const observe = () => {
+      const { level, simulation } = gameStore.getState();
+      const lesson = lessonStore.getState();
+      if (level.learning.phase === 'demonstration' && lesson.demoPhase === 'skipped') progressStore.getState().recordResult(level.id, 'skipped');
+      else if (simulation.completion && !demoPlaying(lesson.demoPhase)) progressStore.getState().recordResult(level.id, 'completed');
+    };
+    const gameSubscription = gameStore.subscribe(observe);
+    const lessonSubscription = lessonStore.subscribe(observe);
+    observe();
+    return () => { gameSubscription(); lessonSubscription(); };
+  }, [screen, isPreview]);
+  const openLevel = (id: string) => {
+    if (!progressStore.getState().selectLevel(id)) return;
     lessonStore.getState().resetLesson();
-    gameStore.getState().loadLevel(curriculumLevels[0]);
+    gameStore.getState().loadLevel(curriculumLevels.find(level => level.id === id)!);
     setScreen('puzzle');
   };
+  const start = () => openLevel(progress.currentLevelId);
   const exit = () => {
     lessonStore.getState().resetLesson();
     gameStore.getState().dispose();
     window.history.replaceState(null, '', window.location.pathname);
     setScreen('expedition');
   };
-  if (screen === 'puzzle') return <Puzzle onExit={exit} />;
+  const continueLesson = () => {
+    lessonStore.getState().nextLesson();
+    progressStore.getState().selectLevel(gameStore.getState().level.id);
+  };
+  if (screen === 'puzzle') return <Puzzle onExit={exit} onContinue={isPreview ? undefined : continueLesson}
+    onFinish={isPreview ? undefined : () => setScreen('complete')} />;
   return <main className={`journey-shell ${screen}-screen`}>
     {screen === 'title' ? <>
       <h1 className="wordmark" tabIndex={-1} ref={heading}>Kotak-Katik</h1>
       <p>Susun langkah. Bantu kucing ambil ikan.</p>
-      <button className="journey-primary" onClick={start}>Mulai</button>
+      <button className="journey-primary" onClick={start}>{progress.completedLevelIds.includes(curriculumLevels.at(-1)!.id) ? 'Main lagi' : progress.unlockedLevelIds.length > 1 ? 'Lanjutkan' : 'Mulai'}</button>
       <button className="journey-secondary" onClick={() => setScreen('expedition')}><Map aria-hidden="true" />Ekspedisi</button>
+    </> : screen === 'complete' ? <>
+      <h1 tabIndex={-1} ref={heading}><Check aria-hidden="true" />Ekspedisi selesai!</h1>
+      <p>{progress.completedLevelIds.length} dari 16 tahap selesai.</p>
+      {progress.completedLevelIds.length < curriculumLevels.length && <p>Contoh yang dilewati bisa dilihat lagi.</p>}
+      <button className="journey-primary" onClick={() => setScreen('expedition')}>Lihat ekspedisi</button>
+      <button className="journey-secondary" onClick={() => setScreen('title')}>Beranda</button>
     </> : <>
       <button className="journey-secondary" onClick={() => setScreen('title')}><ArrowLeft aria-hidden="true" />Beranda</button>
       <h1 tabIndex={-1} ref={heading}>Ekspedisi</h1>
-      <button className="journey-primary" onClick={start}>1. {curriculumLevels[0].title}</button>
+      <p>{progress.completedLevelIds.length} dari 16 tahap selesai.</p>
+      {progress.completedLevelIds.includes(curriculumLevels.at(-1)!.id) && <button className="journey-secondary" onClick={() => setScreen('complete')}>Ekspedisi selesai!</button>}
+      <Expedition onSelect={openLevel} />
     </>}
   </main>;
 }

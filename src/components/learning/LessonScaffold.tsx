@@ -22,7 +22,7 @@ export function LessonOptions() {
   </details>;
 }
 
-export function LessonScaffold({ ready }: { ready: boolean }) {
+export function LessonScaffold({ ready, onContinue, onFinish }: { ready: boolean; onContinue?: () => void; onFinish?: () => void }) {
   const level = useGameStore((state) => state.level);
   const simulation = useGameStore((state) => state.simulation);
   const lesson = useLessonStore((state) => state);
@@ -53,9 +53,11 @@ export function LessonScaffold({ ready }: { ready: boolean }) {
     }}>Periksa satu per satu</button>}
     {lesson.demoPhase === 'interrupted' && <button className="continue-lesson" onClick={lesson.startDemo}><RotateCcw aria-hidden="true" />Ulang contoh</button>}
     {canContinue && index < curriculumLevels.length - 1 && <button className="next-lesson" onClick={() => {
-      lesson.nextLesson();
+      if (onContinue) onContinue(); else lesson.nextLesson();
       requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.next-lesson, .palette-command:not(:disabled), .run-button:not(:disabled)')?.focus({ preventScroll: true }));
     }}>Lanjut<ArrowRight aria-hidden="true" /></button>}
-    {canContinue && index === curriculumLevels.length - 1 && <span className="journey-complete"><Check aria-hidden="true" />Semua tahap selesai!</span>}
+    {canContinue && index === curriculumLevels.length - 1 && (onFinish
+      ? <button className="next-lesson" onClick={onFinish}>Selesai<Check aria-hidden="true" /></button>
+      : <span className="journey-complete"><Check aria-hidden="true" />Semua tahap selesai!</span>)}
   </section>;
 }
