@@ -1,4 +1,3 @@
-import { ArrowUp, CornerUpLeft, CornerUpRight, Repeat } from 'lucide-react';
 import type { CommandType } from '../../game/types';
 
 export const commandLabels: Record<CommandType, string> = {
@@ -9,17 +8,10 @@ export const commandLabels: Record<CommandType, string> = {
 };
 
 export function CommandIcon({ type = 'forward' }: { type?: CommandType }) {
-  switch (type) {
-    case 'forward':
-      return <ArrowUp className="command-icon" strokeWidth={3.5} aria-hidden="true" focusable="false" />;
-    case 'turn-left':
-      return <CornerUpLeft className="command-icon" strokeWidth={3.5} aria-hidden="true" focusable="false" />;
-    case 'turn-right':
-      return <CornerUpRight className="command-icon" strokeWidth={3.5} aria-hidden="true" focusable="false" />;
-    case 'repeat':
-      return <Repeat className="command-icon" strokeWidth={3.2} aria-hidden="true" focusable="false" />;
-    default:
-      return null;
-  }
+  return <svg className="command-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
+    {type === 'forward' ? <path d="M24 7 9 23h10v18h10V23h10Z" fill="currentColor" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      : type === 'repeat' ? <g stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><path d="M35 14a15 15 0 0 0-25 9M13 34a15 15 0 0 0 25-9M35 5v11H24M13 43V32h11" /></g>
+      : <g transform={type === 'turn-right' ? 'translate(48 0) scale(-1 1)' : undefined} stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"><path d="M37 39V28q0-10-10-10H10M20 7 9 18l11 11" /></g>}
+  </svg>;
 }
 

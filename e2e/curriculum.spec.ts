@@ -5,6 +5,7 @@ import { curriculumLevels } from '../src/game/levels/curriculum';
 import { verifySolution } from '../src/game/levels/validate-curriculum';
 import type { CommandType, Program } from '../src/game/types';
 import { setRepeatCount } from './repeat-counter';
+import { boardIsVisible } from './board-frame';
 
 const labels: Record<CommandType, string> = { forward: 'Maju', 'turn-left': 'Kiri', 'turn-right': 'Kanan', repeat: 'Ulangi' };
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
@@ -17,6 +18,7 @@ async function removeStarter(page: Page, program: Program, press: Press) {
     const command = program[index];
     const label = command.type === 'repeat' ? `Ulangi ${index + 1}` : `perintah ${index + 1}: ${labels[command.type]}`;
     await press(button(page, `Pilih ${label}`));
+    if (command.type === 'repeat') await press(button(page, 'Pilihan Ulangi'));
     await press(button(page, `Hapus ${label}`));
   }
 }
@@ -28,8 +30,12 @@ async function buildProgram(page: Page, program: Program, press: Press) {
     if (command.type === 'repeat') {
       await press(button(page, `Pilih Ulangi ${index + 1}`));
       await setRepeatCount(page, index, command.count, press);
-      await press(button(page, `Tambah di posisi 1 dalam Ulangi ${index + 1}`));
-      for (const child of command.commands) await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
+      await press(button(page, `Edit isi Ulangi ${index + 1}`));
+      for (const [bodyIndex, child] of command.commands.entries()) {
+        await press(button(page, `Tambah di posisi ${bodyIndex + 1} dalam Ulangi ${index + 1}`));
+        await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
+      }
+      await press(button(page, 'Kembali ke urutan'));
     }
   }
 }
@@ -43,6 +49,7 @@ for (const level of curriculumLevels) test(`Curriculum ${level.id}: real demonst
   await expect(page.getByRole('region', { name: level.title, exact: true })).toBeVisible();
   await expect(page.locator('.board-scene')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('canvas')).toBeVisible();
+  await expect.poll(() => boardIsVisible(page)).toBe(true);
   await expect(page.locator('.slot-count, .lesson-phase, .demo-trace')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
@@ -121,6 +128,7 @@ test('unknown preview keeps the default board and the selected engineering fixtu
   await expect(button(page, 'Tambah Kiri')).toHaveCount(0);
   await expect(page.locator('.slot-count')).toHaveCount(0);
   await page.goto('/?fixture=loops&level=missing');
+  await button(page, 'Tambah di posisi 1').click();
   await expect(button(page, 'Tambah Ulangi')).toBeVisible();
   await expect(page.getByLabel('0 dari 3 ikan terkumpul')).toBeVisible();
 });

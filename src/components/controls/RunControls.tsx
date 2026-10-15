@@ -3,9 +3,8 @@ import { programError } from '../../game/program';
 import { ControlIcon } from './ControlIcon';
 import { gameStore } from '../../stores/game-store';
 import { demoPlaying, useLessonStore } from '../../stores/lesson-store';
-import type { ReactNode } from 'react';
 
-export function RunControls({ ready, watching = false, showStep = true, resetControl }: { ready: boolean; watching?: boolean; showStep?: boolean; resetControl?: ReactNode }) {
+export function RunControls({ ready, watching = false, showStep = true }: { ready: boolean; watching?: boolean; showStep?: boolean }) {
   const status = useGameStore((s) => s.simulation.status);
   const empty = useGameStore((s) => s.program.length === 0);
   const run = useGameStore((s) => s.run);
@@ -24,15 +23,10 @@ export function RunControls({ ready, watching = false, showStep = true, resetCon
       aria-label={running ? 'Berhenti' : terminal ? 'Jalankan lagi' : 'Jalankan'} onClick={running ? stop : run}>
       <ControlIcon type={running ? 'stop' : 'play'} /><span className="run-label" aria-hidden="true">{running ? 'Berhenti' : 'Main'}</span>
     </button>
-    {showStep && <button className="step-button" disabled={disabled} aria-label="Satu langkah" title="Satu langkah" onClick={step}>
-      <ControlIcon type="step" />
-      <span className="step-label" aria-hidden="true">Langkah</span>
+    {showStep && <button className={`step-button ${inspect ? 'inspect-action' : ''}`} disabled={disabled}
+      aria-label={inspect ? 'Periksa satu per satu' : 'Satu langkah'} onClick={inspect ? () => gameStore.getState().resetSimulation() : step}>
+      <ControlIcon type={inspect ? 'reset' : 'step'} />
     </button>}
-    {inspect && <button className="inspect-action" disabled={watching} aria-label="Periksa satu per satu" onClick={() => {
-      gameStore.getState().resetSimulation();
-      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.step-button')?.focus({ preventScroll: true }));
-    }}><ControlIcon type="reset" /><span>Periksa</span></button>}
-    {resetControl}
   </div>;
 }
 

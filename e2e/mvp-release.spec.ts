@@ -15,6 +15,7 @@ async function replaceProgram(page: Page, starter: Program, solution: Program, p
     const command = starter[index];
     const label = command.type === 'repeat' ? `Ulangi ${index + 1}` : `perintah ${index + 1}: ${labels[command.type]}`;
     await press(button(page, `Pilih ${label}`));
+    if (command.type === 'repeat') await press(button(page, 'Pilihan Ulangi'));
     await press(button(page, `Hapus ${label}`));
   }
   for (const [index, command] of solution.entries()) {
@@ -23,8 +24,12 @@ async function replaceProgram(page: Page, starter: Program, solution: Program, p
     if (command.type === 'repeat') {
       await press(button(page, `Pilih Ulangi ${index + 1}`));
       await setRepeatCount(page, index, command.count, press);
-      await press(button(page, `Tambah di posisi 1 dalam Ulangi ${index + 1}`));
-      for (const child of command.commands) await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
+      await press(button(page, `Edit isi Ulangi ${index + 1}`));
+      for (const [bodyIndex, child] of command.commands.entries()) {
+        await press(button(page, `Tambah di posisi ${bodyIndex + 1} dalam Ulangi ${index + 1}`));
+        await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
+      }
+      await press(button(page, 'Kembali ke urutan'));
     }
   }
 }
@@ -112,6 +117,7 @@ test('leaving a running puzzle cannot advance a new stage or persist its runtime
   await page.locator('summary').click();
   await button(page, 'Lewati contoh').click();
   await button(page, 'Lanjut').click();
+  await button(page, 'Tambah di posisi 2').click();
   await button(page, 'Tambah Maju').click();
   await button(page, 'Jalankan').click();
   await button(page, 'Ekspedisi').click();

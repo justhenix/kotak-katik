@@ -5,7 +5,7 @@ import { demoPlaying, lessonStore, useLessonStore } from '../../stores/lesson-st
 import { curriculumLevels } from '../../game/levels/curriculum';
 import { GhostHand } from './GhostHand';
 
-export function LessonOptions() {
+export function LessonOptions({ onRestart }: { onRestart?: () => void }) {
   const level = useGameStore((state) => state.level);
   const lesson = useLessonStore((state) => state);
   const menu = useRef<HTMLDetailsElement>(null);
@@ -24,9 +24,9 @@ export function LessonOptions() {
     <summary aria-label="Pilihan"><Ellipsis aria-hidden="true" /></summary>
     <div className="lesson-options-list">
       {level.learning.demonstration ? <>
-        <button onClick={() => { lesson.startDemo(); close(); }}><RotateCcw aria-hidden="true" />Ulang contoh</button>
-        <button onClick={() => { lesson.skipDemo(); close(); }}><SkipForward aria-hidden="true" />Lewati contoh</button>
-      </> : <button onClick={() => { if (level.learning.phase === 'practice') gameStore.getState().resetProgram(); else lesson.resetLesson(); close(); }}><RotateCcw aria-hidden="true" />Mulai ulang</button>}
+        <button onClick={() => { lesson.startDemo(); onRestart?.(); close(); }}><RotateCcw aria-hidden="true" />Ulang contoh</button>
+        <button onClick={() => { lesson.skipDemo(); onRestart?.(); close(); }}><SkipForward aria-hidden="true" />Lewati contoh</button>
+      </> : <button onClick={() => { if (level.learning.phase === 'practice') gameStore.getState().resetProgram(); else lesson.resetLesson(); onRestart?.(); close(); }}><RotateCcw aria-hidden="true" />Mulai ulang</button>}
     </div>
   </details>;
 }

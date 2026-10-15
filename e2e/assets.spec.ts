@@ -2,7 +2,11 @@ import { expect, test } from '@playwright/test';
 import type { Locator } from '@playwright/test';
 
 test('GLB gameplay: phases, movement, collection, interruption, and reduced motion', async ({ page }, testInfo) => {
-  const press = (control: Locator) => testInfo.project.name === 'mobile' ? control.tap() : control.click();
+  const press = async (control: Locator) => {
+    if (control === add) await page.locator('.insert-slot.chosen-target').click();
+    if (control === reset) await page.locator('summary').click();
+    await (testInfo.project.name === 'mobile' ? control.tap() : control.click());
+  };
   const errors: string[] = [];
   const models = new Set<string>();
   page.on('pageerror', (error) => errors.push(error.message));
@@ -20,7 +24,7 @@ test('GLB gameplay: phases, movement, collection, interruption, and reduced moti
   );
   const add = page.getByRole('button', { name: 'Tambah Maju', exact: true });
   const step = page.getByRole('button', { name: 'Satu langkah', exact: true });
-  const reset = page.getByRole('button', { name: 'Hapus semua', exact: true });
+  const reset = page.getByRole('button', { name: 'Mulai ulang', exact: true });
   await expect(page.locator('.board-scene')).toHaveAttribute('aria-busy', 'false');
   await expect(canvas).toHaveAttribute('data-cat-animation', 'idle');
   await expect(canvas).toHaveAttribute('data-cat-x', '0');
@@ -81,6 +85,7 @@ test('execution waits for GLBs rather than canvas creation', async ({ page }) =>
   const gate = new Promise<void>((resolve) => { release = resolve; });
   await page.route('**/assets/models/cat.glb', async (route) => { await gate; await route.continue(); });
   await page.goto('/?fixture=kernel');
+  await page.getByRole('button', { name: 'Tambah di posisi 1', exact: true }).click();
   await page.getByRole('button', { name: 'Tambah Maju', exact: true }).click();
   await expect(page.getByText('Menyiapkan papan…')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Jalankan', exact: true })).toBeDisabled();
@@ -130,6 +135,7 @@ test('missing GLB shows the existing recovery state and cannot start execution',
   await page.goto('/?fixture=kernel');
   await expect(page.getByText('Papan belum bisa dibuka.', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Muat ulang', exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Tambah di posisi 1', exact: true }).click();
   await page.getByRole('button', { name: 'Tambah Maju', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Jalankan', exact: true })).toBeDisabled();
 });

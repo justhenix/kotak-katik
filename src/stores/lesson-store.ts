@@ -222,7 +222,8 @@ export function tutorialTarget(level: LevelDefinition, program: Program, simulat
   if (program.length < level.initialProgram.length) return { type: 'palette' };
   const emptyLoop = program.findIndex((command) => command.type === 'repeat' && command.commands.length === 0);
   if (emptyLoop >= 0) return lesson.guideChoice ? { type: 'palette', loopIndex: emptyLoop } : { type: 'slot', loopIndex: emptyLoop, index: 0 };
-  if (simulation.status === 'failed' && simulation.activeCommandPath) return lesson.hintStrength > 0 ? { type: 'command', path: simulation.activeCommandPath } : null;
+  if (simulation.status === 'failed' && simulation.activeCommandPath) return lesson.guideChoice ? { type: 'palette' }
+    : lesson.hintStrength > 0 ? { type: 'command', path: simulation.activeCommandPath } : null;
   const interaction = level.learning.guidance?.[lesson.guideIndex];
   if (!interaction) return program.length ? lesson.guideChoice ? { type: 'palette' } : { type: 'run' } : null;
   if (lesson.guideChoice && interaction.target.type === 'slot') return { type: 'palette' };

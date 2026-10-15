@@ -1,182 +1,149 @@
 .game-shell {
-  --cream: #fff2d2;
-  --forward: #ffda75;
-  --edge: #806d45;
+  --cream: #fff7e5;
+  --piece: 56px;
   position: relative;
   isolation: isolate;
-  max-width: none;
-  min-height: 100svh;
-  height: auto;
-  padding: 22px 34px 26px;
-  grid-template-rows: auto minmax(330px, 1fr) auto;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 540px;
+  padding: max(14px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   background: #8adfe0;
 }
-.game-shell .game-header { position: relative; z-index: 3; min-height: 58px; }
-.game-shell .puzzle-exit, .game-shell .lesson-options summary {
-  min-height: 58px;
-  border: 2px solid #95835d;
-  border-radius: 18px;
-  background: #fff2d2;
-  box-shadow: inset 0 2px #fffbed, 0 3px #b8a077;
+.game-header { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.puzzle-exit, .fish-progress, .lesson-options summary { height: 46px; min-height: 46px; background: var(--cream); border: 1px solid #fffdf5; border-radius: 999px; box-shadow: 0 3px #d9cfb5; }
+.puzzle-exit { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0; width: 46px; }
+.puzzle-exit svg { width: 25px; height: 25px; color: #16847c; stroke-width: 2.6; }
+.puzzle-exit span { display: none; }
+.header-actions { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.fish-progress { display: flex; align-items: center; gap: 7px; height: auto; padding: 6px 13px; white-space: nowrap; font: 500 1.1rem/1 'Fredoka',sans-serif; }
+.fish-icon { width: 33px; height: 25px; flex-shrink: 0; }
+.all-collected { background: #f0f6df; }
+.lesson-options { position: relative; }
+.lesson-options summary { display: grid; place-items: center; width: 46px; cursor: pointer; list-style: none; }
+.lesson-options summary::-webkit-details-marker { display: none; }
+.lesson-options summary svg { width: 25px; height: 25px; stroke-width: 3; }
+.lesson-options-list { position: absolute; right: 0; top: calc(100% + 12px); display: grid; gap: 4px; width: max-content; max-width: calc(100vw - 24px); padding: 8px; border: 1px solid #d9cfb5; border-radius: 18px; background: var(--cream); box-shadow: 0 3px #d9cfb5; }
+.lesson-options-list button { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border: 0; border-radius: 10px; background: transparent; text-align: left; }
+.lesson-options-list button svg { width: 24px; height: 24px; }
+.world-area { min-height: 0; min-width: 0; }
+.board-scene { position: absolute; inset: 0; z-index: 0; }
+.scene-loading, .scene-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 20px; text-align: center; pointer-events: none; }
+.scene-fallback button { pointer-events: auto; padding: 10px 20px; background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; }
+.feedback { position: absolute; z-index: 1; left: 50%; top: var(--feedback-center,70%); transform: translate(-50%,-50%); width: max-content; max-width: calc(100% - 24px); min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; padding: 7px 15px; border: 1px solid #fffdf6; border-radius: 999px; background: var(--cream); box-shadow: 0 3px #d9cfb5; font: 500 1rem/1.2 'Fredoka',sans-serif; }
+.feedback[data-visible="false"] { visibility: hidden; }
+.feedback p { white-space: nowrap; }
+.feedback-symbol { display: grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; }
+.feedback-symbol svg { width: 26px; height: 26px; }
+.feedback-symbol .fish-icon { width: 34px; }
+.feedback-full { display: none; }
+.feedback.completed { color: #315a37; background: #f0f6df; }
+.feedback.failed { color: #863b37; background: #fff0e5; }
+.feedback.finished { color: #795717; }
+.workbench { position: relative; z-index: 3; min-width: 0; width: 100%; max-width: 1240px; justify-self: center; padding: 12px 12px 14px; border: 2px solid #fffcf4; border-bottom: 5px solid #d9cfb5; border-radius: 30px; background: var(--cream); box-shadow: 0 8px 20px #286d6a12; }
+.command-dock { min-width: 0; }
+.dock-main { display: flex; align-items: center; gap: 10px; min-width: 0; height: 74px; }
+.program-area { flex: 1; min-width: 0; }
+.program-sequence { min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x; }
+.program-sequence::-webkit-scrollbar { display: none; }
+.program-list { display: flex; align-items: center; gap: 9px; width: max-content; min-width: 100%; min-height: 74px; list-style: none; margin: 0; padding: 7px 12px 9px 2px; }
+.program-list li { display: flex; flex: 0 0 auto; }
+.puzzle-block { position: relative; --block: #ffda75; --piece-edge: #c99e39; color: #30464b; background: var(--block); border: 1px solid #ffffff66; border-bottom: 2px solid var(--piece-edge); border-radius: 13px; box-shadow: 0 4px var(--piece-edge), inset 0 2px #ffffff55; }
+.puzzle-block::after { content: ''; position: absolute; right: -9px; top: 50%; transform: translateY(-50%); width: 10px; height: 21px; border-bottom: 3px solid var(--piece-edge); border-radius: 0 8px 8px 0; background: var(--block); pointer-events: none; }
+.forward { --block: #ffda75; --piece-edge: #c99e39; }
+.turn-left { --block: #82d6d0; --piece-edge: #3d9e9a; }
+.turn-right { --block: #f3ae8e; --piece-edge: #c27b58; }
+.repeat { --block: #c8b8e8; --piece-edge: #9680be; }
+.command-block { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 0 0 var(--piece); width: var(--piece); height: var(--piece); padding: 7px 3px 3px; }
+.command-icon { width: 32px; height: 32px; }
+.command-number { position: absolute; left: 5px; top: 3px; font: 500 11px/1 'Fredoka',sans-serif; }
+.repeat-select { padding: 4px; gap: 0; }
+.repeat-select .command-icon { width: 26px; height: 26px; }
+.repeat-count { font: 500 14px/1 'Fredoka',sans-serif; }
+.command-block[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.active-command, .completed-command { outline: 3px solid #355e3d; outline-offset: 2px; }
+.failed-command { outline: 3px solid #943044; outline-offset: 2px; }
+.block-state { position: absolute; top: 2px; right: 2px; display: grid; place-items: center; min-width: 19px; height: 19px; border-radius: 5px; background: #355e3d; color: white; font-size: 12px; }
+.failed-command .block-state { background: #943044; }
+.insert-slot { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 54px; padding: 0; border: 1.5px dashed #9e8e6e; border-radius: 12px; background: transparent; color: #796a4c; }
+.insert-slot svg { width: 24px; height: 24px; }
+.insert-slot[aria-expanded="true"] { border-color: var(--ink); background: #f0e6cc; }
+.scope-back { display: flex; flex: 0 0 44px; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 44px; height: 56px; padding: 0; border: 0; border-radius: 10px; background: #ece0f4; color: #58416d; }
+.scope-back svg { width: 22px; height: 22px; }
+.scope-back span { font: 500 14px/1 'Fredoka',sans-serif; }
+.dock-primary { flex: 0 0 auto; }
+.controls-area { display: flex; align-items: center; gap: 6px; }
+.controls-area button { display: grid; place-items: center; padding: 0; border-radius: 50%; }
+.run-button { order: 2; width: 68px; min-width: 68px; height: 68px; border: 2px solid #ffbe59; background: #ff9d29; color: #fffaf0; box-shadow: 0 4px #d76d17, inset 0 2px #ffd079; }
+.run-button .control-icon { width: 37px; height: 37px; stroke: #6d390f; stroke-width: 1.2; }
+.stop-button { background: #df873d; }
+.step-button { order: 1; width: 44px; height: 44px; border: 1px solid #e0d3b5; background: #f1e7ce; color: #71664e; box-shadow: 0 3px #d9cfb5; }
+.step-button .control-icon { width: 25px; height: 25px; }
+.run-label, .step-label { display: none; }
+.lesson-scaffold { display: contents; }
+.next-lesson, .continue-lesson { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 54px; padding: 8px 14px; border: 1px solid #365d35; border-radius: 999px; background: #467345; color: #fffdf4; box-shadow: 0 4px #2f532f; font: 500 1.1rem/1.1 'Fredoka',sans-serif; }
+.next-lesson svg, .continue-lesson svg { width: 22px; height: 22px; }
+.journey-complete { display: inline-flex; align-items: center; gap: 8px; font: 500 1rem 'Fredoka',sans-serif; }
+.journey-complete svg { width: 24px; height: 24px; }
+.dock-context { display: flex; align-items: center; justify-content: flex-start; gap: 6px; width: 100%; height: 58px; margin-top: 7px; padding-top: 7px; border-top: 1px solid #e0d4b9; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; white-space: nowrap; }
+.dock-context > button { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: transparent; }
+.dock-context > button svg { width: 25px; height: 25px; }
+.dock-context > button:has(.tool-label) { display: flex; flex-direction: column; justify-content: center; width: max(44px,3rem); flex-basis: max(44px,3rem); }
+.dock-context > button:has(.tool-label) svg { width: 20px; height: 20px; }
+.tool-label { font: 500 .75rem/1 'Fredoka',sans-serif; }
+.dock-context > .delete-selected { color: #863b37; }
+.dock-context .close-tools { margin-left: auto; color: #7d725e; }
+.palette-area { flex: 1 0 auto; min-width: 0; }
+.palette-commands { display: flex; align-items: center; justify-content: center; gap: 14px; padding-right: 10px; }
+.palette-command { --palette-icon: clamp(18px,calc(44px - .75rem),23px); display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 0 0 max(48px,3.1rem); width: max(48px,3.1rem); height: 50px; padding: 2px; gap: 0; border-radius: 9px; }
+.palette-command .command-icon { width: var(--palette-icon); height: var(--palette-icon); }
+.palette-command span { font: 500 .75rem/1 'Fredoka',sans-serif; }
+.palette-command::after { height: 16px; width: 8px; right: -7px; }
+.palette-note { font-size: 1rem; }
+.repeat-counter { display: flex; flex: 0 0 auto; align-items: center; gap: 2px; }
+.repeat-counter button { flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: #ece0f4; font-size: 24px; color: #58416d; }
+.repeat-counter button[aria-disabled="true"] { opacity: .45; }
+.repeat-counter output { min-width: max(36px,1.8rem); text-align: center; font: 500 1.1rem/1 'Fredoka',sans-serif; }
+.ghost-hand { position: fixed; top: 0; left: 0; width: 52px; height: 52px; z-index: 10; pointer-events: none; transition: transform 500ms cubic-bezier(.23,1,.32,1); }
+.ghost-hand img { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 2px #263d4540); }
+.instruction-focus { outline: 3px dotted #465a5a; outline-offset: 3px; }
+.palette-commands.instruction-focus { outline: none; }
+.palette-commands.instruction-focus button { outline: 3px dotted #465a5a; outline-offset: 2px; }
+.instruction-focus:disabled { opacity: 1; }
+.drag-preview { position: fixed; z-index: 20; display: grid; place-items: center; width: 56px; height: 56px; transform: translate(-50%,-65%) rotate(-5deg); pointer-events: none; }
+.command-dock [data-draggable="true"] { touch-action: none; user-select: none; }
+.command-dock button:focus-visible, .program-sequence:focus-visible, .game-header :focus-visible { outline: 3px solid #234c64; outline-offset: 3px; }
+@media (min-width: 721px) {
+  .game-shell { --piece: 78px; padding: 24px 32px 28px; }
+  .puzzle-exit, .fish-progress, .lesson-options summary { height: 58px; min-height: 58px; }
+  .puzzle-exit { width: auto; padding: 0 22px; font: 500 1.25rem 'Fredoka',sans-serif; }
+  .puzzle-exit span { display: inline; }
+  .fish-progress { padding: 8px 20px; font-size: 1.5rem; gap: 12px; }
+  .fish-icon { width: 44px; height: 32px; }
+  .lesson-options summary { width: 58px; }
+  .workbench { padding: 18px 24px 21px; border-radius: 38px; }
+  .dock-main { height: 104px; gap: 24px; }
+  .program-list { min-height: 104px; gap: 13px; padding: 9px 14px 12px 4px; }
+  .command-block .command-icon { width: 44px; height: 44px; }
+  .command-number { font-size: 13px; top: 5px; left: 7px; }
+  .repeat-select .command-icon { width: 36px; height: 36px; }
+  .repeat-count { font-size: 18px; }
+  .insert-slot { width: 60px; height: 74px; flex-basis: 60px; }
+  .run-button { width: 98px; height: 98px; min-width: 98px; }
+  .run-button .control-icon { width: 52px; height: 52px; }
+  .controls-area { gap: 14px; }
+  .step-button { width: 58px; height: 58px; }
+  .step-button .control-icon { width: 30px; height: 30px; }
+  .scope-back { height: 76px; width: 52px; flex-basis: 52px; gap: 4px; }
+  .scope-back span { font-size: 17px; }
+  .dock-context { height: 66px; margin-top: 10px; padding-top: 10px; justify-content: flex-start; gap: 12px; }
+  .palette-area { flex: 0 0 auto; }
+  .palette-command { width: max(58px,3.1rem); flex-basis: max(58px,3.1rem); }
+  .feedback { min-height: 50px; padding: 8px 20px; font-size: 1.15rem; }
+  .feedback-full { display: inline; }
+  .feedback-short { display: none; }
+  .next-lesson, .continue-lesson { min-height: 68px; padding: 10px 24px; font-size: 1.4rem; }
 }
-.game-shell .puzzle-exit { gap: 10px; padding: 10px 18px; font: 600 1.35rem 'Fredoka Title', 'Fredoka', sans-serif; }
-.game-shell .puzzle-exit svg { width: 27px; height: 27px; }
-.game-shell .header-actions { gap: 12px; }
-.game-shell .fish-progress { padding: 6px 22px 6px 16px; gap: 14px; border: 3px solid #5e8454; background: #f3f8dc; box-shadow: inset 0 3px #fffdf0, 0 5px #427047; font: 600 1.9rem 'Fredoka Title', 'Fredoka', sans-serif; min-height: 64px; }
-.game-shell .fish-icon { width: 62px; height: 40px; }
-.game-shell .lesson-options summary { width: 58px; height: 58px; }
-.game-shell .lesson-options summary svg { width: 28px; height: 28px; }
-.game-shell .lesson-options-list { top: calc(100% + 18px); min-width: 258px; padding: 8px; border-radius: 19px; box-shadow: inset 0 2px #fffbed, 0 3px #b8a077; }
-.game-shell .lesson-options-list button { min-width: 0; min-height: 60px; padding: 12px 24px; gap: 18px; font: 600 1.35rem/1.25 'Fredoka Title', 'Fredoka', sans-serif; }
-.game-shell .lesson-options-list svg { width: 28px; height: 28px; }
-.game-shell .world-area { position: static; padding: 0; }
-.game-shell .board-scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
-.game-shell .scene-loading, .game-shell .scene-fallback { z-index: 4; }
-.game-shell .feedback {
-  position: absolute;
-  top: var(--feedback-center, 65%);
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  flex-wrap: nowrap;
-  gap: 16px;
-  width: max-content;
-  max-width: 100%;
-  min-height: 70px;
-  margin: 0 auto;
-  padding: 7px 24px;
-  border: 2px solid #a18c5c;
-  border-radius: 999px;
-  background: #fff1cb;
-  box-shadow: inset 0 2px #fffbea, 0 6px #ac9669;
-  color: #51472c;
-  font: 600 1.5rem/1.25 'Fredoka Title', 'Fredoka', sans-serif;
-}
-.game-shell .feedback[data-visible="false"] { visibility: hidden; }
-.game-shell .feedback p { min-width: 0; white-space: nowrap; }
-.game-shell .feedback-short { display: none; }
-.game-shell .feedback-symbol { flex: 0 0 50px; width: 50px; height: 50px; background: #8c7842; color: white; border-radius: 50%; }
-.game-shell .feedback-symbol svg { width: 36px; height: 36px; }
-.game-shell .feedback-symbol .fish-icon { width: 42px; height: 32px; }
-.game-shell .feedback.completed, .game-shell .feedback.collected-feedback:not(.failed, .finished) { color: #315a37; border-color: #92b969; background: #edf8d0; box-shadow: inset 0 2px #faffec, 0 6px #80ac60; }
-.game-shell .feedback.completed .feedback-symbol, .game-shell .feedback.collected-feedback .feedback-symbol { background: #315a37; }
-.game-shell .feedback.failed { color: #7e352f; border-color: #bc786b; background: #ffe1d6; box-shadow: inset 0 2px #fff4e9, 0 6px #bb7869; }
-.game-shell .feedback.failed .feedback-symbol { background: #9a493f; }
-.game-shell .feedback.finished { color: #70521c; border-color: #bc974c; background: #ffebad; box-shadow: inset 0 2px #fff9dc, 0 6px #c39a4d; }
-.game-shell .feedback.finished .feedback-symbol { background: #9c7634; }
-.game-shell .feedback .feedback-symbol.fish-symbol { background: transparent; border-radius: 0; }
-.game-shell .workbench { z-index: 2; min-height: 0; padding: 14px 20px 12px; border-radius: 28px; border: 3px solid #fffbea; border-bottom: 8px solid #bca477; box-shadow: 0 8px 18px #408d8b1c; background: #fff2d2; }
-.game-shell .feedback.completed { min-width: min(25rem, 100%); }
-.game-shell .editor { gap: 10px 18px; }
-.game-shell .program-area { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; }
-.game-shell .delete-program-button { position: static; width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: 2px solid #a18460; border-radius: 12px; box-shadow: 0 3px #a18460; background: #faedcf; color: #8b463b; }
-.game-shell .delete-program-button .control-icon { width: 24px; height: 24px; }
-.game-shell .program-scroll { grid-column: 1; grid-row: 1; min-height: 126px; border: 2px solid #dec799; border-radius: 20px; background: #faedcf; box-shadow: inset 0 2px 6px #b49b652b; }
-.game-shell .program-strip { padding: 14px 24px 16px 14px; }
-.game-shell .command-block { width: max(88px, 3.6rem); height: max(82px, 3.5rem); border-radius: 16px; background: var(--block); }
-.game-shell .command-icon { width: 48px; height: 48px; }
-.game-shell .command-number { font: 600 1.2rem/1 'Fredoka Title', 'Fredoka', sans-serif; left: 9px; top: 6px; }
-.game-shell .puzzle-block { box-shadow: 0 7px var(--edge), inset 0 3px #fff6ce; }
-.game-shell .forward { --block: #ffdb76; }
-.game-shell .turn-left { --block: #82d6d0; }
-.game-shell .turn-right { --block: #f3ae8e; }
-.game-shell .command-block[aria-pressed="true"] { box-shadow: 0 7px var(--edge), inset 0 0 0 3px var(--ink), inset 0 5px #fffaf0; }
-.game-shell .active-command, .game-shell .completed-command { border-color: #355e3d; box-shadow: 0 7px #355e3d, inset 0 0 0 3px #fffaf0; }
-.game-shell .block-state { min-width: 29px; height: 29px; font-size: 21px; border-radius: 9px; }
-.game-shell .failed-command { border-color: #943044; box-shadow: 0 7px #943044, inset 0 0 0 3px #fffaf0; animation: none; }
-.game-shell .insert-slot { height: 82px; }
-.game-shell .palette-area { padding: 0 4px 2px; gap: 8px; }
-.game-shell .palette-command { min-height: 76px; padding: 7px 12px; }
-.game-shell .palette-command .command-icon { width: 40px; height: 40px; }
-.game-shell .next-lesson, .game-shell .continue-lesson { min-width: 196px; min-height: 64px; padding: 10px 26px; gap: 16px; border-radius: 18px; font: 600 1.6rem 'Fredoka Title', 'Fredoka', sans-serif; box-shadow: inset 0 2px #6a8b5a, 0 3px #2e5536; margin-top: 6px; }
-.game-shell .next-lesson svg { width: 28px; height: 28px; }
-.game-shell .workbench .lesson-scaffold { padding-bottom: 0; }
-.game-shell .active-command { animation: none; }
-.game-shell .selection-tools { position: relative; grid-column: 1 / -1; grid-row: 2; gap: 6px; padding: 12px 0 2px; }
-.game-shell .selection-tools::before { content: ''; position: absolute; left: var(--command-anchor); top: 0; height: 10px; border-left: 3px solid #806d45; }
-.game-shell .selection-label { display: inline-flex; align-items: center; gap: 5px; font-size: 1rem; }
-.game-shell .selection-label .command-icon { width: 24px; height: 24px; }
-.game-shell .selection-tools button { min-height: 44px; padding: 6px 9px; }
-.game-shell .command-placement { display: flex; flex-wrap: wrap; gap: 6px; }
-.game-shell .repeat-counter { padding: 0; border: 0; background: none; box-shadow: none; gap: 3px; }
-.game-shell .repeat-counter output { min-width: 36px; }
-.game-shell .selection-tools .repeat-counter button { width: max(44px, 2.2rem); height: max(44px, 2.2rem); padding: 0; line-height: 1; }
-.game-shell .program-navigation { grid-column: 1 / -1; grid-row: 3; padding-top: 3px; }
-.game-shell .program-navigation span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.game-shell .program-navigation { justify-content: space-between; }
-.game-shell .program-navigation button { height: 44px; background: none; border-color: transparent; box-shadow: none; }
-.game-shell .controls-area { padding: 0; gap: 10px; }
-.game-shell .controls-area .clear-button { flex: 0 0 44px; min-width: 44px; width: 44px; min-height: 44px; height: 44px; padding: 5px; }
-.game-shell .controls-area .inspect-action { margin: 0; min-height: 88px; padding: 8px; flex-direction: column; font: 500 1rem 'Fredoka', sans-serif; }
-.game-shell .palette-area:has(.palette-note) .palette-commands { display: none; }
-.game-shell .palette-area:has(.palette-note) { min-height: 0; padding: 0 4px; }
-.game-shell .palette-note { margin: 0; font-size: .9rem; }
-.game-shell [data-draggable="true"] { touch-action: none; user-select: none; cursor: grab; }
-.game-shell [data-draggable="true"]:active { cursor: grabbing; }
-.game-shell .insert-slot[data-drop-target] { background: #d8e9b5; border-color: #355e3d; }
-.game-shell .drag-preview { position: fixed; z-index: 50; display: grid; place-items: center; width: 70px; height: 72px; transform: translate(-50%, -65%) rotate(-5deg); pointer-events: none; opacity: .9; }
-@media (max-width: 720px) {
-  .game-shell { padding: 12px 10px max(14px, env(safe-area-inset-bottom)); grid-template-rows: auto minmax(max(300px, calc(7rem + 180px)), 1fr) auto; gap: 0; }
-  .game-shell .game-header { gap: 8px; min-height: 46px; }
-  .game-shell .puzzle-exit { min-height: 46px; gap: 6px; padding: 8px 10px; font-size: 1rem; border-radius: 14px; }
-  .game-shell .puzzle-exit svg { width: 22px; height: 22px; }
-  .game-shell .header-actions { gap: 7px; }
-  .game-shell .fish-progress { min-height: 46px; padding: 4px 10px 4px 7px; gap: 6px; font-size: 1.3rem; }
-  .game-shell .fish-icon { width: 36px; height: 26px; }
-  .game-shell .lesson-options summary { min-height: 46px; width: 46px; height: 46px; border-radius: 14px; }
-  .game-shell .lesson-options-list { min-width: 0; width: max-content; max-width: calc(100vw - 24px); }
-  .game-shell .lesson-options-list button { padding: 10px 14px; font-size: 1.1rem; }
-  .game-shell .world-area { padding: 0; }
-  .game-shell .feedback { min-height: 48px; padding: 5px 10px; gap: 8px; font-size: 1rem; border-radius: 24px; }
-  .game-shell .feedback-full { display: none; }
-  .game-shell .feedback-short { display: inline; }
-  .game-shell .feedback.completed { min-width: 0; }
-  .game-shell .feedback-symbol { flex-basis: 34px; width: 34px; height: 34px; }
-  .game-shell .feedback-symbol svg { width: 26px; height: 26px; }
-  .game-shell .workbench { min-height: 0; padding: 10px 10px 12px; border-radius: 22px; border-bottom-width: 6px; }
-  .game-shell .editor { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .game-shell .program-scroll { min-height: 90px; border-radius: 14px; }
-  .game-shell .program-strip { padding: 9px 14px 13px 12px; gap: 4px; }
-  .game-shell .command-block { width: max(58px, 2.7rem); height: max(62px, 2.9rem); border-radius: 13px; }
-  .game-shell .command-icon { width: 34px; height: 34px; }
-  .game-shell .command-number { font-size: 1rem; top: 4px; left: 7px; }
-  .game-shell .block-state { min-width: 22px; height: 22px; font-size: 15px; border-radius: 6px; }
-  .game-shell .insert-slot { flex-basis: 52px; width: 52px; height: max(62px, 2.9rem); }
-  .game-shell .repeat-item { gap: 7px; padding: 6px 12px calc(1.1rem + 7px) 6px; border-radius: 14px; }
-  .game-shell .repeat-select { min-width: 52px; min-height: 62px; padding: 4px; }
-  .game-shell .repeat-select .command-icon { width: 28px; height: 28px; }
-  .game-shell .repeat-select span { line-height: 1; }
-  .game-shell .repeat-item > .insert-slot { flex-basis: 52px; width: 52px; height: max(62px, 2.9rem); }
-  .game-shell .loop-progress { bottom: 2px; gap: 4px; font-size: .8rem; }
-  .game-shell .loop-progress > span { width: 1.15rem; height: 1.15rem; }
-  .game-shell .controls-area { grid-column: 1; grid-row: auto; display: flex; flex-wrap: wrap; gap: 8px; width: 100%; padding: 0; }
-  .game-shell .controls-area .run-button { flex: 1.15 1 0; }
-  .game-shell .controls-area .step-button { flex: 1 1 0; }
-  .game-shell .controls-area .inspect-action { flex: 1 1 0; margin: 0; }
-  .game-shell .controls-area button { min-width: max-content; min-height: 50px; padding: 5px 8px; gap: 5px; flex-direction: row; }
-  .game-shell .controls-area:has(.inspect-action) button { flex-direction: column; min-height: 56px; padding: 4px; gap: 2px; }
-  .game-shell .controls-area:has(.inspect-action) .clear-button { min-height: 44px; }
-  .game-shell .controls-area .inspect-action { font-size: .95rem; }
-  .game-shell .controls-area .control-icon { width: 24px; height: 24px; }
-  .game-shell .run-label { font-size: 1.1rem; }
-  .game-shell .step-label { font-size: 1rem; }
-  .game-shell .palette-commands { gap: 12px; }
-  .game-shell .palette-command { min-width: 52px; width: auto; min-height: 58px; padding: 4px 6px; gap: 2px; }
-  .game-shell .palette-command span { font-size: .95rem; }
-  .game-shell .palette-command .command-icon { width: 30px; height: 30px; }
-  .game-shell .next-lesson, .game-shell .continue-lesson { min-width: 156px; min-height: 52px; padding: 8px 20px; font-size: 1.3rem; border-radius: 14px; }
-  .game-shell .selection-label { flex: 1 1 auto; font-size: .95rem; }
-  .game-shell .selection-tools { gap: 6px; }
-  .game-shell .selection-tools .delete-selected { margin-left: auto; }
-  .game-shell .command-placement { width: 100%; }
-  .game-shell .command-placement button { padding: 6px 4px; font: 500 .95rem/1.2 'Fredoka', sans-serif; }
-  .game-shell .selection-tools > button { font-size: .9rem; }
-}
-@media (max-width: 360px) {
-  .game-shell .program-strip { padding-left: 6px; padding-right: 6px; }
-  .game-shell .command-block { width: max(48px, 2.7rem); }
-  .game-shell .repeat-item { gap: 4px; padding-left: 4px; padding-right: 6px; }
-  .game-shell .repeat-select { min-width: 44px; }
-  .game-shell .insert-slot, .game-shell .repeat-item > .insert-slot { flex-basis: 44px; width: 44px; }
-}
-@media (prefers-reduced-motion: reduce) { .game-shell button { transition: none; } }
+@media (max-width: 360px) { .game-shell { padding-inline: 8px; } .workbench { padding-inline: 10px; } .dock-main { gap: 7px; } .palette-commands { gap: 10px; padding-right: 8px; } .palette-command { flex-basis: max(46px,3rem); width: max(46px,3rem); } }
+@media (prefers-reduced-motion: reduce) { .ghost-hand { transition: none; } .game-shell button { transition: none; } }

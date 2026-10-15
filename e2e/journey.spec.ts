@@ -14,6 +14,7 @@ test('expedition uses authored order and distinguishes skipped examples, complet
   await page.getByRole('button', { name: 'Lewati contoh', exact: true }).click();
   await page.getByRole('button', { name: 'Lanjut', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Maju ke ikan', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Tambah di posisi 2', exact: true }).click();
   await page.getByRole('button', { name: 'Tambah Maju', exact: true }).click();
   await page.getByRole('button', { name: 'Jalankan', exact: true }).click();
   await expect(page.locator('.feedback')).toHaveAttribute('data-status', 'completed');
@@ -34,6 +35,7 @@ test('progress survives refresh; replay resets runtime; reset requires a deliber
   await page.locator('summary').click();
   await page.getByRole('button', { name: 'Lewati contoh', exact: true }).click();
   await page.getByRole('button', { name: 'Lanjut', exact: true }).click();
+  await page.getByRole('button', { name: 'Tambah di posisi 2', exact: true }).click();
   await page.getByRole('button', { name: 'Tambah Maju', exact: true }).click();
   await page.getByRole('button', { name: 'Jalankan', exact: true }).click();
   await expect(page.locator('.feedback')).toHaveAttribute('data-status', 'completed');

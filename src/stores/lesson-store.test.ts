@@ -193,6 +193,18 @@ describe('authored demonstrations and linear lesson progression', () => {
 });
 
 describe('hint reveal and fading', () => {
+  it('keeps a failed pose inspectable while directing an opened editor to its palette', () => {
+    const { game, lesson } = setup('m2-right-together');
+    game.getState().addCommand('turn-left'); game.getState().addCommand('forward');
+    game.getState().run(); vi.runAllTimers();
+    const failed = game.getState().simulation;
+    expect(failed.status).toBe('failed');
+    lesson.getState().showHint();
+    expect(tutorialTarget(game.getState().level, game.getState().program, failed, lesson.getState())?.type).toBe('command');
+    lesson.getState().chooseGuideTarget();
+    expect(tutorialTarget(game.getState().level, game.getState().program, failed, lesson.getState())).toEqual({ type: 'palette' });
+    expect(game.getState().simulation).toBe(failed);
+  });
   it('reveals the insertion slot on entry and fades it after insertion', () => {
     const { game, lesson } = setup('m2-move-try');
     const hints = () => visibleHints(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState().revealed);

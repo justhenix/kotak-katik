@@ -80,15 +80,14 @@ function FitCamera({ level, onLayout }: { level: LevelDefinition; onLayout: (ite
       const offset = new Vector3((left + right) / 2, (bottom + top) / 2, 0).applyQuaternion(camera.quaternion);
       camera.position.add(offset);
       const start = Math.max(region.top, mobile && menu ? menu.bottom + 10 : region.top);
-      const areaHeight = Math.max(100, (region.bottom - start - feedbackHeight - 32) * 0.83);
+      const areaHeight = Math.max(100, (region.bottom - start - feedbackHeight - 38) * 0.96);
       const verticalOffset = mobile ? 0 : Math.min(24, areaHeight * 0.04);
-      camera.zoom = Math.min(size.width * (mobile ? 0.91 : 0.46) / (right - left), (areaHeight - verticalOffset * 2) * (mobile ? 0.88 : 0.99) / (top - bottom), mobile ? 110 : 180);
+      camera.zoom = Math.min(size.width * (mobile ? 0.94 : 0.68) / (right - left), (areaHeight - verticalOffset * 2) * (mobile ? 0.94 : 0.99) / (top - bottom), mobile ? 160 : 240);
       const desiredY = start - canvas.top + areaHeight / 2 + verticalOffset;
       camera.position.addScaledVector(new Vector3(0, 1, 0).applyQuaternion(camera.quaternion), (desiredY - size.height / 2) / camera.zoom);
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
-      const boardBottom = desiredY + (top - bottom) * camera.zoom / 2;
-      const bannerCenter = (boardBottom + region.bottom - canvas.top) / 2;
+      const bannerCenter = region.bottom - canvas.top - feedbackHeight / 2 - 14;
       document.querySelector<HTMLElement>('.world-area')?.style.setProperty('--feedback-center', `${bannerCenter}px`);
       fitted.current = key;
       gl.domElement.dataset.cameraFrame = JSON.stringify({ position: camera.position.toArray(), rotation: camera.quaternion.toArray(), zoom: camera.zoom });

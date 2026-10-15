@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Map } from 'lucide-react';
+import { ArrowLeft, Check, Map, TriangleAlert, CircleAlert } from 'lucide-react';
 import { Expedition } from '../components/journey/Expedition';
 import { progressStore, useProgressStore } from '../stores/progress-store';
 import { curriculumLevels } from '../game/levels/curriculum';
@@ -8,7 +8,7 @@ import { ProgramTray } from '../components/program/ProgramTray';
 import { ControlIcon } from '../components/controls/ControlIcon';
 import { CommandIcon, commandLabels } from '../components/commands/CommandIcon';
 import { gameStore, useGameStore } from '../stores/game-store';
-import { LessonScaffold, LessonOptions } from '../components/learning/LessonScaffold';
+import { LessonOptions } from '../components/learning/LessonScaffold';
 import { demoPlaying, lessonStore, useLessonStore, visibleHints } from '../stores/lesson-store';
 
 const TitleScene = lazy(async () => {
@@ -73,7 +73,7 @@ function Feedback() {
   const mobileMessage = hint ? mobileHints[hint] ?? bannerHints[hint] ?? hint
     : status === 'completed' || collectionVisible && status !== 'failed' && status !== 'finished' ? 'Ikan terkumpul!'
     : status === 'failed' ? 'Ubah urutanmu.' : emptyLoop ? 'Isi Ulangi.' : status === 'paused' ? 'Lihat hasilnya.' : message;
-  const fullMessage = hint ? bannerHints[hint] ?? hint : message;
+  const fullMessage = hint ? (bannerHints[hint] ?? hint).split(/\s+/).slice(0, 5).join(' ') : message;
   const fishSymbol = status !== 'completed' && status !== 'failed' && status !== 'paused'
     && !(primitive && status === 'running' && !collectionVisible);
   return <div className={`feedback ${status} ${collectionVisible ? 'collected-feedback' : ''}`} role="status" aria-live="polite" aria-atomic="true" data-status={status} data-visible={!hidden}
@@ -81,7 +81,7 @@ function Feedback() {
     data-x={simulation.avatar.position.x} data-z={simulation.avatar.position.z} data-orientation={simulation.avatar.orientation}
     data-actions={simulation.nextCommandIndex}>
     <span className={`feedback-symbol ${fishSymbol ? 'fish-symbol' : ''} ${hidden ? 'sr-only' : ''}`} aria-hidden="true">{status === 'completed' ? <ControlIcon type="check" />
-      : status === 'failed' ? '!' : status === 'finished' ? <FishIcon /> : status === 'paused' ? <ControlIcon type="pause" />
+      : status === 'failed' ? <CircleAlert /> : status === 'finished' ? <TriangleAlert /> : status === 'paused' ? <ControlIcon type="pause" />
       : collectionVisible ? <FishIcon />
       : primitive && status === 'running' ? <CommandIcon type={primitive.type} /> : <FishIcon />}</span>
     <p className={hidden ? 'sr-only' : ''}>{fullMessage === mobileMessage ? fullMessage
@@ -96,6 +96,7 @@ function FishIcon() {
 
 function Puzzle({ onExit, onContinue, onFinish }: { onExit: () => void; onContinue?: () => void; onFinish?: () => void }) {
   const [sceneReady, setSceneReady] = useState(false);
+  const [editorRevision, setEditorRevision] = useState(0);
   const title = useGameStore((s) => s.level.title);
   const collected = useGameStore((s) => s.simulation.collectedIds.length);
   const total = useGameStore((s) => s.level.collectibles.length);
@@ -104,18 +105,17 @@ function Puzzle({ onExit, onContinue, onFinish }: { onExit: () => void; onContin
   const status = useGameStore((s) => s.simulation.status);
   useEffect(() => () => { lessonStore.getState().resetLesson(); gameStore.getState().dispose(); }, []);
   return <main className="game-shell" data-learning-phase={phase} data-status={status}>
-    <header className="game-header"><h1 className="sr-only">{title}</h1><button className="puzzle-exit" onClick={onExit}><Map aria-hidden="true" /><span>Ekspedisi</span></button>
+    <header className="game-header"><h1 className="sr-only">{title}</h1><button className="puzzle-exit" aria-label="Ekspedisi" onClick={onExit}><Map aria-hidden="true" /><span>Ekspedisi</span></button>
       <div className="header-actions"><div className={`fish-progress ${collected === total ? 'all-collected' : ''}`} role="img" aria-label={`${collected} dari ${total} ikan terkumpul`}>
-        <FishIcon /><span>{collected} / {total}</span>
-      </div><LessonOptions /></div>
+        <FishIcon /><span>{collected}/{total}</span>
+      </div><LessonOptions onRestart={() => setEditorRevision(value => value + 1)} /></div>
     </header>
     <section className="world-area" aria-label={title}>
       <GameScene onReady={setSceneReady} />
       <Feedback />
     </section>
     <div className="workbench">
-      <LessonScaffold ready={sceneReady} onContinue={onContinue} onFinish={onFinish} />
-      <ProgramTray key={levelId} ready={sceneReady} />
+      <ProgramTray key={`${levelId}:${editorRevision}`} ready={sceneReady} onContinue={onContinue} onFinish={onFinish} />
     </div>
   </main>;
 }
