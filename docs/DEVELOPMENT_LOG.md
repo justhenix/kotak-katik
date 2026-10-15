@@ -401,3 +401,13 @@ Record meaningful work after verification and map it to real Git history. Use `P
 
 **Limits**
 - Browser touch is emulated; no physical-device, classroom, or actual screen-reader validation is claimed. Google Form upload acceptance/submission remains the user's handoff. Production application files are unchanged from the verified a990865 game.
+
+### 2026-10-15, repository cleanup after submission handoff
+
+- User requested artifact cleanup, closing completed issues, and a concise README. Work was limited to repository maintenance; no gameplay, asset, dependency-version, or submission-document changes.
+- Shortened README to the play link, learning/gameplay summary, local commands, five reference documents, authentic journal/history, and credits.
+- Archived local verification/build/test outputs and the standalone screenshots directory outside the repository at C:/Users/henix/.codex/archives/kotak-katik-20261015/230553. Removed three evidence images unreferenced by historical Markdown. Referenced report evidence remains available; tracked removals are also recoverable through Git history.
+- Added standalone screenshots to Git/deployment ignore rules and aligned the GitHub homepage with the custom production domain.
+- Closed completed MVP issue #1; no open issues or pull requests remained at inspection.
+- The cross-volume archive move followed an existing node_modules junction in a temporary verification checkout. Restored local dependencies with bun install --frozen-lockfile; React resolves again and package.json/bun.lock are unchanged.
+- Checked README links, retained report evidence links, exactly five .agents references, unchanged prompt journal/raw log, and unchanged application source/assets. No gameplay suite was rerun for this documentation/artifact-only change; earlier release results remain historical evidence.
