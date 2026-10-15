@@ -51,3 +51,7 @@ Remaining fidelity differences: the preserved GLBs differ from the generated ref
 ## Release verification
 
 Final test/build/deployment results are appended after execution in `DEVELOPMENT_LOG.md`. Historical entries and `PROMPT_JOURNAL.md` are not rewritten. The implementation is developed on `henix/gameplay-reference`; the existing user-owned `screenshots/` directory is excluded from the commit and deployment.
+
+## Verified production release
+
+Implementation: `b47bbaeb3ac7623db7afdc4bca6fbdbed7facbf2` on `henix/gameplay-reference`. A clean committed-source archive was deployed to [kotak-katik.vercel.app](https://kotak-katik.vercel.app), deployment `dpl_EupmuwWZRUeUe4jC5HRfEBMnW9ot`, READY. Anonymous HTTP 200, frozen install, cloud production build, and 12 deployed desktop/mobile browser checks passed. The append-only development log records local verification, repaired failures, evidence, and the deployment details. No main-branch integration or Git push was performed.
