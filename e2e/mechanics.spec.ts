@@ -154,7 +154,7 @@ test('tap editor: body/top ordering, removal, slot limits, editing after Step/er
   await press(button(page, 'Tambah Kiri ke Ulangi 1'));
   await expect(feedback(page)).toHaveAttribute('data-status', 'idle');
   await expect(page.getByLabel('0 dari 3 ikan terkumpul')).toBeVisible();
-  await expect(button(page, 'Tambah Maju ke Ulangi 1')).toBeDisabled();
+  await expect(button(page, 'Tambah Maju ke Ulangi 1')).toHaveCount(0);
   await expect(page.getByText('Ulangi penuh.', { exact: true })).toBeVisible();
   await press(button(page, 'Pilih perintah 3 di Ulangi 1: Kiri'));
   await press(button(page, 'Hapus perintah 3 di Ulangi 1: Kiri'));
@@ -181,7 +181,7 @@ test('tap editor: body/top ordering, removal, slot limits, editing after Step/er
   await expect(button(page, 'Pilih Ulangi 1')).toBeVisible();
   await press(button(page, 'Tambah di posisi 3'));
   await press(button(page, 'Tambah Maju')); await press(button(page, 'Tambah Kanan'));
-  await expect(button(page, 'Tambah Ulangi')).toBeDisabled();
+  await expect(button(page, 'Tambah Ulangi')).toHaveCount(0);
   await expect(page.getByText('Urutan penuh.', { exact: true })).toBeVisible();
   await expect(page.locator('.program-list').first().locator(':scope > li')).toHaveCount(4);
   await press(button(page, 'Pilih perintah 4: Kanan'));

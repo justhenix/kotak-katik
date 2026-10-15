@@ -34,11 +34,11 @@ test('GLB gameplay: phases, movement, collection, interruption, and reduced moti
   await expect(canvas).toHaveAttribute('data-cat-x', '1');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-step.png`, fullPage: true });
   const eating = waitForPhase('eat');
+  const dancing = waitForPhase('dance');
   await press(step);
   await expect(page.getByLabel('1 dari 1 ikan terkumpul')).toBeVisible();
   await eating;
   await expect(canvas).toHaveAttribute('data-cat-x', '2');
-  const dancing = waitForPhase('dance');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-eat.png`, fullPage: true });
   await dancing;
   await page.screenshot({ path: `.verification/${testInfo.project.name}-glb-dance.png`, fullPage: true });

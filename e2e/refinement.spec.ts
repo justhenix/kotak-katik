@@ -46,7 +46,7 @@ test('one shared palette edits Repeat bodies at their slot limit and can return 
   await press(button(page, 'Pilih perintah 2 di Ulangi 1: Kiri'));
   await press(button(page, '+ Sesudah'));
   await press(button(page, 'Tambah Maju ke Ulangi 1'));
-  await expect(button(page, 'Tambah Maju ke Ulangi 1')).toBeDisabled();
+  await expect(button(page, 'Tambah Maju ke Ulangi 1')).toHaveCount(0);
   await press(button(page, 'Pilih perintah 3 di Ulangi 1: Maju'));
   await press(button(page, 'Ganti dengan Kanan'));
   await expect(button(page, 'Pilih perintah 3 di Ulangi 1: Kanan')).toHaveAttribute('aria-pressed', 'true');

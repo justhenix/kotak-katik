@@ -1133,3 +1133,309 @@ Reference: the supplied 1672×941 PNG attachment, `codex-clipboard-82bb1ad0-4fe3
 - Production build, 239 unit tests, and 38 distinct relevant desktop/mobile browser checks pass, including targeted reruns described in the development log.
 - Engine, curriculum, working puzzle UI, original model binaries, and `PROMPT_JOURNAL.md` remain unchanged. No push or deployment performed.
 
+## 2026-10-15: Reference-accurate gameplay overhaul
+
+**Original user prompt (verbatim)**
+
+```text
+# Kotak-Katik - Reference-Accurate Gameplay Overhaul
+
+Recreate the attached gameplay reference as faithfully as possible using the existing React Three Fiber, Three.js, and CSS architecture.
+
+**Goal:** Achieve near 1:1 visual fidelity while maintaining low cognitive load, accessibility, performance, and all 16 playable stages.
+
+This is an implementation task. Do not stop at planning.
+
+## 1. Inspect and preserve
+
+Read `AGENTS.md`, `.agents/design.md`, `.agents/gameplay.md`, `.agents/accessibility.md`, and the current source.
+
+Inspect any existing title-screen shader or visual-overhaul work before implementing.
+
+Preserve:
+
+- Existing cat and fish GLB assets.
+- Deterministic gameplay and 16-stage curriculum.
+- Command editor, tutorials, progression, and localStorage.
+- All working controls and execution feedback.
+- Existing route and preview behavior.
+
+Do not rewrite the engine, introduce new mechanics, or rebuild working systems unnecessarily.
+
+## 2. Match the reference composition
+
+Use the supplied image as the primary visual target.
+
+Recreate:
+
+- Calm, luminous turquoise water background.
+- Raised, softly beveled grass-and-earth tiles.
+- Cute low-poly cat at the logical current position.
+- Green circular orientation/position indicator.
+- Small surrounding floating islands.
+- Carefully placed trees, rocks, grass, and white flowers.
+- Soft directional shadows and subtle water ripples.
+- Large, readable, cream-colored command workbench.
+
+**Match the composition, scale, materials, lighting, shadows, spacing, and colors.**
+
+Avoid visual clutter. The central puzzle path must remain the strongest focal point.
+
+## 3. Shader and materials
+
+Implement or reuse lightweight stylized water rendering:
+
+- Smooth turquoise color variation.
+- Subtle procedural movement.
+- Restrained ripples around islands.
+- Soft illustrated lighting and gentle depth.
+- Matte, saturated low-poly materials.
+- Soft contact shadows beneath objects.
+
+No photorealistic water, expensive reflections, excessive bloom, heavy postprocessing, or aggressive particle effects.
+
+Respect reduced motion and mobile GPU limitations.
+
+Prefer shared materials, instanced geometry where appropriate, and demand-based rendering.
+
+## 4. Logical world generation
+
+The reference shows one completed puzzle. Its layout must NOT become a hardcoded board for every stage.
+
+Generate walkable tiles strictly from the existing authored level data.
+
+Scale and frame the orthographic camera according to each board's bounds.
+
+Place decorative islands deterministically outside playable coordinates.
+
+Decoration must never:
+
+- Resemble additional walkable routes.
+- Obscure the cat, fish, or commands.
+- Interfere with instructional overlays.
+- Make relative directions harder to interpret.
+
+Maintain the existing cyan-left and orange-right associations.
+
+Keep the gameplay camera stable.
+
+## 5. Interface fidelity
+
+Recreate the reference's tactile UI.
+
+**Top-left**
+
+- Cream raised Ekspedisi button.
+- Existing navigation behavior.
+
+**Top-right**
+
+- Fish progress counter with illustrated fish icon.
+- Cream rounded three-dot menu.
+- Styled dropdown containing existing actions such as Mulai ulang.
+- Preserve keyboard, touch, and focus behavior.
+
+**Notification banner**
+
+- Centered immediately above the workbench.
+- Compact, rounded, raised pastel surface.
+- Icon + one line of text.
+- Maximum five Indonesian words.
+- Green success, coral failure, amber incomplete.
+- Persistent important feedback; brief collection feedback.
+
+**Bottom workbench**
+
+- Cream surface with subtle thickness and shadow.
+- Softly inset command tray.
+- Existing interlocking command-block geometry.
+- Clear numbered blocks and active/completed indicators.
+- Green Lanjut button centered below completed commands.
+- Editing and execution controls remain functional in other states.
+
+Match the screenshot's proportions without hardcoding pixel positions that break responsive layouts.
+
+Do not add score cards, badges, extra labels, tutorial paragraphs, or decorative UI.
+
+## 6. Gameplay visual feedback
+
+Use existing simulation events.
+
+- Idle: subtle character animation.
+- Move: smooth, readable movement.
+- Turn: clear relative rotation.
+- Collection: short visual reaction.
+- Collision: persistent failing-command indication.
+- Success: restrained cat celebration, completion highlight, and success banner.
+
+Critical visual feedback must never depend on sound or color alone.
+
+No unnecessary animation loops or distracting effects.
+
+## 7. Responsive behavior
+
+Verify desktop at 1474×1023 and 1440×900, mobile at 390×844 and 320×740.
+
+On mobile:
+
+- Keep the board large and recognizable.
+- Reduce scenery before reducing playable tile size.
+- Reflow workbench controls.
+- Preserve large touch targets.
+- Prevent clipping, overlaps, and horizontal page overflow.
+- Keep all controls usable at 200% text zoom.
+
+## 8. Mandatory visual iteration
+
+Run the actual app and capture screenshots.
+
+Compare them side by side with the reference.
+
+Correct discrepancies in this order:
+
+1. Camera framing and overall composition.
+2. Tile size, position, and geometry.
+3. Cat scale and orientation.
+4. Water shader and lighting.
+5. Environmental decoration.
+6. UI layout, typography, and surfaces.
+7. Banner, menus, and command states.
+
+Perform at least one correction pass after the initial rendering.
+
+Test the appearance across Forward, Turning, Repeat, Debugging, and Success states, rather than optimizing only the reference's completed stage.
+
+## 9. Release gate
+
+Run unit tests, production build, and relevant desktop/mobile Playwright tests.
+
+Verify no gameplay regressions, runtime errors, broken GLBs, overflow, or significant performance degradation.
+
+Preserve append-only development records. Do not curate the prompt journal automatically.
+
+Commit changes on a safe branch and deploy only after critical checks pass. Do not overwrite concurrent title-screen work.
+
+Report:
+
+- Implemented visual changes.
+- Before/after screenshots.
+- Remaining fidelity gaps.
+- Shader/performance impact.
+- Tests, build, and deployment status.
+- Commit SHA.
+
+**Definition of done:** Kotak-Katik gameplay closely resembles the supplied reference, feels like the same polished miniature world as the title screen, remains visually calm, and preserves all existing learning interactions.
+```
+
+Reference: supplied gameplay PNG attachment `codex-clipboard-60cb05ea-9625-4e23-a6b0-9f6121e88edd.png`. It is not a runtime asset. Implementation details and evidence are recorded in `GAMEPLAY_VISUAL_OVERHAUL.md`; executed release results are appended to `DEVELOPMENT_LOG.md`.
+
+## 2026-10-15: Workbench and gameplay composition refinement
+
+The preceding implementation was paused at the user's request before its release gate, commit, or deployment. Work resumed with this refinement request.
+
+**Original user prompt (verbatim)**
+
+```text
+Refine Kotak-Katik's existing gameplay composition and workbench UI&#x20;
+
+The current interface feels like a technical control panel rather than a playful children's game.
+
+**Priorities:**
+
+1. Simplify nested panels into one compact, tactile toy-like workbench. Preserve interlocking puzzle blocks and their editing behavior, draggable puzzle blocks.
+2. Reduce excessive mobile workbench height. Keep program, Main/Langkah, and command palette in a clear, compact hierarchy. Show contextual editing actions only when relevant.
+3. Keep the playable board as the focal point. Reframe the orthographic camera around logical tiles, cat, and fish.
+4. Make decorative props viewport-aware both desktop and mobile (mobile if possible) desktop mandatory. Reposition, scale, or hide secondary islands when they overlap the GUI. Never hide gameplay-critical objects.
+5. Anchor contextual actions, including Delete, to the relevant command instead of floating disconnected over the world.
+6. Fix feedback semantics: success uses a check; unfinished puzzles use an appropriate warning/fish indicator. Banners remain single-line, maximum five words.
+7. Preserve the current shader, 3D assets, gameplay, accessibility, and responsive touch controls.
+
+Avoid more decorative UI, dashboards, nested cards, floating toolbars, or excessive whitespace.
+
+**Verification:** Capture desktop and mobile screenshots across editing, running, Repeat, failure, and completion states. Inspect visible scene bounds and controls. Correct any overlap or clipping, then run build and relevant tests.
+
+Implement the changes, not just recommendations. Do not rewrite the interpreter or curriculum.
+```
+
+References: the three supplied attachments `codex-clipboard-79164e51-437b-4b0c-a2c7-24e260302e09.png`, `codex-clipboard-59e3044e-9957-4f16-ab11-dd986ebc1cc0.png`, and `codex-clipboard-550bedf4-4cee-4f04-be99-72a5a8e6faca.png`. None is a runtime asset.
+
+**Additional user instruction (verbatim)**
+
+```text
+Do not ask qustion, i will go away for 2 hours (midterm exam) do not ask/disturb
+```
+
+
+## 2026-10-15: Mobile spacing, centered feedback, and unframed fish
+
+**Original user prompt (verbatim)**
+
+```text
+Refine the current Kotak-Katik gameplay UI based on the attached screenshots.
+
+The current version is close, but **mobile feels cramped**, the **status/banner should be centered in the middle area**, and the **fish should not use a sphere/glow highlight**.
+
+## Priorities
+
+### 1. Fix mobile cramped layout
+
+- Reduce vertical crowding on mobile.
+- Give the board more breathing room.
+- Compress workbench spacing without making controls tiny.
+- Reflow controls into a cleaner hierarchy.
+- Keep touch targets large and readable.
+- Avoid stacked panels that feel like a control dashboard.
+
+### 2. Center the status/banner
+
+- Place the compact notification banner in the **middle area between the puzzle board and the workbench**.
+- It should feel visually centered and intentional, not stuck to an edge.
+- Keep it compact and single-line.
+- Maintain the tactile toy-like style.
+
+### 3. Remove fish sphere highlight
+
+- **Do not use a glowing sphere, bubble, or halo around the fish.**
+- The fish should stand out through:
+  - clean silhouette,
+  - good placement,
+  - slight idle animation if needed,
+  - scale and contrast,
+  - optional tiny accent marks only if subtle.
+- Keep the fish readable without adding cognitive load.
+
+### 4. Preserve puzzle clarity
+
+- Keep the cat, fish, path, and command sequence as the main focus.
+- Decorative islands must not compete with gameplay.
+- Do not let props or GUI visually crowd the board.
+
+### 5. Keep the current art direction
+
+Preserve:
+
+- pastel low-poly island style,
+- soft water shader,
+- tactile cream workbench,
+- child-friendly buttons and blocks,
+- existing gameplay logic and accessibility cues.
+
+## Verification
+
+Capture updated screenshots for:
+
+- desktop success state,
+- mobile success state,
+- mobile editing state.
+
+Check specifically:
+
+- mobile no longer feels cramped,
+- banner sits visually in the middle,
+- fish has no sphere highlight,
+- gameplay elements remain clearly readable.
+
+Implement the fixes directly. Do not redesign the engine or curriculum.
+```
+
+References: supplied attachments `codex-clipboard-8512ab5b-9987-42fd-b113-a8c632e961f0.png` and `codex-clipboard-c74e9706-61d5-4344-bc8c-6b75bb2710a1.png`. These are visual evidence, not runtime assets.

@@ -2,9 +2,13 @@ import type { GameState, LevelDefinition } from '../../game/types';
 import { samePosition } from '../../game/engine/simulation';
 import { sceneConfig } from '../config';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { MeshStandardMaterial } from 'three';
 
 const soil = new RoundedBoxGeometry(sceneConfig.tileWidth, sceneConfig.tileHeight, sceneConfig.tileWidth, 2, 0.045);
 const grass = new RoundedBoxGeometry(sceneConfig.tileWidth, 0.13, sceneConfig.tileWidth, 2, 0.045);
+const soilMaterial = new MeshStandardMaterial({ color: sceneConfig.colors.grassEdge, roughness: 1 });
+const grassMaterial = new MeshStandardMaterial({ color: sceneConfig.colors.grass, roughness: 1 });
+const warningMaterial = new MeshStandardMaterial({ color: '#df9d7e', roughness: 1 });
 
 export function Board({ level, simulation }: { level: LevelDefinition; simulation: GameState }) {
   const { colors, tileHeight } = sceneConfig;
@@ -13,14 +17,10 @@ export function Board({ level, simulation }: { level: LevelDefinition; simulatio
       const collision = simulation.collision && samePosition(position, simulation.collision.position);
       const current = samePosition(position, simulation.avatar.position);
       return <group key={`${position.x},${position.z}`} position={[position.x, 0, position.z]}>
-        <mesh geometry={soil} position={[0, -tileHeight / 2 - 0.02, 0]} receiveShadow castShadow dispose={null}>
-          <meshStandardMaterial color={colors.grassEdge} roughness={1} />
-        </mesh>
-        <mesh geometry={grass} position={[0, -0.035, 0]} receiveShadow castShadow dispose={null}>
-          <meshStandardMaterial color={collision ? colors.warning : colors.grass} roughness={1} />
-        </mesh>
+        <mesh geometry={soil} material={soilMaterial} position={[0, -tileHeight / 2 - 0.05, 0]} receiveShadow castShadow dispose={null} />
+        <mesh geometry={grass} material={collision ? warningMaterial : grassMaterial} position={[0, -0.035, 0]} receiveShadow castShadow dispose={null} />
         {current && <mesh position={[0, 0.041, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.36, 0.39, 32]} /><meshBasicMaterial color={simulation.collision ? colors.warning : simulation.completion ? colors.collected : colors.ink} />
+          <ringGeometry args={[0.36, 0.385, 48]} /><meshBasicMaterial color={simulation.collision ? colors.warning : colors.collected} />
         </mesh>}
       </group>;
     })}

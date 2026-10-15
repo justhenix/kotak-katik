@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Group } from 'three';
+import { Group, Mesh } from 'three';
 import type { Position } from '../../game/types';
 import { sceneConfig } from '../config';
 import { useModel } from '../models';
@@ -9,6 +9,7 @@ export function Fish({ position, collected, reduced, variant = 'clownfish' }: {
   position: Position; collected: boolean; reduced: boolean; variant?: 'clownfish' | 'trout';
 }) {
   const { scene } = useModel(variant === 'trout' ? 'fishTrout' : 'fish');
+  useEffect(() => { scene.traverse(object => { if (object instanceof Mesh) object.castShadow = false; }); }, [scene]);
   const visual = useRef<Group>(null);
   const pickup = useRef({ elapsed: 0, active: false, firstFrame: true });
   const invalidate = useThree((state) => state.invalidate);

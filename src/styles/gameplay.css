@@ -1,0 +1,182 @@
+.game-shell {
+  --cream: #fff2d2;
+  --forward: #ffda75;
+  --edge: #806d45;
+  position: relative;
+  isolation: isolate;
+  max-width: none;
+  min-height: 100svh;
+  height: auto;
+  padding: 22px 34px 26px;
+  grid-template-rows: auto minmax(330px, 1fr) auto;
+  background: #8adfe0;
+}
+.game-shell .game-header { position: relative; z-index: 3; min-height: 58px; }
+.game-shell .puzzle-exit, .game-shell .lesson-options summary {
+  min-height: 58px;
+  border: 2px solid #95835d;
+  border-radius: 18px;
+  background: #fff2d2;
+  box-shadow: inset 0 2px #fffbed, 0 3px #b8a077;
+}
+.game-shell .puzzle-exit { gap: 10px; padding: 10px 18px; font: 600 1.35rem 'Fredoka Title', 'Fredoka', sans-serif; }
+.game-shell .puzzle-exit svg { width: 27px; height: 27px; }
+.game-shell .header-actions { gap: 12px; }
+.game-shell .fish-progress { padding: 6px 22px 6px 16px; gap: 14px; border: 3px solid #5e8454; background: #f3f8dc; box-shadow: inset 0 3px #fffdf0, 0 5px #427047; font: 600 1.9rem 'Fredoka Title', 'Fredoka', sans-serif; min-height: 64px; }
+.game-shell .fish-icon { width: 62px; height: 40px; }
+.game-shell .lesson-options summary { width: 58px; height: 58px; }
+.game-shell .lesson-options summary svg { width: 28px; height: 28px; }
+.game-shell .lesson-options-list { top: calc(100% + 18px); min-width: 258px; padding: 8px; border-radius: 19px; box-shadow: inset 0 2px #fffbed, 0 3px #b8a077; }
+.game-shell .lesson-options-list button { min-width: 0; min-height: 60px; padding: 12px 24px; gap: 18px; font: 600 1.35rem/1.25 'Fredoka Title', 'Fredoka', sans-serif; }
+.game-shell .lesson-options-list svg { width: 28px; height: 28px; }
+.game-shell .world-area { position: static; padding: 0; }
+.game-shell .board-scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.game-shell .scene-loading, .game-shell .scene-fallback { z-index: 4; }
+.game-shell .feedback {
+  position: absolute;
+  top: var(--feedback-center, 65%);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  flex-wrap: nowrap;
+  gap: 16px;
+  width: max-content;
+  max-width: 100%;
+  min-height: 70px;
+  margin: 0 auto;
+  padding: 7px 24px;
+  border: 2px solid #a18c5c;
+  border-radius: 999px;
+  background: #fff1cb;
+  box-shadow: inset 0 2px #fffbea, 0 6px #ac9669;
+  color: #51472c;
+  font: 600 1.5rem/1.25 'Fredoka Title', 'Fredoka', sans-serif;
+}
+.game-shell .feedback[data-visible="false"] { visibility: hidden; }
+.game-shell .feedback p { min-width: 0; white-space: nowrap; }
+.game-shell .feedback-short { display: none; }
+.game-shell .feedback-symbol { flex: 0 0 50px; width: 50px; height: 50px; background: #8c7842; color: white; border-radius: 50%; }
+.game-shell .feedback-symbol svg { width: 36px; height: 36px; }
+.game-shell .feedback-symbol .fish-icon { width: 42px; height: 32px; }
+.game-shell .feedback.completed, .game-shell .feedback.collected-feedback:not(.failed, .finished) { color: #315a37; border-color: #92b969; background: #edf8d0; box-shadow: inset 0 2px #faffec, 0 6px #80ac60; }
+.game-shell .feedback.completed .feedback-symbol, .game-shell .feedback.collected-feedback .feedback-symbol { background: #315a37; }
+.game-shell .feedback.failed { color: #7e352f; border-color: #bc786b; background: #ffe1d6; box-shadow: inset 0 2px #fff4e9, 0 6px #bb7869; }
+.game-shell .feedback.failed .feedback-symbol { background: #9a493f; }
+.game-shell .feedback.finished { color: #70521c; border-color: #bc974c; background: #ffebad; box-shadow: inset 0 2px #fff9dc, 0 6px #c39a4d; }
+.game-shell .feedback.finished .feedback-symbol { background: #9c7634; }
+.game-shell .feedback .feedback-symbol.fish-symbol { background: transparent; border-radius: 0; }
+.game-shell .workbench { z-index: 2; min-height: 0; padding: 14px 20px 12px; border-radius: 28px; border: 3px solid #fffbea; border-bottom: 8px solid #bca477; box-shadow: 0 8px 18px #408d8b1c; background: #fff2d2; }
+.game-shell .feedback.completed { min-width: min(25rem, 100%); }
+.game-shell .editor { gap: 10px 18px; }
+.game-shell .program-area { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; }
+.game-shell .delete-program-button { position: static; width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: 2px solid #a18460; border-radius: 12px; box-shadow: 0 3px #a18460; background: #faedcf; color: #8b463b; }
+.game-shell .delete-program-button .control-icon { width: 24px; height: 24px; }
+.game-shell .program-scroll { grid-column: 1; grid-row: 1; min-height: 126px; border: 2px solid #dec799; border-radius: 20px; background: #faedcf; box-shadow: inset 0 2px 6px #b49b652b; }
+.game-shell .program-strip { padding: 14px 24px 16px 14px; }
+.game-shell .command-block { width: max(88px, 3.6rem); height: max(82px, 3.5rem); border-radius: 16px; background: var(--block); }
+.game-shell .command-icon { width: 48px; height: 48px; }
+.game-shell .command-number { font: 600 1.2rem/1 'Fredoka Title', 'Fredoka', sans-serif; left: 9px; top: 6px; }
+.game-shell .puzzle-block { box-shadow: 0 7px var(--edge), inset 0 3px #fff6ce; }
+.game-shell .forward { --block: #ffdb76; }
+.game-shell .turn-left { --block: #82d6d0; }
+.game-shell .turn-right { --block: #f3ae8e; }
+.game-shell .command-block[aria-pressed="true"] { box-shadow: 0 7px var(--edge), inset 0 0 0 3px var(--ink), inset 0 5px #fffaf0; }
+.game-shell .active-command, .game-shell .completed-command { border-color: #355e3d; box-shadow: 0 7px #355e3d, inset 0 0 0 3px #fffaf0; }
+.game-shell .block-state { min-width: 29px; height: 29px; font-size: 21px; border-radius: 9px; }
+.game-shell .failed-command { border-color: #943044; box-shadow: 0 7px #943044, inset 0 0 0 3px #fffaf0; animation: none; }
+.game-shell .insert-slot { height: 82px; }
+.game-shell .palette-area { padding: 0 4px 2px; gap: 8px; }
+.game-shell .palette-command { min-height: 76px; padding: 7px 12px; }
+.game-shell .palette-command .command-icon { width: 40px; height: 40px; }
+.game-shell .next-lesson, .game-shell .continue-lesson { min-width: 196px; min-height: 64px; padding: 10px 26px; gap: 16px; border-radius: 18px; font: 600 1.6rem 'Fredoka Title', 'Fredoka', sans-serif; box-shadow: inset 0 2px #6a8b5a, 0 3px #2e5536; margin-top: 6px; }
+.game-shell .next-lesson svg { width: 28px; height: 28px; }
+.game-shell .workbench .lesson-scaffold { padding-bottom: 0; }
+.game-shell .active-command { animation: none; }
+.game-shell .selection-tools { position: relative; grid-column: 1 / -1; grid-row: 2; gap: 6px; padding: 12px 0 2px; }
+.game-shell .selection-tools::before { content: ''; position: absolute; left: var(--command-anchor); top: 0; height: 10px; border-left: 3px solid #806d45; }
+.game-shell .selection-label { display: inline-flex; align-items: center; gap: 5px; font-size: 1rem; }
+.game-shell .selection-label .command-icon { width: 24px; height: 24px; }
+.game-shell .selection-tools button { min-height: 44px; padding: 6px 9px; }
+.game-shell .command-placement { display: flex; flex-wrap: wrap; gap: 6px; }
+.game-shell .repeat-counter { padding: 0; border: 0; background: none; box-shadow: none; gap: 3px; }
+.game-shell .repeat-counter output { min-width: 36px; }
+.game-shell .selection-tools .repeat-counter button { width: max(44px, 2.2rem); height: max(44px, 2.2rem); padding: 0; line-height: 1; }
+.game-shell .program-navigation { grid-column: 1 / -1; grid-row: 3; padding-top: 3px; }
+.game-shell .program-navigation span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.game-shell .program-navigation { justify-content: space-between; }
+.game-shell .program-navigation button { height: 44px; background: none; border-color: transparent; box-shadow: none; }
+.game-shell .controls-area { padding: 0; gap: 10px; }
+.game-shell .controls-area .clear-button { flex: 0 0 44px; min-width: 44px; width: 44px; min-height: 44px; height: 44px; padding: 5px; }
+.game-shell .controls-area .inspect-action { margin: 0; min-height: 88px; padding: 8px; flex-direction: column; font: 500 1rem 'Fredoka', sans-serif; }
+.game-shell .palette-area:has(.palette-note) .palette-commands { display: none; }
+.game-shell .palette-area:has(.palette-note) { min-height: 0; padding: 0 4px; }
+.game-shell .palette-note { margin: 0; font-size: .9rem; }
+.game-shell [data-draggable="true"] { touch-action: none; user-select: none; cursor: grab; }
+.game-shell [data-draggable="true"]:active { cursor: grabbing; }
+.game-shell .insert-slot[data-drop-target] { background: #d8e9b5; border-color: #355e3d; }
+.game-shell .drag-preview { position: fixed; z-index: 50; display: grid; place-items: center; width: 70px; height: 72px; transform: translate(-50%, -65%) rotate(-5deg); pointer-events: none; opacity: .9; }
+@media (max-width: 720px) {
+  .game-shell { padding: 12px 10px max(14px, env(safe-area-inset-bottom)); grid-template-rows: auto minmax(max(300px, calc(7rem + 180px)), 1fr) auto; gap: 0; }
+  .game-shell .game-header { gap: 8px; min-height: 46px; }
+  .game-shell .puzzle-exit { min-height: 46px; gap: 6px; padding: 8px 10px; font-size: 1rem; border-radius: 14px; }
+  .game-shell .puzzle-exit svg { width: 22px; height: 22px; }
+  .game-shell .header-actions { gap: 7px; }
+  .game-shell .fish-progress { min-height: 46px; padding: 4px 10px 4px 7px; gap: 6px; font-size: 1.3rem; }
+  .game-shell .fish-icon { width: 36px; height: 26px; }
+  .game-shell .lesson-options summary { min-height: 46px; width: 46px; height: 46px; border-radius: 14px; }
+  .game-shell .lesson-options-list { min-width: 0; width: max-content; max-width: calc(100vw - 24px); }
+  .game-shell .lesson-options-list button { padding: 10px 14px; font-size: 1.1rem; }
+  .game-shell .world-area { padding: 0; }
+  .game-shell .feedback { min-height: 48px; padding: 5px 10px; gap: 8px; font-size: 1rem; border-radius: 24px; }
+  .game-shell .feedback-full { display: none; }
+  .game-shell .feedback-short { display: inline; }
+  .game-shell .feedback.completed { min-width: 0; }
+  .game-shell .feedback-symbol { flex-basis: 34px; width: 34px; height: 34px; }
+  .game-shell .feedback-symbol svg { width: 26px; height: 26px; }
+  .game-shell .workbench { min-height: 0; padding: 10px 10px 12px; border-radius: 22px; border-bottom-width: 6px; }
+  .game-shell .editor { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .game-shell .program-scroll { min-height: 90px; border-radius: 14px; }
+  .game-shell .program-strip { padding: 9px 14px 13px 12px; gap: 4px; }
+  .game-shell .command-block { width: max(58px, 2.7rem); height: max(62px, 2.9rem); border-radius: 13px; }
+  .game-shell .command-icon { width: 34px; height: 34px; }
+  .game-shell .command-number { font-size: 1rem; top: 4px; left: 7px; }
+  .game-shell .block-state { min-width: 22px; height: 22px; font-size: 15px; border-radius: 6px; }
+  .game-shell .insert-slot { flex-basis: 52px; width: 52px; height: max(62px, 2.9rem); }
+  .game-shell .repeat-item { gap: 7px; padding: 6px 12px calc(1.1rem + 7px) 6px; border-radius: 14px; }
+  .game-shell .repeat-select { min-width: 52px; min-height: 62px; padding: 4px; }
+  .game-shell .repeat-select .command-icon { width: 28px; height: 28px; }
+  .game-shell .repeat-select span { line-height: 1; }
+  .game-shell .repeat-item > .insert-slot { flex-basis: 52px; width: 52px; height: max(62px, 2.9rem); }
+  .game-shell .loop-progress { bottom: 2px; gap: 4px; font-size: .8rem; }
+  .game-shell .loop-progress > span { width: 1.15rem; height: 1.15rem; }
+  .game-shell .controls-area { grid-column: 1; grid-row: auto; display: flex; flex-wrap: wrap; gap: 8px; width: 100%; padding: 0; }
+  .game-shell .controls-area .run-button { flex: 1.15 1 0; }
+  .game-shell .controls-area .step-button { flex: 1 1 0; }
+  .game-shell .controls-area .inspect-action { flex: 1 1 0; margin: 0; }
+  .game-shell .controls-area button { min-width: max-content; min-height: 50px; padding: 5px 8px; gap: 5px; flex-direction: row; }
+  .game-shell .controls-area:has(.inspect-action) button { flex-direction: column; min-height: 56px; padding: 4px; gap: 2px; }
+  .game-shell .controls-area:has(.inspect-action) .clear-button { min-height: 44px; }
+  .game-shell .controls-area .inspect-action { font-size: .95rem; }
+  .game-shell .controls-area .control-icon { width: 24px; height: 24px; }
+  .game-shell .run-label { font-size: 1.1rem; }
+  .game-shell .step-label { font-size: 1rem; }
+  .game-shell .palette-commands { gap: 12px; }
+  .game-shell .palette-command { min-width: 52px; width: auto; min-height: 58px; padding: 4px 6px; gap: 2px; }
+  .game-shell .palette-command span { font-size: .95rem; }
+  .game-shell .palette-command .command-icon { width: 30px; height: 30px; }
+  .game-shell .next-lesson, .game-shell .continue-lesson { min-width: 156px; min-height: 52px; padding: 8px 20px; font-size: 1.3rem; border-radius: 14px; }
+  .game-shell .selection-label { flex: 1 1 auto; font-size: .95rem; }
+  .game-shell .selection-tools { gap: 6px; }
+  .game-shell .selection-tools .delete-selected { margin-left: auto; }
+  .game-shell .command-placement { width: 100%; }
+  .game-shell .command-placement button { padding: 6px 4px; font: 500 .95rem/1.2 'Fredoka', sans-serif; }
+  .game-shell .selection-tools > button { font-size: .9rem; }
+}
+@media (max-width: 360px) {
+  .game-shell .program-strip { padding-left: 6px; padding-right: 6px; }
+  .game-shell .command-block { width: max(48px, 2.7rem); }
+  .game-shell .repeat-item { gap: 4px; padding-left: 4px; padding-right: 6px; }
+  .game-shell .repeat-select { min-width: 44px; }
+  .game-shell .insert-slot, .game-shell .repeat-item > .insert-slot { flex-basis: 44px; width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .game-shell button { transition: none; } }

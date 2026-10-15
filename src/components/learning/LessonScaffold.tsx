@@ -9,15 +9,24 @@ export function LessonOptions() {
   const level = useGameStore((state) => state.level);
   const lesson = useLessonStore((state) => state);
   const menu = useRef<HTMLDetailsElement>(null);
-  if (level.learning.phase === 'practice') return null;
-  const close = () => { if (menu.current) menu.current.open = false; };
-  return <details className="lesson-options" ref={menu}>
+  useEffect(() => {
+    const outside = (event: PointerEvent) => { if (event.target instanceof Node && !menu.current?.contains(event.target) && menu.current) menu.current.open = false; };
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, []);
+  const close = () => {
+    if (menu.current) menu.current.open = false;
+    menu.current?.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+  };
+  return <details className="lesson-options" ref={menu} onKeyDown={event => {
+    if (event.key === 'Escape') close();
+  }}>
     <summary aria-label="Pilihan"><Ellipsis aria-hidden="true" /></summary>
     <div className="lesson-options-list">
       {level.learning.demonstration ? <>
         <button onClick={() => { lesson.startDemo(); close(); }}><RotateCcw aria-hidden="true" />Ulang contoh</button>
         <button onClick={() => { lesson.skipDemo(); close(); }}><SkipForward aria-hidden="true" />Lewati contoh</button>
-      </> : <button onClick={() => { lesson.resetLesson(); close(); }}><RotateCcw aria-hidden="true" />Mulai ulang</button>}
+      </> : <button onClick={() => { if (level.learning.phase === 'practice') gameStore.getState().resetProgram(); else lesson.resetLesson(); close(); }}><RotateCcw aria-hidden="true" />Mulai ulang</button>}
     </div>
   </details>;
 }
@@ -43,14 +52,8 @@ export function LessonScaffold({ ready, onContinue, onFinish }: { ready: boolean
   const watching = demoPlaying(lesson.demoPhase);
   const index = curriculumLevels.findIndex((candidate) => candidate.id === level.id);
   const canContinue = !watching && (simulation.completion || lesson.demoPhase === 'skipped');
-  const inspect = level.learning.concept === 'debugging' && (simulation.status === 'failed' || simulation.status === 'finished')
-    && (!watching || lesson.demoAction?.type === 'restart');
   return <section className="lesson-scaffold" aria-label="Bantuan belajar" data-phase={level.learning.phase} data-demo-phase={lesson.demoPhase}>
     <GhostHand />
-    {inspect && <button className="inspect-action" disabled={watching} onClick={() => {
-      gameStore.getState().resetSimulation();
-      requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.step-button')?.focus({ preventScroll: true }));
-    }}>Periksa satu per satu</button>}
     {lesson.demoPhase === 'interrupted' && <button className="continue-lesson" onClick={lesson.startDemo}><RotateCcw aria-hidden="true" />Ulang contoh</button>}
     {canContinue && index < curriculumLevels.length - 1 && <button className="next-lesson" onClick={() => {
       if (onContinue) onContinue(); else lesson.nextLesson();

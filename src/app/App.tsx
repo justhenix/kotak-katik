@@ -16,6 +16,27 @@ const TitleScene = lazy(async () => {
   return { default: TitleScene };
 });
 
+const bannerHints: Readonly<Record<string, string>> = {
+  'Lihat kucing dan jalan ke ikan.': 'Lihat jalan ke ikan.',
+  'Coba satu langkah. Lihat belokan ini.': 'Lihat belokan. Coba satu langkah.',
+  'Masih ada satu petak ke ikan.': 'Masih satu petak ke ikan.',
+};
+const mobileHints: Readonly<Record<string, string>> = {
+  'Satu Maju, satu petak.': 'Maju satu petak.',
+  'Taruh Maju di sini.': 'Taruh Maju.',
+  'Lalu ambil ikan berikutnya.': 'Ambil ikannya.',
+  'Kiri mengikuti arah kucing.': 'Kiri kucing.',
+  'Lihat sisi kanan kucing.': 'Kanan kucing.',
+  'Tambahkan belokan di sini.': 'Tambah belokan.',
+  'Lihat jalan setelah ikan pertama.': 'Lihat belokan.',
+  'Maju yang sama berjalan lagi.': 'Maju berulang.',
+  'Hitung petak menuju ikan.': 'Hitung petak.',
+  'Lihat kucing dan jalan ke ikan.': 'Lihat jalannya.',
+  'Coba satu langkah. Lihat belokan ini.': 'Coba satu langkah.',
+  'Masih ada satu petak ke ikan.': 'Satu petak lagi.',
+  'Lanjutkan urutan di sini.': 'Lanjutkan urutan.',
+};
+
 function Feedback() {
   const simulation = useGameStore((s) => s.simulation);
   const program = useGameStore((s) => s.program);
@@ -28,25 +49,44 @@ function Feedback() {
   const command = activeCommandIndex === null ? undefined : program[activeCommandIndex];
   const primitive = command?.type === 'repeat' ? command.commands[activeCommandPath?.[1] ?? 0] : command;
   const collecting = simulation.events.some((event) => event.type === 'collected');
+  const [collectionVisible, setCollectionVisible] = useState(false);
+  const collectionTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (status === 'idle') { clearTimeout(collectionTimer.current); setCollectionVisible(false); }
+    else if (collecting) {
+      clearTimeout(collectionTimer.current);
+      setCollectionVisible(true);
+      collectionTimer.current = setTimeout(() => setCollectionVisible(false), 1200);
+    }
+  }, [simulation.events, collecting, status]);
+  useEffect(() => () => clearTimeout(collectionTimer.current), []);
   const emptyLoop = program.some((item) => item.type === 'repeat' && item.commands.length === 0);
   const message = status === 'completed' ? 'Semua ikan terkumpul!'
     : status === 'failed' ? 'Jalan habis. Ubah urutanmu.'
     : status === 'finished' ? 'Masih ada ikan.'
     : emptyLoop ? 'Isi perintah dalam Ulangi.'
-    : status === 'paused' ? collecting ? 'Jeda. Ikan terkumpul!' : 'Jeda. Lihat hasilnya.'
-    : collecting ? 'Ikan terkumpul!'
+    : status === 'paused' ? collectionVisible ? 'Jeda. Ikan terkumpul!' : 'Jeda. Lihat hasilnya.'
+    : collectionVisible ? 'Ikan terkumpul!'
     : status === 'running' ? primitive ? commandLabels[primitive.type] : 'Siap jalan…'
     : 'Ambil semua ikan';
-  return <div className={`feedback ${status}`} role="status" aria-live="polite" aria-atomic="true" data-status={status}
+  const hidden = quiet && !hint && !collectionVisible;
+  const mobileMessage = hint ? mobileHints[hint] ?? bannerHints[hint] ?? hint
+    : status === 'completed' || collectionVisible && status !== 'failed' && status !== 'finished' ? 'Ikan terkumpul!'
+    : status === 'failed' ? 'Ubah urutanmu.' : emptyLoop ? 'Isi Ulangi.' : status === 'paused' ? 'Lihat hasilnya.' : message;
+  const fullMessage = hint ? bannerHints[hint] ?? hint : message;
+  const fishSymbol = status !== 'completed' && status !== 'failed' && status !== 'paused'
+    && !(primitive && status === 'running' && !collectionVisible);
+  return <div className={`feedback ${status} ${collectionVisible ? 'collected-feedback' : ''}`} role="status" aria-live="polite" aria-atomic="true" data-status={status} data-visible={!hidden}
     data-command-path={activeCommandPath?.join('.') ?? ''} data-loop-iteration={loopIteration ?? ''}
     data-x={simulation.avatar.position.x} data-z={simulation.avatar.position.z} data-orientation={simulation.avatar.orientation}
     data-actions={simulation.nextCommandIndex}>
-    <span className={`feedback-symbol ${quiet && !hint ? 'sr-only' : ''}`} aria-hidden="true">{status === 'completed' ? <ControlIcon type="check" />
-      : status === 'failed' ? '!' : status === 'paused' ? <ControlIcon type="pause" />
-      : collecting ? <ControlIcon type="check" />
+    <span className={`feedback-symbol ${fishSymbol ? 'fish-symbol' : ''} ${hidden ? 'sr-only' : ''}`} aria-hidden="true">{status === 'completed' ? <ControlIcon type="check" />
+      : status === 'failed' ? '!' : status === 'finished' ? <FishIcon /> : status === 'paused' ? <ControlIcon type="pause" />
+      : collectionVisible ? <FishIcon />
       : primitive && status === 'running' ? <CommandIcon type={primitive.type} /> : <FishIcon />}</span>
-    <p className={quiet && !hint ? 'sr-only' : ''}>{hint ?? message}</p>
-    {command?.type === 'repeat' && loopIteration !== null && <span className="feedback-iteration" aria-label={`Putaran ${loopIteration} dari ${command.count}`}>↻ {loopIteration} / {command.count}</span>}
+    <p className={hidden ? 'sr-only' : ''}>{fullMessage === mobileMessage ? fullMessage
+      : <><span className="feedback-full">{fullMessage}</span><span className="feedback-short">{mobileMessage}</span></>}</p>
+    {command?.type === 'repeat' && loopIteration !== null && <span className="sr-only" aria-label={`Putaran ${loopIteration} dari ${command.count}`} />}
   </div>;
 }
 
@@ -61,8 +101,9 @@ function Puzzle({ onExit, onContinue, onFinish }: { onExit: () => void; onContin
   const total = useGameStore((s) => s.level.collectibles.length);
   const levelId = useGameStore((s) => s.level.id);
   const phase = useGameStore((s) => s.level.learning.phase);
+  const status = useGameStore((s) => s.simulation.status);
   useEffect(() => () => { lessonStore.getState().resetLesson(); gameStore.getState().dispose(); }, []);
-  return <main className="game-shell" data-learning-phase={phase}>
+  return <main className="game-shell" data-learning-phase={phase} data-status={status}>
     <header className="game-header"><h1 className="sr-only">{title}</h1><button className="puzzle-exit" onClick={onExit}><Map aria-hidden="true" /><span>Ekspedisi</span></button>
       <div className="header-actions"><div className={`fish-progress ${collected === total ? 'all-collected' : ''}`} role="img" aria-label={`${collected} dari ${total} ikan terkumpul`}>
         <FishIcon /><span>{collected} / {total}</span>

@@ -1,0 +1,66 @@
+[
+  {
+    "name": "baseline",
+    "round": 0,
+    "activeMs": 1574,
+    "calls": 1621,
+    "medianGapMs": 37,
+    "frames": 33,
+    "canvas": {
+      "width": 1384,
+      "height": 482
+    },
+    "warm": {
+      "activeMs": 1879,
+      "calls": 2352
+    }
+  },
+  {
+    "name": "overhaul",
+    "round": 0,
+    "activeMs": 2026,
+    "calls": 1782,
+    "medianGapMs": 36,
+    "frames": 35,
+    "canvas": {
+      "width": 936,
+      "height": 585
+    },
+    "warm": {
+      "activeMs": 2027,
+      "calls": 2364
+    }
+  },
+  {
+    "name": "baseline",
+    "round": 1,
+    "activeMs": 1584,
+    "calls": 1621,
+    "medianGapMs": 40,
+    "frames": 33,
+    "canvas": {
+      "width": 1384,
+      "height": 482
+    },
+    "warm": {
+      "activeMs": 1782,
+      "calls": 2205
+    }
+  },
+  {
+    "name": "overhaul",
+    "round": 1,
+    "activeMs": 2020,
+    "calls": 1782,
+    "medianGapMs": 36,
+    "frames": 34,
+    "canvas": {
+      "width": 936,
+      "height": 585
+    },
+    "warm": {
+      "activeMs": 2160,
+      "calls": 2464
+    }
+  }
+]

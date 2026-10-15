@@ -15,7 +15,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
   await expect(page.getByRole('button', { name: 'Jalankan', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Coba lagi', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Reset papan', exact: true })).toHaveCount(0);
-  await expect(page.locator('.controls-area button')).toHaveCount(2);
+  await expect(page.locator('.controls-area .run-button, .controls-area .step-button')).toHaveCount(2);
   await expect(page.getByRole('button', { name: 'Hapus semua', exact: true })).toBeDisabled();
   if (testInfo.project.name === 'desktop') {
     const play = await page.getByRole('button', { name: 'Jalankan', exact: true }).boundingBox();
@@ -25,7 +25,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
     expect(play!.x + play!.width).toBeLessThan(step!.x);
     expect(step?.width).toBe(88);
     expect(step?.height).toBe(88);
-    expect(trash?.width).toBe(70);
+    expect(trash!.width).toBeGreaterThanOrEqual(44);
   } else {
     const play = await page.getByRole('button', { name: 'Jalankan', exact: true }).boundingBox();
     const step = await page.getByRole('button', { name: 'Satu langkah', exact: true }).boundingBox();
@@ -34,8 +34,12 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
     expect(step?.y).toBe(play?.y);
     expect(play!.width).toBeGreaterThan(step!.width);
     await expect(page.locator('.run-label')).toBeVisible();
-    expect(trash?.width).toBe(48);
+    expect(trash!.width).toBeGreaterThanOrEqual(44);
   }
+  const workbench = (await page.locator('.workbench').boundingBox())!;
+  const clear = (await page.getByRole('button', { name: 'Hapus semua', exact: true }).boundingBox())!;
+  expect(clear.y).toBeGreaterThanOrEqual(workbench.y);
+  expect(clear.y + clear.height).toBeLessThan(workbench.y + workbench.height);
   await page.screenshot({ path: `.verification/${testInfo.project.name}-initial.png`, fullPage: true });
 
   // R3F's canvas can be a tab stop; follow the real focus order to the first control.
@@ -82,7 +86,7 @@ test('M0 desktop/mobile smoke: Forward, Step, Run again, Clear, invalid-tile sto
   await add(page).click();
   await page.getByRole('button', { name: 'Jalankan', exact: true }).click();
   await expect(feedback(page)).toHaveAttribute('data-status', 'failed');
-  await expect(page.getByText('Jalan habis. Ubah urutanmu.')).toBeVisible();
+  await expect(page.locator('.feedback p')).toContainText(testInfo.project.name === 'mobile' ? 'Ubah urutanmu.' : 'Jalan habis. Ubah urutanmu.');
   await expect(active(page)).toHaveAttribute('aria-label', 'Pilih perintah 3: Maju');
   await page.screenshot({ path: `.verification/${testInfo.project.name}-invalid-tile.png`, fullPage: true });
   const failedActions = await feedback(page).getAttribute('data-actions');

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Group, Shape } from 'three';
+import { Group, Mesh, Shape } from 'three';
 import type { GameState } from '../../game/types';
 import { sceneConfig } from '../config';
 import { useModel } from '../models';
 import { CatPlayback } from './playback';
+import { Contact } from '../title/Dressing';
 
 const arrow = new Shape();
 arrow.moveTo(0, 0.15); arrow.lineTo(-0.12, 0); arrow.lineTo(-0.045, 0);
@@ -36,6 +37,7 @@ export function Cat({ simulation, reduced }: { simulation: GameState; reduced: b
   const turnCount = useRef(0);
   const invalidate = useThree((state) => state.invalidate);
   const canvas = useThree((state) => state.gl.domElement);
+  useEffect(() => { scene.traverse(object => { if (object instanceof Mesh) object.castShadow = false; }); }, [scene]);
   useEffect(() => {
     playback.sync(simulation, reduced);
     if (!reduced && playback.phase === 'turn') {
@@ -61,6 +63,7 @@ export function Cat({ simulation, reduced }: { simulation: GameState; reduced: b
   });
   return <primitive object={placement} dispose={null}>
     <primitive object={scene} dispose={null} />
+    <Contact width={0.85} depth={0.80} y={0.036} />
     <DirectionCues />
   </primitive>;
 }

@@ -1,9 +1,11 @@
 import { CommandIcon, commandLabels } from './CommandIcon';
 import { useGameStore } from '../../stores/game-store';
 import type { CommandType } from '../../game/types';
+import type { useCommandDrag } from '../program/useCommandDrag';
 
-export function CommandPalette({ loopIndex, replacing, full, watching = false, choices, onChoose }: {
+export function CommandPalette({ loopIndex, replacing, full, watching = false, choices, onChoose, drag }: {
   loopIndex?: number; replacing: boolean; full: boolean; watching?: boolean; choices?: readonly CommandType[]; onChoose: (type: CommandType) => void;
+  drag: ReturnType<typeof useCommandDrag>;
 }) {
   const allowed = useGameStore((s) => s.level.allowedCommands);
   const running = useGameStore((s) => s.simulation.status === 'running');
@@ -12,9 +14,10 @@ export function CommandPalette({ loopIndex, replacing, full, watching = false, c
     <h2 id="palette-title" className="sr-only">{title}</h2>
     <div className="palette-commands">
       {allowed.filter((type) => (!choices || choices.includes(type)) && ((loopIndex === undefined && !replacing) || type !== 'repeat')).map((type) => <button key={type} data-type={type}
+        {...drag.bind({ type }, running || watching || (!replacing && full))}
         className={`palette-command puzzle-block ${type}`} disabled={running || watching || (!replacing && full)}
         aria-label={replacing ? `Ganti dengan ${commandLabels[type]}` : `Tambah ${commandLabels[type]}${loopIndex === undefined ? '' : ` ke Ulangi ${loopIndex + 1}`}`}
-        onClick={() => onChoose(type)}>
+        onClick={() => { if (!drag.consumeClick()) onChoose(type); }}>
         <CommandIcon type={type} /><span>{commandLabels[type]}</span>
       </button>)}
     </div>
