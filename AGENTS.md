@@ -1,78 +1,53 @@
-# AGENTS.md
+# Workspace guidance: Kotak-Katik
 
-## Project
+## Product and release priorities
 
-Kotak-Katik is a visual computational-thinking game for elementary students, designed especially for deaf students in SDLB-B classes 1–3. It teaches sequencing, relative direction, repetition, debugging, and basic algorithmic reasoning through a deterministic grid-based cat controlled by visual command blocks.
+Kotak-Katik is a visual computational-thinking game for general elementary students in grades 3–6 (SD kelas 3–6). Children can read short Indonesian instructions and learn by planning, constructing commands, executing, observing, debugging, and improving.
 
-Build an understandable learning game, not a generic coding website or a Scratch clone. Keep the relationship between instruction, action, and result visible.
+Prioritize correct learning mechanics, comprehension, accessibility, functional completeness, responsive usability, then polish. The competition release is feature-frozen: preserve the current game, curriculum, progression, commands, cat/fish models, and visual identity. Only documentation, verification, deployment, and proven release blockers are in scope. Do not add features, import assets, upgrade dependencies, redesign UI, or refactor working systems.
 
-## Priorities
+## Five canonical reference documents
 
-When requirements conflict, prioritize:
+Exactly these five Markdown files belong in .agents/:
 
-1. Correct learning mechanic
-2. Child comprehension
-3. Accessibility
-4. Functional completeness
-5. Responsive usability
-6. Visual polish
-7. Technical cleverness
+- [product.md](.agents/product.md): canonical MDS/PRD, audience, implemented scope, acceptance.
+- [pedagogy.md](.agents/pedagogy.md): 16-stage curriculum and I Do / We Do / You Do.
+- [gameplay.md](.agents/gameplay.md): deterministic mechanics and progression.
+- [design.md](.agents/design.md): UI/UX and applicable accessibility guidance.
+- [technical.md](.agents/technical.md): architecture, quality bar, tests, deployment, eligibility.
 
-Do not trade priorities 1–5 for priorities 6–7.
+The former accessibility and quality-bar documents were consolidated into design and technical on 15 October 2026. Their original versions remain in Git history. Root AGENTS.md is guidance, not a sixth upload.
 
-## Core mechanics
+## Mechanics and engineering
 
-- The cat moves on a tile grid using commands for forward, turn left, turn right, and repeat a command sequence.
-- Forward is relative to the cat’s current orientation. Turns change orientation without changing tiles. Never replace this mechanic with screen-relative movement.
-- The same level and command sequence must always produce the same result.
-- Support both full-program execution and single-step execution so a child can inspect each command and its result.
-- Treat commands as program data. Keep puzzle rules in the interpreter, not in UI events, meshes, or animation callbacks.
+Forward follows the cat's orientation. Turns rotate in place. Run and Step share a pure deterministic interpreter; commands remain typed program data. Simulation owns movement, collection, collision, and completion. Three.js renders state and never decides rules. Keep explicit level, avatar, program, cursor, status, loop, and completion state.
 
-## Learning and feedback
+Inspect relevant code/conventions before edits. Preserve data flow, package manager, renderer, and architecture. Avoid duplicated rules, hidden effects, scattered magic values, and any used to bypass errors. Navigation cancels pending execution and demonstration work. Persist progress separately from runtime/program state.
 
-- Introduce concepts in order: forward movement, sequences, turns, combined paths, loops, debugging, then mixed challenges. Do not add difficulty only by making paths longer.
-- Use gradual release: demonstrate, provide a constrained completion, then let the child solve independently.
-- Make mistakes useful: let the player observe, step through, identify a mismatch, edit, and retry. Avoid punitive feedback, unexplained “wrong” states, and immediate solution reveals.
-- Keep branching choices limited and node states clear if using an expedition map. Fixed or seeded progression is acceptable.
+## Learning and inclusive interaction
 
-## Accessibility and child-facing UI
+Preserve demonstration, guided completion, independent play, and the authored 16-stage progression. Mistakes remain inspectable and retryable; no punitive feedback or immediate solution reveals. Use short concrete Indonesian, consistent icons, visible orientation, cyan left/orange right, readable controls, touch targets, keyboard focus, reduced motion, and visual feedback without audio dependence.
 
-- Never communicate gameplay-critical information through sound alone. Execution, collisions, and completion need clear visual feedback.
-- Make the cat’s forward, left, and right directions easy to identify. Keep left/right cues consistent across the character and commands; use cyan for left and orange for right where applicable.
-- BISINDO material must be validated. Do not invent or approximate signs; leave an integration point if validated material is unavailable.
-- Use short, concrete Indonesian for child-facing text. Prefer icons and interaction over paragraphs, but use text when it prevents ambiguity. Avoid unexplained icons, tiny helper text, tooltip-dependent actions, and developer terminology.
-- Preserve readable tiles and reachable, large touch targets on mobile. Reflow panels when needed and prevent horizontal overflow.
-- Keep one obvious primary task on each screen.
+Do not claim validated sign-language media, special-education effectiveness, classroom testing, or comprehensive accessibility testing that has not occurred. Existing functional accessibility stays intact.
 
-## Visual and asset direction
+## Visual and asset preservation
 
-- Keep the board readable above decoration. Props must not obscure tile boundaries, orientation, destinations, or command feedback.
-- Use a lightweight low-poly or voxel-like world with simple silhouettes and the cat as the focal character.
-- Use an orthographic isometric/axonometric camera. Camera movement or perspective must not make tile relationships harder to read.
-- Use assets allowed by the competition and their licenses. Document third-party assets and packages; do not copy material from unrelated projects.
+Keep the stable orthographic low-poly diorama and legible tile relationships. Preserve custom procedural foliage in src/scene/title/Dressing.tsx and src/scene/Environment/ToyboxDressing.tsx. Do not merge henix/quaternius-foliage-ground. Props must not obscure the board. Preserve licenses and third-party credit.
 
-## Engineering
+## Authentic history and scope pivot
 
-- Keep simulation state separate from Three.js rendering. The simulation is authoritative; rendering follows it. A level should be testable without rendering the scene.
-- Keep explicit state for the level, cat position and orientation, command program, execution progress, execution status, and completion.
-- Before changing code, inspect the relevant files and conventions, understand the current implementation, and make the smallest coherent change. Do not rewrite working systems or migrate frameworks, package managers, renderers, or styling systems without an explicit request.
-- Prefer focused components, typed domain data, predictable data flow, and shared primitives where repetition exists. Avoid premature abstraction, duplicated rules, scattered gameplay magic numbers, hidden side effects, and `any` used to bypass type errors.
-- Keep the experience lightweight. Control scene complexity, animation loops, asset loading, and unnecessary re-renders without optimizing prematurely.
+The audience changed from the earlier special-education focus to general SD grades 3–6 on 15 October 2026. Record this explicitly; never rewrite past prompts, reports, decisions, or Git commits to conceal it. docs/PROMPT_LOG.md remains raw evidence. docs/PROMPT_JOURNAL.md contains at most five selected original prompts verbatim, with supported outcomes, provenance, and honest timestamp limits.
 
-## Scope and competition constraints
+Do not reset/force-push history or overwrite another contributor's work. Inspect status, branches, latest commits, and diffs before release. Use normal commits and pushes to main.
 
-Prefer a polished playable learning loop over feature count. Do not add multiplayer, authentication, backend infrastructure, procedural generation, social features, economies, inventories, AI chat, or extra settings without a clear product need. Local structured level data is acceptable.
+## Verification and submission
 
-This project is for the M-One Telkomsel Coding Competition 2026, “Web Education for Kids.” Keep the repository public and the deployed site accessible for judging. Maintain accurate AI-development documentation and prompt history. Preserve an auditable Git history: do not falsify prompt history, rewrite or force-push competition commits, or copy code/components from older personal projects.
+Run production build and focused tests. Verify affected mechanics, title/Mulai, tutorial, command construction, execution, fish, progression, Ekspedisi, persistence, mobile layout, runtime errors, and assets as relevant. Never equate compilation or push with functioning gameplay/deployment.
 
-Before adding a feature, check whether it improves learning, comprehension, accessibility, or judged product quality. If it does not, defer it.
+Competition: M-ONE Telkomsel Coding Competition 2026, Web Education for Kids. Public repository and anonymous production access are required. Target: <https://kotak-katik.henix.my.id>.
 
-## Verification and completion
+Upload exactly five .agents Markdown references and one docs/PROMPT_JOURNAL.md. Verify the form accepts .md; report rejection without making PDF/DOCX replacements. Do not claim submission without confirmation. Internal stop: 15 October 2026, 23:00 WIB; then submission/recovery only. Participant-confirmed deadline: 23:59 WIB.
 
-After meaningful gameplay changes, verify the affected behavior, including movement, turns and orientation, collisions, loops, stepping, reset/retry, and level completion as relevant. For UI changes, inspect desktop and mobile layouts. Check for runtime errors; compilation alone does not prove the interaction works.
+## Skill routing and recovery
 
-A feature is done when the intended interaction works, the learning mechanic stays correct, important state is visually understandable, relevant input modes work, desktop and mobile remain usable, and the change fits the existing architecture without unnecessary scope.
-
-## Project guidance
-
-Keep this root file focused on durable constraints. Put detailed product, pedagogy, accessibility, design, technical, and competition guidance in `.agents/` documents as those documents are created. Consult relevant project guidance before making decisions. If guidance conflicts, surface the conflict; a direct user instruction takes precedence unless it violates competition rules.
+Apply anti-slop standards and plain language. For frontend edits consult fe-audit-slop; for API/schema/LLM edits consult be-audit-slop. If a test/edit fails twice or five reads yield no progress, apply frustrated recovery. No autonomous visual or backend expansion during the freeze.

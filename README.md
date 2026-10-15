@@ -1,66 +1,133 @@
 # Kotak-Katik
 
-A deaf-first visual computational-thinking game for elementary learners, built for the M-One Telkomsel Coding Competition 2026.
+Kotak-Katik adalah game edukasi berbasis web untuk siswa kelas 3–6 SD yang memperkenalkan computational thinking melalui permainan menyusun perintah, mengarahkan kucing mengambil ikan, serta menyelesaikan tantangan logika secara bertahap.
 
-**Play:** [kotak-katik.vercel.app](https://kotak-katik.vercel.app).
+Dibuat untuk M-ONE Telkomsel Coding Competition 2026, tema **Web Education for Kids**.
 
-## Play the MVP
+**Mainkan:** [kotak-katik.henix.my.id](https://kotak-katik.henix.my.id)
+**Repositori publik:** [justhenix/kotak-katik](https://github.com/justhenix/kotak-katik)
+**Alamat sekunder:** [kotak-katik.vercel.app](https://kotak-katik.vercel.app)
 
-`/` opens the title screen. **Mulai** enters the first lesson; **Lanjutkan** resumes local progression. **Ekspedisi** shows all 16 stages in their authored order: movement, sequencing, relative turns, combined paths, repetition, debugging, then mixed application. Completed stages can be replayed. Locked stages open after the preceding stage succeeds or its demonstration is explicitly skipped. Skipping unlocks the next lesson without awarding completion. The final puzzle leads to the journey completion screen with an accurate completed-stage count.
+## Mengapa Kotak-Katik?
 
-**I Do** automatically demonstrates real block placement and execution when the board is ready. An original Kenney hand pointer follows actual controls. **We Do** uses prepared programs and highlights one child action at a time. Hints grow after inactivity or an unsuccessful attempt without entering commands for the child. **You Do** starts empty with no procedural pointer. Orientation, collection, execution and collision cues remain visible throughout. **Lanjut** appears after completion or an explicitly skipped demonstration.
+Urutan dan pengulangan dapat diamati ketika sebuah instruksi menghasilkan tindakan konkret. Anak menyusun blok, melihat kucing bergerak, lalu memperbaiki langkah jika hasilnya belum sesuai. Permainan memberi ruang berpikir, bereksperimen, dan mencoba kembali.
 
-Progress uses versioned localStorage in this browser. Refresh restores completion, unlocks and the selected stage; programs, cat position and execution are recreated from authored data. Corrupt/stale data is safely normalized. If storage is blocked, play continues for the session and the expedition shows a saving notice. **Ekspedisi → Progres → Mulai dari awal → Hapus progres** deliberately clears local progress; **Batal** keeps it.
+**Rencanakan → Susun perintah → Jalankan → Amati → Perbaiki → Coba lagi.**
 
-Preview an authored stage with `/?level=m2-right-together` or any stable ID in [M2A's curriculum report](docs/M2_WORKTREE_REPORT.md). The original Forward-only kernel remains at `/?fixture=kernel`. Open `/?fixture=turning` for Forward/Left/Right, or `/?fixture=loops` for those commands plus editable **Repeat 2×, 3×, 4×**. Explicit unknown level/fixture URLs retain the original fallback behavior. The scene retains the curated animated cat, enlarged default clownfish, and optional trout asset.
+## Pengguna dan tujuan belajar
 
-Tap the shared palette to add commands at the selected `+`. Tap a program block to select it: the palette replaces a primitive, while contextual controls insert before/after, reorder, or delete. Tap a Repeat header to change its count; its inner `+` selects the primitive-only body palette. Escape returns to the end of the outer program. The horizontal strip scrolls to the insertion target and active command without moving the page.
+Untuk siswa SD umum kelas 3–6 yang mampu membaca instruksi pendek berbahasa Indonesia. Pengalaman pemrograman tidak diperlukan.
 
-Play appears when it is the next relevant action during introductory guided stages. Step is introduced for debugging and mixed puzzles; engineering fixtures retain both controls. Play becomes Stop during child execution; after failure it reruns the retained program from the original board. Touching a command card or editing resets the board and execution cursor while keeping the program. One Step advances exactly one primitive, including inside Repeat. The active block and numbered loop iteration stay visible. The header's **⋯** contains **Ulang contoh**, **Lewati contoh**, or **Mulai ulang**. Replay restores a demonstration; skipping cancels it without awarding completion. Reset restores the prepared program and cues. Hiding the browser during a demonstration interrupts it and offers replay. Berhenti preserves the result for inspection. Invalid movement keeps the cat in place and marks the failing block. Periksa satu per satu returns a debugging puzzle to its start without changing its program. Completion requires a valid program to end with every fish collected.
+Konsep yang diperkenalkan: sequencing, algorithmic thinking, arah relatif, repetition/loops, debugging, serta penalaran logis dan pemecahan masalah. Ini tujuan rancangan pembelajaran; efektivitasnya belum diukur melalui uji kelas.
 
-Nested loops, obstacle mechanics, drag-and-drop, audio, and themes are deferred. See [M3 sprint evidence](docs/M3_MVP_SPRINT.md), [M1 architecture](docs/M1_ARCHITECTURE.md), [M1.1 interface](docs/M1_1_INTERFACE.md), and [IDWDYD redesign](docs/IDWDYD_REDESIGN.md).
+Pada **15 Oktober 2026**, sasaran ditetapkan dari fokus pendidikan khusus sebelumnya menjadi SD umum kelas 3–6. Mekanik dan kurikulum dipertahankan. Prompt, keputusan, dan laporan lama tetap menjadi bukti sejarah.
 
-## Run and verify
+## Gameplay dan fitur
 
-```sh
+- 16 tahap tetap: gerak, urutan, belokan, jalur gabungan, Ulangi, debugging, dan tantangan campuran.
+- Blok Maju, Kiri, Kanan, dan Ulangi 2–4 kali; isi Ulangi berupa perintah primitif.
+- Maju mengikuti arah hadap kucing; belokan berputar di tempat.
+- Eksekusi program, penanda blok/iterasi aktif, tabrakan, retry, dan inspeksi satu langkah sesuai fase belajar.
+- Ekspedisi, pembukaan tahap, replay, layar akhir, progres lokal dan resume setelah refresh.
+- Kontrol ketuk/keyboard, tampilan responsif, reduced motion, dan informasi tanpa ketergantungan audio.
+- Diorama low-poly dengan kucing/ikan terkurasi dan foliage prosedural asli proyek.
+
+## Cara bermain
+
+1. Tekan **Mulai** dan amati contoh pertama. **Lanjutkan** tersedia saat ada progres.
+2. Pilih slot **+**, lalu tambahkan perintah yang tersedia.
+3. Perhatikan arah hadap kucing sebelum memilih Maju, Kiri, atau Kanan.
+4. Jalankan susunan dan amati ikan serta blok aktif.
+5. Jika belum berhasil, periksa hasil, ubah perintah, lalu coba lagi. **Satu langkah** diperkenalkan pada debugging dan tantangan campuran.
+6. Selesaikan program valid dengan seluruh ikan terkumpul untuk membuka tahap berikutnya.
+
+Contoh dapat diulang/dilewati melalui menu. Skip membuka kelanjutan tanpa mencatat completion. Ekspedisi membedakan tahap terkunci, terbuka, saat ini, dan selesai.
+
+Progres disimpan pada browser yang sama; program dan eksekusi dibuat ulang saat masuk tahap. Jika storage ditolak, permainan sesi tetap berjalan dengan pemberitahuan visual. Hapus progres melalui **Ekspedisi → Progres → Mulai dari awal → Hapus progres**; Batal mempertahankannya.
+
+## I Do / We Do / You Do
+
+**I Do:** contoh otomatis memakai interpreter permainan yang sama. Anak mengamati perintah dan hasil.
+
+**We Do:** program awal dan petunjuk mengarahkan satu tindakan pada satu waktu. Anak melihat hasil percobaannya sebelum memperbaiki.
+
+**You Do:** anak menyusun solusi mandiri ketika bantuan prosedural berkurang. Orientasi dan umpan balik tetap tersedia.
+
+## Teknologi dan arsitektur
+
+Bun, Vite, React, TypeScript, Three.js/React Three Fiber, Zustand, Tailwind CSS, Lucide React, Fredoka/Inter, Vitest, dan Playwright. Versi aktual tercatat dalam [package.json](package.json) dan bun.lock.
+
+src/game/ memuat simulasi murni dan kurikulum; src/stores/ mengelola editor, eksekusi, tutorial, navigasi, dan progres; src/components/ menyediakan kontrol DOM; src/scene/ menampilkan state. Aturan gerak, ikan, tabrakan, dan completion diputuskan simulasi.
+
+Tidak ada backend atau API key. Progres memakai localStorage versi 1. WebGL diperlukan. Perangkat fisik, sesi screen reader nyata, serta pemahaman peserta didik belum divalidasi.
+
+## Menjalankan lokal
+
+Pasang Bun, lalu:
+
+~~~sh
 bun install --frozen-lockfile
 bun run dev
+~~~
+
+Build produksi:
+
+~~~sh
+bun run build
+bun run preview
+~~~
+
+## Pengujian
+
+~~~sh
 bun run test
 bun run build
 bun x playwright install chromium
-bun run test:e2e
-# Separate preview port when 4173 is occupied:
-bun run test:e2e --config playwright.curriculum.config.ts
-```
+bun x playwright test e2e/journey.spec.ts
+~~~
 
-Browser smoke tests use the production build at port 4173. Rebuild after source changes. Exact package versions are recorded in `package.json` and `bun.lock`. No API keys are required.
+Browser lokal memakai hasil production build. Preview teknik: /?fixture=kernel, /?fixture=turning, /?fixture=loops, atau /?level=m2-right-together. Preview tidak memberikan progres Ekspedisi.
 
-## Boundaries
+Pemeriksaan deployment dari PowerShell:
 
-`src/game/` owns typed level/program data, authored lesson metadata, movement/turning, collection, validation, reset, and a live execution cursor. `src/stores/` owns command editing, 400 ms Run pacing, and the tutorial controller. Tutorials call the same public Step/Run/edit/reset actions as the learner. Run/Step share one pure primitive executor. `src/components/` edits/observes logical state. `src/scene/` renders that state with R3F; mesh transforms never decide game rules. Demand rendering sleeps when the scene settles. Reduced motion skips position/yaw interpolation and keeps static tutorial/execution cues.
-
-The progress store owns only completion, unlocks and resume selection. Navigation cancels Run/demo work and resets the board before re-entry. Engineering previews bypass the title and never write expedition progress.
-
-## Design decisions
-
-Following `.agents/design.md`: pastel toy diorama, ENERGY 2 / RHYTHM 2 / MOTION 2. The stable orthographic board is the focal point. One cream workbench keeps program and controls together; mobile stacks them. Chunky command edges repeat tile thickness and signal pressability. Fredoka warms brief headings; Inter keeps controls readable. Curated GLBs provide the cat/fish. Face and attached arrows show forward/left/right; thick command outlines and iteration text preserve execution/error state without audio. The 240 ms cat transition shows cause and effect before the next 400 ms action.
-
-See [attribution](docs/ATTRIBUTIONS.md). No BISINDO media is integrated; validated material can later attach to level learning metadata without changing the engine.
-
-## Current limits
-
-WebGL is required. The JavaScript renderer bundle is about 349 kB gzip and triggers Vite's size advisory. Learner comprehension and physical-device behavior are not yet validated.
-
-## Release and submission
-
-`vercel.json` configures a frozen Bun install, `bun run build`, and static `dist` output. There are no runtime secrets or backend services. The app uses a single root URL plus optional preview query parameters.
-
-The release passed 239 unit tests, all 98 local production-browser checks and 12 deployed desktop/mobile smoke checks. To run browser checks against the deployed game from PowerShell:
-
-```powershell
-$env:MVP_BASE_URL = 'https://kotak-katik.vercel.app'
+~~~powershell
+$env:MVP_BASE_URL = 'https://kotak-katik.henix.my.id'
 bun x playwright test e2e/journey.spec.ts --config playwright.release.config.ts
 Remove-Item Env:MVP_BASE_URL
-```
+~~~
 
-Before submitting, confirm that the repository is public, the deployed URL opens without authentication, and the organizer's required artifacts are included. `docs/PROMPT_LOG.md` records authentic prompts/outcomes. The user must explicitly select prompts for `docs/PROMPT_JOURNAL.md`; the sprint does not curate it automatically. Release verification and any outstanding actions are recorded in [the sprint report](docs/M3_MVP_SPRINT.md).
+Pada pemeriksaan final 15 Oktober, **264 unit test dan production build lulus**. Sepuluh pemeriksaan browser custom domain lulus, termasuk perjalanan seluruh 16 tahap dengan input mobile, title/tutorial, Ekspedisi, persistensi, dan viewport 1440/390/320. Suite mechanics lama memiliki selector yang mengasumsikan palette terbuka sebelum slot dipilih dan belum disesuaikan dengan UI saat ini; hasilnya tidak diklaim lulus. Detail verifikasi tercatat pada [development log](docs/DEVELOPMENT_LOG.md). Advisory ukuran chunk renderer Vite tetap muncul.
+
+## Screenshot dan bukti
+
+Gambar berasal dari sesi browser lokal 15 Oktober 2026. Konteks tiap gambar tersedia pada [indeks screenshot](screenshots/README.md).
+
+![Layar judul Kotak-Katik](screenshots/01-title-screen-desktop.jpg)
+
+![Urutan selesai dan ikan terkumpul](screenshots/04-forward-sequence-completed-desktop.jpg)
+
+[Bukti mobile](screenshots/08-forward-puzzle-mobile.jpg) dan [laporan milestone M3](docs/M3_MVP_SPRINT.md) menyediakan bukti tambahan bertanggal.
+
+## Pengembangan berbantuan AI
+
+AI membantu implementasi, debugging, audit, dan verifikasi berdasarkan batas produk. Developer meninjau hasil; prompt dan Git history dipertahankan agar proses dapat diperiksa.
+
+Lima Docs Acuan AI yang diunggah langsung sebagai Markdown:
+
+1. [product.md](.agents/product.md): MDS/PRD, sasaran, scope, acceptance.
+2. [pedagogy.md](.agents/pedagogy.md): kurikulum dan gradual release.
+3. [gameplay.md](.agents/gameplay.md): mekanik dan progres.
+4. [design.md](.agents/design.md): UI/UX dan aksesibilitas.
+5. [technical.md](.agents/technical.md): arsitektur, kualitas, test, deployment.
+
+[AGENTS.md](AGENTS.md) adalah panduan root, bukan unggahan keenam. Panduan aksesibilitas dan quality bar lama digabung ke design/technical; versi sebelumnya tetap di Git.
+
+[Jurnal prompt terkurasi](docs/PROMPT_JOURNAL.md) adalah **satu berkas dengan lima prompt autentik**. [Raw prompt log](docs/PROMPT_LOG.md) dan [development log](docs/DEVELOPMENT_LOG.md) menyimpan sejarah. Format pengumpulan tetap Markdown; tidak dibuat PDF/DOCX. Ekstensi unggahan harus diverifikasi pada formulir resmi.
+
+## Rilis, credits, dan lisensi
+
+Rilis mempertahankan game saat ini. Akun, multiplayer, AI chat, dashboard, ekonomi, editor level, loop bersarang, audio, dan tema baru di luar scope.
+
+Vercel menggunakan frozen install, build, dan output dist sesuai [vercel.json](vercel.json). Custom domain dan alur game diperiksa langsung pada 15 Oktober 2026. Pengiriman formulir merupakan langkah terpisah dari deployment.
+
+[Atribusi lengkap](docs/ATTRIBUTIONS.md), [kontrak aset](docs/ASSETS.md), serta [lisensi runtime](public/licenses) tersedia. Kucing: Kenney Cube Pets (CC0). Clownfish: Quaternius (CC0). Alternatif trout: Poly by Google (CC BY 3.0). Pointer: Kenney Cursor Pack (CC0). Fredoka/Inter: OFL. Pemberitahuan paket runtime disertakan; lisensi pihak ketiga berlaku terpisah dari kode. Foliage judul/gameplay dibuat secara prosedural dalam proyek.
