@@ -6,6 +6,7 @@ import { curriculumLevels } from '../game/levels/curriculum';
 import { validateLevel } from '../game/engine/simulation';
 import { programError } from '../game/program';
 import type { Command, CommandType, GameState, LevelDefinition, PrimitiveCommand, Program, RepeatCount } from '../game/types';
+import type { Interaction } from './interaction-policy';
 
 export const ACTION_PACE_MS = 400;
 
@@ -31,6 +32,9 @@ type GameStore = {
 export function createGameStore(level: LevelDefinition) {
   validateLevel(level);
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let interactionGuard: (action: Interaction) => boolean = () => true;
+  let lessonDispatchDepth = 0;
+  const permit = (action: Interaction) => lessonDispatchDepth > 0 || interactionGuard(action);
   const cancel = () => { clearTimeout(timer); timer = undefined; };
   const store = createStore<GameStore>((set, get) => {
     const resetSimulation = () => createInitialState(get().level);
@@ -73,6 +77,9 @@ export function createGameStore(level: LevelDefinition) {
         set({ level: nextLevel, program: structuredClone(nextLevel.initialProgram), simulation: createInitialState(nextLevel) });
       },
       addCommand: (type, loopIndex, atIndex) => {
+        const loop = loopIndex === undefined ? undefined : get().program[loopIndex];
+        const index = atIndex ?? (loop?.type === 'repeat' ? loop.commands.length : get().program.length);
+        if (!permit({ type: 'add', command: type, index, loopIndex })) return;
         if (get().simulation.status === 'running' || !get().level.allowedCommands.includes(type)) return;
         if (loopIndex !== undefined && type === 'repeat') return;
         editScope(loopIndex, (commands) => {
@@ -83,6 +90,7 @@ export function createGameStore(level: LevelDefinition) {
         });
       },
       replaceCommand: (index, type, loopIndex) => {
+        if (!permit({ type: 'replace', command: type, index, loopIndex })) return;
         if (!get().level.allowedCommands.includes(type)) return;
         editScope(loopIndex, (commands) => {
           if (!commands[index] || commands[index].type === 'repeat' || commands[index].type === type) return commands;
@@ -90,9 +98,11 @@ export function createGameStore(level: LevelDefinition) {
         });
       },
       removeCommand: (index, loopIndex) => {
+        if (!permit({ type: 'remove', index, loopIndex })) return;
         editScope(loopIndex, (commands) => commands[index] ? commands.filter((_, commandIndex) => index !== commandIndex) : commands);
       },
       moveCommand: (index, offset, loopIndex) => {
+        if (!permit({ type: 'move', index, loopIndex })) return;
         editScope(loopIndex, (commands) => {
           if (!commands[index] || !commands[index + offset]) return commands;
           const moved = [...commands];
@@ -101,31 +111,37 @@ export function createGameStore(level: LevelDefinition) {
         });
       },
       setRepeatCount: (index, count) => {
+        if (!permit({ type: 'count', index, count })) return;
         const loop = get().program[index];
         if (loop?.type !== 'repeat' || ![2, 3, 4].includes(count)) return;
         edit(get().program.map((command, commandIndex) => commandIndex === index ? { ...loop, count } : command));
       },
       step: () => {
+        if (!permit({ type: 'step' })) return;
         const status = get().simulation.status;
         if (status === 'running' || get().program.length === 0 || programError(get().level, get().program)) return;
         cancel();
         if (['failed', 'finished', 'completed'].includes(status)) set({ simulation: resetSimulation() });
         advance(false);
       },
-      run: start,
+      run: () => { if (permit({ type: 'run' })) start(); },
       retry: () => {
+        if (!permit({ type: 'retry' })) return;
         if (get().simulation.status === 'running') return;
         start();
       },
       resetSimulation: () => {
+        if (!permit({ type: 'resetSimulation' })) return;
         cancel();
         set({ simulation: resetSimulation() });
       },
       resetProgram: () => {
+        if (!permit({ type: 'resetProgram' })) return;
         if (get().simulation.status === 'running') return;
         edit(structuredClone(get().level.initialProgram));
       },
       stop: () => {
+        if (!permit({ type: 'stop' })) return;
         if (get().simulation.status !== 'running') return;
         cancel();
         const simulation = get().simulation;
@@ -134,7 +150,13 @@ export function createGameStore(level: LevelDefinition) {
       dispose: cancel,
     };
   });
-  return store;
+  return Object.assign(store, {
+    setInteractionGuard(guard: (action: Interaction) => boolean) { interactionGuard = guard; },
+    withLessonActions<T>(dispatch: () => T): T {
+      lessonDispatchDepth++;
+      try { return dispatch(); } finally { lessonDispatchDepth--; }
+    },
+  });
 }
 
 export function selectInitialLevel(search: string): LevelDefinition {

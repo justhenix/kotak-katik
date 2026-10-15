@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import type { ReactNode } from 'react';
-import { Color, Group, MeshStandardMaterial, ShaderMaterial, SphereGeometry } from 'three';
+import { Color, Group, IcosahedronGeometry, MeshStandardMaterial, ShaderMaterial, SphereGeometry } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export const TILE_SIZE = 1.8;
 const soil = new RoundedBoxGeometry(TILE_SIZE, 0.56, TILE_SIZE, 2, 0.085);
 const grass = new RoundedBoxGeometry(TILE_SIZE, 0.14, TILE_SIZE, 2, 0.045);
 const sphere = new SphereGeometry(1, 12, 8);
+const foliage = new IcosahedronGeometry(1, 1);
 const earthMaterial = new MeshStandardMaterial({ color: '#bd8969', roughness: 1 });
 const grassMaterial = new MeshStandardMaterial({ color: '#c3dc70', roughness: 1 });
 const distantEarth = new MeshStandardMaterial({ color: '#89c5be', roughness: 1, transparent: true, opacity: 0.40, depthWrite: false });
 const distantGrass = new MeshStandardMaterial({ color: '#b8dfac', roughness: 1, transparent: true, opacity: 0.50, depthWrite: false });
-const leafMaterial = new MeshStandardMaterial({ color: '#62b341', roughness: 1 });
-const paleLeafMaterial = new MeshStandardMaterial({ color: '#86c748', roughness: 1 });
+const leafMaterial = new MeshStandardMaterial({ color: '#62b341', roughness: 1, flatShading: true });
+const paleLeafMaterial = new MeshStandardMaterial({ color: '#86c748', roughness: 1, flatShading: true });
 const barkMaterial = new MeshStandardMaterial({ color: '#926342', roughness: 1 });
 const petalMaterial = new MeshStandardMaterial({ color: '#fff8ed', roughness: 1 });
 const pollenMaterial = new MeshStandardMaterial({ color: '#ffcf3e', roughness: 1 });
@@ -78,17 +79,15 @@ export function Tree({ position = [0, 0, 0], scale = 1, double = false }: { posi
     <mesh material={barkMaterial} position={[0, 0.28, 0]} castShadow>
       <cylinderGeometry args={[0.105, 0.13, 0.55, 9]} />
     </mesh>
-    <mesh geometry={sphere} material={leafMaterial} position={[0, 0.85, 0]} scale={[0.46, 0.48, 0.43]} castShadow dispose={null} />
-    <mesh geometry={sphere} material={paleLeafMaterial} position={[0.13, 0.97, -0.12]} scale={[0.30, 0.34, 0.30]} castShadow dispose={null} />
-    {double && <mesh geometry={sphere} material={paleLeafMaterial} position={[0, 1.40, 0]} scale={[0.34, 0.35, 0.32]} castShadow dispose={null} />}
+    <mesh geometry={foliage} material={leafMaterial} position={[0, 0.85, 0]} scale={[0.46, 0.48, 0.43]} castShadow dispose={null} />
+    {double && <mesh geometry={foliage} material={paleLeafMaterial} position={[0, 1.25, 0]} scale={[0.30, 0.31, 0.29]} castShadow dispose={null} />}
   </group>;
 }
 
 export function Bush() {
   return <group>
     <Contact width={1.1} depth={0.85} />
-    {[[0, 0.32, 0, 0.42], [-0.25, 0.24, 0.10, 0.32], [0.22, 0.23, -0.08, 0.32], [0.02, 0.52, -0.07, 0.25]].map(([x, y, z, s], i) =>
-      <mesh key={i} geometry={sphere} material={i === 3 ? paleLeafMaterial : leafMaterial} position={[x, y, z]} scale={s} castShadow dispose={null} />)}
+    <mesh geometry={foliage} material={leafMaterial} position={[0, 0.34, 0]} scale={[0.52, 0.34, 0.40]} castShadow dispose={null} />
   </group>;
 }
 

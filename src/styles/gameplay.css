@@ -107,10 +107,14 @@
 .repeat-counter output { min-width: max(36px,1.8rem); text-align: center; font: 500 1.1rem/1 'Fredoka',sans-serif; }
 .ghost-hand { position: fixed; top: 0; left: 0; width: 52px; height: 52px; z-index: 10; pointer-events: none; transition: transform 500ms cubic-bezier(.23,1,.32,1); }
 .ghost-hand img { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 2px #263d4540); }
+.tutorial-spotlight { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 8; pointer-events: none; }
+.spotlight-ring { fill: none; stroke: #fff2aa; stroke-width: 3; }
 .instruction-focus { outline: 3px dotted #465a5a; outline-offset: 3px; }
+.instruction-focus { transition: opacity 160ms cubic-bezier(.23,1,.32,1); }
+.instruction-focus.tutorial-nudge { opacity: .65; }
 .palette-commands.instruction-focus { outline: none; }
 .palette-commands.instruction-focus button { outline: 3px dotted #465a5a; outline-offset: 2px; }
-.instruction-focus:disabled { opacity: 1; }
+.game-shell .instruction-focus:disabled { opacity: 1; }
 .drag-preview { position: fixed; z-index: 20; display: grid; place-items: center; width: 56px; height: 56px; transform: translate(-50%,-65%) rotate(-5deg); pointer-events: none; }
 .command-dock [data-draggable="true"] { touch-action: none; user-select: none; }
 .command-dock button:focus-visible, .program-sequence:focus-visible, .game-header :focus-visible { outline: 3px solid #234c64; outline-offset: 3px; }
@@ -146,4 +150,4 @@
   .next-lesson, .continue-lesson { min-height: 68px; padding: 10px 24px; font-size: 1.4rem; }
 }
 @media (max-width: 360px) { .game-shell { padding-inline: 8px; } .workbench { padding-inline: 10px; } .dock-main { gap: 7px; } .palette-commands { gap: 10px; padding-right: 8px; } .palette-command { flex-basis: max(46px,3rem); width: max(46px,3rem); } }
-@media (prefers-reduced-motion: reduce) { .ghost-hand { transition: none; } .game-shell button { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .ghost-hand { transition: none; } .game-shell button, .instruction-focus { transition: none; } .instruction-focus.tutorial-nudge { opacity: 1; outline-style: solid; } }

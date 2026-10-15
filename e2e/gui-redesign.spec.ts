@@ -170,7 +170,7 @@ test('visual acceptance: six required real states, one-row HUD and dock, no boar
   await append(page,'Maju',0,0); await b(page,'Tambah Kanan ke Ulangi 1').click(); await dismiss(page); await capture('320-repeat-body');
   await page.setViewportSize({width:390,height:844}); await ready(page,'/?level=m2-debug-together');
   await b(page,'Jalankan').click(); await expect(feedback(page)).toHaveAttribute('data-status','finished');
-  await b(page,'Periksa satu per satu').click(); await b(page,'Satu langkah').click(); await b(page,'Pilih perintah 3: Kanan').click(); await capture('390-debugging');
+  await b(page,'Periksa satu per satu').click(); await b(page,'Satu langkah').click(); await b(page,'Tambah di posisi 4').click(); await capture('390-debugging');
   await ready(page,'/?level=m2-move-try'); await append(page,'Maju',1); await b(page,'Jalankan').click(); await expect(feedback(page)).toHaveAttribute('data-status','completed'); await capture('390-completion');
   await ready(page,'/?fixture=turning'); await append(page,'Maju',0); await b(page,'Tambah Maju').click();
   await b(page,'Jalankan').click(); await expect(feedback(page)).toHaveAttribute('data-status','failed'); await capture('390-failure');

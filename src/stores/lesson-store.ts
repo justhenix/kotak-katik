@@ -5,6 +5,8 @@ import { samePosition } from '../game/engine/simulation';
 import { gameStore } from './game-store';
 import type { createGameStore } from './game-store';
 import type { CommandPath, DemonstrationAction, GameState, LevelDefinition, Program, TutorialTarget, VisualHint } from '../game/types';
+import { canInteract, guidedCountTask, guidedTask, isRecovering } from './interaction-policy';
+import type { Interaction } from './interaction-policy';
 
 export const DEMO_COMMAND_MS = 700;
 export const DEMO_ACTION_MS = 350;
@@ -22,7 +24,10 @@ type LessonState = {
   guideIndex: number;
   guideChoice: boolean;
   hintStrength: number;
+  blockedInteraction: number;
+  requestInteraction: (action: Interaction) => boolean;
   chooseGuideTarget: () => void;
+  releaseGuideTarget: () => void;
   interruptDemo: () => void;
   showHint: () => void;
   startDemo: () => void;
@@ -69,7 +74,7 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
   const initial = () => ({
     levelId: game.getState().level.id, revealed: entryHints(game.getState().level), observedAttempt: false,
     demoPhase: 'idle' as DemoPhase, demoIndex: 0, demoPath: null, demoAction: null,
-    guideIndex: 0, guideChoice: false, hintStrength: 0,
+    guideIndex: 0, guideChoice: false, hintStrength: 0, blockedInteraction: 0,
   });
   const store = createStore<LessonState>((set, get) => {
     const present = (index: number) => {
@@ -77,7 +82,6 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
       const { level, program, simulation } = game.getState();
       const action = level.learning.demonstration?.[index];
       if (!action) { set({ demoPhase: 'done', demoAction: null, demoPath: null }); return; }
-      // The real editor resets the board when a command is selected for replacement.
       const command = program[simulation.cursor.commandIndex];
       const path: CommandPath | null = action.type === 'replace' || action.type === 'select' ? action.path
         : action.type === 'add' ? action.loopIndex === undefined ? [action.index] : [action.loopIndex, action.index]
@@ -88,16 +92,18 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
       timer = setTimeout(() => {
         set({ demoPhase: 'action' });
         timer = setTimeout(() => {
-          const current = game.getState();
-          if (action.type === 'add') current.addCommand(action.command, action.loopIndex, action.index);
-          if (action.type === 'select') current.resetSimulation();
-          if (action.type === 'step') current.step();
-          if (action.type === 'restart') current.resetSimulation();
-          if (action.type === 'replace') current.replaceCommand(action.path[action.path.length - 1], action.command, action.path.length === 2 ? action.path[0] : undefined);
-          if (action.type === 'run') {
-            current.run();
-            // Run completes through the game subscription below, including collisions.
-          } else settle();
+          game.withLessonActions(() => {
+            const current = game.getState();
+            if (action.type === 'add') current.addCommand(action.command, action.loopIndex, action.index);
+            if (action.type === 'select') current.resetSimulation();
+            if (action.type === 'step') current.step();
+            if (action.type === 'restart') current.resetSimulation();
+            if (action.type === 'replace') current.replaceCommand(action.path[action.path.length - 1], action.command, action.path.length === 2 ? action.path[0] : undefined);
+            if (action.type === 'run') {
+              current.run();
+              // Run completes through the game subscription below, including collisions.
+            } else settle();
+          });
         }, DEMO_TAP_MS);
       }, DEMO_COMMAND_MS);
     };
@@ -111,10 +117,16 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
     finishRun = settle;
     return {
       ...initial(),
+      requestInteraction: action => {
+        const permitted = canInteract(game.getState(), get(), action);
+        if (!permitted) set({ blockedInteraction: get().blockedInteraction + 1 });
+        return permitted;
+      },
       chooseGuideTarget: () => set({ guideChoice: true }),
+      releaseGuideTarget: () => set({ guideChoice: false }),
       interruptDemo: () => {
         if (!demoPlaying(get().demoPhase)) return;
-        cancel(); game.getState().stop(); set({ demoPhase: 'interrupted', demoAction: null, demoPath: null });
+        cancel(); game.withLessonActions(() => game.getState().stop()); set({ demoPhase: 'interrupted', demoAction: null, demoPath: null });
       },
       showHint: () => {
         const requested = game.getState().level.learning.visualHints?.filter((hint) => hint.reveal.when === 'on-request').map((hint) => hint.id) ?? [];
@@ -123,31 +135,37 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
       startDemo: () => {
         if (disposed || !game.getState().level.learning.demonstration) return;
         cancel();
-        game.getState().stop();
-        game.getState().resetProgram();
-        game.getState().resetSimulation();
-        if (game.getState().level.learning.demonstrationFromEmpty) {
-          for (let index = game.getState().program.length - 1; index >= 0; index--) game.getState().removeCommand(index);
-        }
+        game.withLessonActions(() => {
+          game.getState().stop();
+          game.getState().resetProgram();
+          game.getState().resetSimulation();
+          if (game.getState().level.learning.demonstrationFromEmpty) {
+            for (let index = game.getState().program.length - 1; index >= 0; index--) game.getState().removeCommand(index);
+          }
+        });
         set(initial());
         present(0);
       },
       skipDemo: () => {
         if (!game.getState().level.learning.demonstration) return;
         cancel();
-        game.getState().stop();
-        // Skip is an explicit exit from observation; it never awards puzzle completion.
-        if (demoPlaying(get().demoPhase)) {
-          game.getState().resetProgram();
-          game.getState().resetSimulation();
-        }
+        game.withLessonActions(() => {
+          game.getState().stop();
+          // Skip is an explicit exit from observation; it never awards puzzle completion.
+          if (demoPlaying(get().demoPhase)) {
+            game.getState().resetProgram();
+            game.getState().resetSimulation();
+          }
+        });
         set({ ...initial(), demoPhase: 'skipped' });
       },
       resetLesson: () => {
         cancel();
-        game.getState().stop();
-        game.getState().resetProgram();
-        game.getState().resetSimulation();
+        game.withLessonActions(() => {
+          game.getState().stop();
+          game.getState().resetProgram();
+          game.getState().resetSimulation();
+        });
         set(initial());
       },
       nextLesson: () => {
@@ -158,7 +176,7 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
         cancel();
         game.getState().loadLevel(curriculumLevels[index + 1]);
       },
-      dispose: () => { disposed = true; cancel(); unsubscribe(); },
+      dispose: () => { disposed = true; cancel(); unsubscribe(); game.setInteractionGuard(() => true); },
     };
   });
   const unsubscribe = game.subscribe((state, previous) => {
@@ -202,6 +220,7 @@ export function createLessonStore(game: ReturnType<typeof createGameStore>) {
       finishRun();
     }
   });
+  game.setInteractionGuard(action => store.getState().requestInteraction(action));
   return store;
 }
 
@@ -219,6 +238,21 @@ export function tutorialTarget(level: LevelDefinition, program: Program, simulat
     return action?.type === 'step' ? { type: 'step' } : { type: 'run' };
   }
   if (level.learning.phase !== 'guided' || simulation.completion || simulation.status === 'running') return null;
+  const countTask = guidedCountTask({ level, program, simulation }, lesson);
+  if (lesson.guideChoice && countTask) return { type: 'count', index: countTask.index };
+  if (isRecovering({ level, program, simulation }, lesson)) {
+    const repair = guidedTask({ level, program, simulation }, lesson);
+    if (simulation.status === 'idle' && !lesson.guideChoice && repair?.type === 'count') return { type: 'run' };
+    if (repair?.type === 'count') return lesson.guideChoice ? { type: 'count', index: repair.index } : { type: 'command', path: [repair.index] };
+    if (repair?.type === 'command') {
+      const owner = repair.path.length === 2 ? repair.path[0] : undefined;
+      const top = program[repair.path[0]];
+      const command = repair.path.length === 1 ? top : top?.type === 'repeat' ? top.commands[repair.path[1]] : undefined;
+      if (simulation.status === 'idle' && !lesson.guideChoice && command) return { type: 'run' };
+      return lesson.guideChoice ? { type: 'palette', loopIndex: owner } : command
+        ? { type: 'command', path: repair.path } : { type: 'slot', index: repair.path.at(-1)!, loopIndex: owner };
+    }
+  }
   if (program.length < level.initialProgram.length) return { type: 'palette' };
   const emptyLoop = program.findIndex((command) => command.type === 'repeat' && command.commands.length === 0);
   if (emptyLoop >= 0) return lesson.guideChoice ? { type: 'palette', loopIndex: emptyLoop } : { type: 'slot', loopIndex: emptyLoop, index: 0 };

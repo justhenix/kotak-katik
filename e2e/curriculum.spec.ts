@@ -23,15 +23,23 @@ async function removeStarter(page: Page, program: Program, press: Press) {
   }
 }
 
-async function buildProgram(page: Page, program: Program, press: Press) {
+async function buildProgram(page: Page, program: Program, press: Press, starter: Program = []) {
   for (const [index, command] of program.entries()) {
-    await press(button(page, `Tambah di posisi ${index + 1}`));
-    await press(button(page, `Tambah ${labels[command.type]}`));
+    const prepared = starter[index];
+    if (prepared) expect(prepared.type).toBe(command.type);
+    else {
+      await press(button(page, `Tambah di posisi ${index + 1}`));
+      await press(button(page, `Tambah ${labels[command.type]}`));
+    }
     if (command.type === 'repeat') {
       await press(button(page, `Pilih Ulangi ${index + 1}`));
       await setRepeatCount(page, index, command.count, press);
+      const preparedBody = prepared?.type === 'repeat' ? prepared.commands : [];
+      expect(command.commands.slice(0, preparedBody.length)).toEqual(preparedBody);
+      if (preparedBody.length === command.commands.length) continue;
       await press(button(page, `Edit isi Ulangi ${index + 1}`));
       for (const [bodyIndex, child] of command.commands.entries()) {
+        if (bodyIndex < preparedBody.length) continue;
         await press(button(page, `Tambah di posisi ${bodyIndex + 1} dalam Ulangi ${index + 1}`));
         await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
       }
@@ -60,8 +68,12 @@ for (const level of curriculumLevels) test(`Curriculum ${level.id}: real demonst
   } else {
     await expect(feedback(page)).toHaveAttribute('data-actions', '0');
     if (level.learning.phase === 'independent') await expect(page.locator('.ghost-hand, .instruction-focus')).toHaveCount(0);
-    await removeStarter(page, level.initialProgram, press);
-    await buildProgram(page, program, press);
+    if (level.learning.phase === 'guided' && level.learning.guidance?.[0]?.complete.type === 'attempt') {
+      await press(button(page, 'Jalankan'));
+      await expect(feedback(page)).toHaveAttribute('data-status', /failed|finished/);
+    }
+    if (level.learning.phase !== 'guided') await removeStarter(page, level.initialProgram, press);
+    await buildProgram(page, program, press, level.learning.phase === 'guided' ? level.initialProgram : []);
     await press(button(page, 'Jalankan'));
   }
   await expect(feedback(page)).toHaveAttribute('data-status', 'completed');

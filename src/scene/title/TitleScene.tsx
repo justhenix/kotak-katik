@@ -98,10 +98,6 @@ function World({ reduced, onReady }: { reduced: boolean; onReady: () => void }) 
     gl.shadowMap.autoUpdate = false;
     gl.shadowMap.needsUpdate = true;
   }, [gl, mobile, onReady]);
-  useFrame(() => {
-    gl.domElement.dataset.titleCalls = String(gl.info.render.calls);
-    gl.domElement.dataset.titleTriangles = String(gl.info.render.triangles);
-  });
   const cat = path[0], fish = path[4];
   return <>
     <FitCamera mobile={mobile} />

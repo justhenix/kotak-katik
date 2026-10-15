@@ -10,22 +10,23 @@ const labels: Record<CommandType, string> = { forward: 'Maju', 'turn-left': 'Kir
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
 type Press = (control: Locator) => Promise<void>;
 
-async function replaceProgram(page: Page, starter: Program, solution: Program, press: Press) {
-  for (let index = starter.length - 1; index >= 0; index--) {
-    const command = starter[index];
-    const label = command.type === 'repeat' ? `Ulangi ${index + 1}` : `perintah ${index + 1}: ${labels[command.type]}`;
-    await press(button(page, `Pilih ${label}`));
-    if (command.type === 'repeat') await press(button(page, 'Pilihan Ulangi'));
-    await press(button(page, `Hapus ${label}`));
-  }
+async function completeProgram(page: Page, starter: Program, solution: Program, press: Press) {
   for (const [index, command] of solution.entries()) {
-    await press(button(page, `Tambah di posisi ${index + 1}`));
-    await press(button(page, `Tambah ${labels[command.type]}`));
+    const prepared = starter[index];
+    if (prepared) expect(prepared.type).toBe(command.type);
+    else {
+      await press(button(page, `Tambah di posisi ${index + 1}`));
+      await press(button(page, `Tambah ${labels[command.type]}`));
+    }
     if (command.type === 'repeat') {
       await press(button(page, `Pilih Ulangi ${index + 1}`));
       await setRepeatCount(page, index, command.count, press);
+      const preparedBody = prepared?.type === 'repeat' ? prepared.commands : [];
+      expect(command.commands.slice(0, preparedBody.length)).toEqual(preparedBody);
+      if (preparedBody.length === command.commands.length) continue;
       await press(button(page, `Edit isi Ulangi ${index + 1}`));
       for (const [bodyIndex, child] of command.commands.entries()) {
+        if (bodyIndex < preparedBody.length) continue;
         await press(button(page, `Tambah di posisi ${bodyIndex + 1} dalam Ulangi ${index + 1}`));
         await press(button(page, `Tambah ${labels[child.type]} ke Ulangi ${index + 1}`));
       }
@@ -48,7 +49,11 @@ test('new player completes all 16 stages through real navigation, editing, reloa
     if (level.learning.phase === 'demonstration') {
       await expect(page.locator('.lesson-scaffold')).toHaveAttribute('data-demo-phase', 'done', { timeout: 35000 });
     } else {
-      await replaceProgram(page, level.initialProgram, curriculumSolutions[level.id], press);
+      if (level.learning.phase === 'guided' && level.learning.guidance?.[0]?.complete.type === 'attempt') {
+        await press(button(page, 'Jalankan'));
+        await expect(page.locator('.feedback')).toHaveAttribute('data-status', /failed|finished/);
+      }
+      await completeProgram(page, level.initialProgram, curriculumSolutions[level.id], press);
       await press(button(page, 'Jalankan'));
     }
     await expect(page.locator('.feedback')).toHaveAttribute('data-status', 'completed');

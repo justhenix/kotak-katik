@@ -62,6 +62,9 @@ describe('authored demonstrations and linear lesson progression', () => {
     const { game, lesson } = setup('m2-move-try');
     game.getState().addCommand('forward');
     game.getState().removeCommand(1);
+    expect(lesson.getState().guideIndex).toBe(1);
+    expect(game.getState().program).toHaveLength(2);
+    game.withLessonActions(() => game.getState().removeCommand(1));
     expect(lesson.getState().guideIndex).toBe(0);
     expect(tutorialTarget(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState())).toEqual({ type: 'palette', command: 'forward' });
     game.getState().addCommand('forward');
@@ -69,7 +72,7 @@ describe('authored demonstrations and linear lesson progression', () => {
     const debug = setup('m2-debug-together');
     debug.game.getState().run(); vi.runAllTimers();
     debug.game.getState().addCommand('forward');
-    debug.game.getState().removeCommand(3);
+    debug.game.withLessonActions(() => debug.game.getState().removeCommand(3));
     expect(debug.lesson.getState().guideIndex).toBe(1);
     expect(debug.lesson.getState().observedAttempt).toBe(true);
   });
@@ -215,9 +218,9 @@ describe('hint reveal and fading', () => {
   it('reveals a relative-turn cue after the matching action and removes a stale pose', () => {
     const { game, lesson } = setup('m2-right-together');
     expect(lesson.getState().revealed).toEqual([]);
-    game.getState().step();
+    game.withLessonActions(() => game.getState().step());
     expect(lesson.getState().revealed).toContain('cat-right');
-    game.getState().resetSimulation();
+    game.withLessonActions(() => game.getState().resetSimulation());
     expect(visibleHints(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState().revealed).map((hint) => hint.id)).not.toContain('cat-right');
     lesson.getState().showHint();
     expect(lesson.getState().revealed).toContain('continue-turn');
@@ -226,14 +229,14 @@ describe('hint reveal and fading', () => {
     const { game, lesson } = setup('m2-debug-watch');
     lesson.getState().showHint();
     expect(lesson.getState().revealed).toEqual([]);
-    game.getState().step(); game.getState().step();
+    game.withLessonActions(() => { game.getState().step(); game.getState().step(); });
     expect(lesson.getState().revealed).toEqual([]);
-    game.getState().step();
+    game.withLessonActions(() => game.getState().step());
     expect(game.getState().simulation.status).toBe('failed');
     expect(lesson.getState().revealed).toEqual(['observe-route', 'inspect-turn']);
-    game.getState().resetSimulation();
+    game.withLessonActions(() => game.getState().resetSimulation());
     expect(lesson.getState().observedAttempt).toBe(true);
-    game.getState().replaceCommand(1, 'turn-left');
+    game.withLessonActions(() => game.getState().replaceCommand(1, 'turn-left'));
     expect(visibleHints(game.getState().level, game.getState().program, game.getState().simulation, lesson.getState().revealed).map((hint) => hint.id)).not.toContain('inspect-turn');
     lesson.getState().resetLesson();
     expect(lesson.getState().observedAttempt).toBe(false);
